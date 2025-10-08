@@ -3,17 +3,22 @@ import StyledDropzone from './DropZone'
 
 function SideMenu({ title = "Parameters", leftButton = "Close", rightButton = "Calculate"}) {
     return(
-        <div className="flex flex-col py-6 rounded-l-3xl px-4 gap-5 lg:w-1/4 md:w-1/2 absolute drop-shadow right-0 bg-[#F8F8F8]">
+        <div className="flex flex-col py-6 rounded-l-3xl px-4 gap-7 lg:w-1/4 md:w-1/2 absolute drop-shadow right-0 bg-[#F8F8F8]">
+            <div className='flex flex-row justify-between'>
             <h1 className="font-bold text-4xl">{title}</h1>
+            <button className='pt-2 justify-center items-center'>
+                <svg width="30px" height="30px" strokeWidth={1.5} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000"><path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="#000000" strokeWidth={1.5} strokeLinecap='round' strokeLinejoin='round'></path><path d="M19.6224 10.3954L18.5247 7.7448L20 6L18 4L16.2647 5.48295L13.5578 4.36974L12.9353 2H10.981L10.3491 4.40113L7.70441 5.51596L6 4L4 6L5.45337 7.78885L4.3725 10.4463L2 11V13L4.40111 13.6555L5.51575 16.2997L4 18L6 20L7.79116 18.5403L10.397 19.6123L11 22H13L13.6045 19.6132L16.2551 18.5155C16.6969 18.8313 18 20 18 20L20 18L18.5159 16.2494L19.6139 13.598L21.9999 12.9772L22 11L19.6224 10.3954Z" stroke="#000000" strokeWidth={1.5} strokeLinecap='round' strokeLinejoin='round'></path></svg>
+            </button>
+            </div>
             <div className="flex flex-col drop-shadow py-6 px-8 bg-white rounded-2xl">
                 <form className='flex flex-col gap-4 w-full h-full'>
                     <div>
                         <label htmlFor="city" >City</label><br/>
-                        <input className='border-1 shadow-md border-[#808080] w-full rounded-[7px]' type="int" id="city"></input><br/>
+                        <input className=' px-2 py-0.5 hover:border-[#006FAA] focus:ring-1 focus:outline-none focus:ring-[#006FAA] border shadow-md border-[#808080] w-full rounded-[7px]' type="text" id="city"></input><br/>
                     </div>
                     <div>
                         <label htmlFor="power" >Maximum PV power (KWP)</label><br/>
-                        <input className='border-1 shadow-md border-[#808080] w-full rounded-[7px]' type="int" id="power"></input><br/>
+                        <input className=' px-2 py-0.5 hover:border-[#006FAA] focus:ring-1 focus:outline-none focus:ring-[#006FAA] border shadow-md border-[#808080] w-full rounded-[7px]' type="text" id="power"></input><br/>
                     </div>
                 <div>
                     <label htmlFor="file" >Upload demand profile</label><br/>
