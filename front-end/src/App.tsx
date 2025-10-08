@@ -1,14 +1,27 @@
-import './App.css'
-// import FiberScene from './trying'
+import { useState, useRef } from 'react'
+import { CSSTransition } from 'react-transition-group'
 import SideMenu from './SideMenu'
-// import StyledDropzone from './DropZone'
+import './App.css'
 
 function App() {
+  const [showSideMenu, setShowSideMenu] = useState(false)
+  const nodeRef = useRef<HTMLDivElement>(null)
+
   return (
     <>
-    {/* <FiberScene/> */}
-    {/* <StyledDropzone /> */}
-    <SideMenu/>
+      <div onClick={() => setShowSideMenu(!showSideMenu)}>
+        CLICK ME!
+      </div>
+
+      <CSSTransition
+        in={showSideMenu}
+        timeout={150}
+        classNames="slide-fade"
+        unmountOnExit
+        nodeRef={nodeRef}
+      >
+        <SideMenu nodeRef={nodeRef} />
+      </CSSTransition>
     </>
   )
 }

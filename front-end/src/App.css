@@ -1,1 +1,20 @@
 @import "tailwindcss";
+.slide-fade-enter {
+  transform: translateX(100%);
+  opacity: 0;
+}
+.slide-fade-enter-active {
+  transform: translateX(0);
+  opacity: 1;
+  transition: all 150ms ease-in-out;
+}
+
+.slide-fade-exit {
+  transform: translateX(0);
+  opacity: 1;
+}
+.slide-fade-exit-active {
+  transform: translateX(100%);
+  opacity: 0;
+  transition: all 150ms ease-in-out;
+}
