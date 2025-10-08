@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import StyledDropzone from './DropZone'
 
 function SideMenu({ title = "Parameters", leftButton = "Close", rightButton = "Calculate"}) {
     return(
@@ -7,29 +8,17 @@ function SideMenu({ title = "Parameters", leftButton = "Close", rightButton = "C
             <div className="flex flex-col drop-shadow py-6 px-8 bg-white rounded-2xl">
                 <form className='flex flex-col gap-4 w-full h-full'>
                     <div>
-                        <label htmlFor="latitude" >Latitude</label><br/>
-                        <input className='border-1 border-[#808080] w-full rounded-[7px]' type="int" id="latitude"></input><br/>
+                        <label htmlFor="city" >City</label><br/>
+                        <input className='border-1 border-[#808080] w-full rounded-[7px]' type="int" id="city"></input><br/>
                     </div>
                     <div>
-                        <label htmlFor="latitude" >Latitude</label><br/>
-                        <input className='border-1 border-[#808080] w-full rounded-[7px]' type="int" id="latitude"></input><br/>
+                        <label htmlFor="power" >Maximum PV power (KWP)</label><br/>
+                        <input className='border-1 border-[#808080] w-full rounded-[7px]' type="int" id="power"></input><br/>
                     </div>
-                    <div>
-                        <label htmlFor="latitude" >Latitude</label><br/>
-                        <input className='border-1 border-[#808080] w-full rounded-[7px]' type="int" id="latitude"></input><br/>
-                    </div>
-                     <div>
-                        <label htmlFor="latitude" >Latitude</label><br/>
-                        <input className='border-1 border-[#808080] w-full rounded-[7px]' type="int" id="latitude"></input><br/>
-                    </div>
-                     <div>
-                        <label htmlFor="latitude" >Latitude</label><br/>
-                        <input className='border-1 border-[#808080] w-full rounded-[7px]' type="int" id="latitude"></input><br/>
-                    </div>
-                     <div>
-                        <label htmlFor="latitude" >Latitude</label><br/>
-                        <input className='border-1 border-[#808080] w-full rounded-[7px]' type="int" id="latitude"></input><br/>
-                    </div>
+                <div>
+                    <label htmlFor="file" >Upload demand profile</label><br/>
+                    <StyledDropzone/>
+                </div>
                 </form>
             </div>
             <div className="flex flex-row justify-center items-center gap-5">
