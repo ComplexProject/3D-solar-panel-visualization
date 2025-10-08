@@ -1,22 +1,6 @@
 import {useMemo} from 'react';
 import {useDropzone} from 'react-dropzone';
 
-const baseStyle: React.CSSProperties = {
-  flex: 1,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  padding: 20,
-  borderWidth: 2,
-  borderRadius: 2,
-  borderColor: '#eeeeee',
-  borderStyle: 'dashed',
-  backgroundColor: '#fafafa',
-  color: '#bdbdbd',
-  outline: 'none',
-  transition: 'border .24s ease-in-out'
-};
-
 const focusedStyle: React.CSSProperties = {
   borderColor: '#2196f3'
 };
@@ -39,7 +23,6 @@ function StyledDropzone() {
   } = useDropzone({accept: {'image/*': []}});
 
   const style = useMemo(() => ({
-    ...baseStyle,
     ...(isFocused ? focusedStyle : {}),
     ...(isDragAccept ? acceptStyle : {}),
     ...(isDragReject ? rejectStyle : {})
@@ -51,9 +34,14 @@ function StyledDropzone() {
 
   return (
     <div className="container">
-      <div {...getRootProps({style})}>
+      <div {...getRootProps({style})} className='flex flex-col justify-center items-center p-5 border-2 rounded-xl hover:cursor-pointer hover:border-[#006FAA] border-[#808080] border-dashed'>
+        <svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000"><path d="M12 22V13M12 13L15.5 16.5M12 13L8.5 16.5" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M20 17.6073C21.4937 17.0221 23 15.6889 23 13C23 9 19.6667 8 18 8C18 6 18 2 12 2C6 2 6 6 6 8C4.33333 8 1 9 1 13C1 15.6889 2.50628 17.0221 4 17.6073" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
         <input {...getInputProps()} />
-        <p>Drag 'n' drop some files here, or click to select files</p>
+        <p>Drag & Drop your file</p>
+        <p>Or</p>
+      <button className=' rounded-[10px] bg-[#D9D9D9] h-8 px-3.5 hover:cursor-pointer hover:bg-[#a8a8a8]'>
+            Browse files
+      </button>
       </div>
     </div>
   );
