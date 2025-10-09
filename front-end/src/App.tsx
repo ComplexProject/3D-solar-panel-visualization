@@ -7,6 +7,10 @@ function App() {
   const [showSideMenu, setShowSideMenu] = useState(false)
   const nodeRef = useRef<HTMLDivElement>(null)
 
+  const closeSideMenu = () => {
+    setShowSideMenu(false)
+  }
+
   return (
     <>
       <div onClick={() => setShowSideMenu(!showSideMenu)}>
@@ -20,7 +24,7 @@ function App() {
         unmountOnExit
         nodeRef={nodeRef}
       >
-        <SideMenu nodeRef={nodeRef} />
+        <SideMenu nodeRef={nodeRef} onClick={closeSideMenu}/>
       </CSSTransition>
     </>
   )

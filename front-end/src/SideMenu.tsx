@@ -4,11 +4,12 @@ import ParameterForm from './ParametersForm';
 import AdvancedSettings from './AdvancedSettings';
 import FormButton from './FormButton';
 
-interface SideMenuProps {
+type SideMenuProps =  {
   nodeRef: RefObject<HTMLDivElement | null>;
+  onClick?: () => void;
 }
 
-function SideMenu({nodeRef} : SideMenuProps) {
+function SideMenu({nodeRef, onClick} : SideMenuProps) {
     const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
 
     return (
@@ -31,7 +32,7 @@ function SideMenu({nodeRef} : SideMenuProps) {
                 {showAdvancedSettings ? <AdvancedSettings /> : <ParameterForm />}
             </div>
             <div className="flex flex-row justify-center items-center gap-5 px-5">
-                {showAdvancedSettings ? <FormButton buttonText='Go back' isClosingButton={true} onClick={() => setShowAdvancedSettings(false)}/> : <FormButton buttonText='Close' isClosingButton={true}/>}
+                {showAdvancedSettings ? <FormButton buttonText='Go back' isClosingButton={true} onClick={() => setShowAdvancedSettings(false)}/> : <FormButton buttonText='Close' isClosingButton={true} onClick={onClick}/>}
                 {showAdvancedSettings ? <FormButton buttonText='Save'/> : <FormButton buttonText='Calculate'/>}
             </div>
         </div>
