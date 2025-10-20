@@ -23,16 +23,6 @@ app.add_middleware(
 
 API_PORT = os.getenv("API_PORT", 1000)
 
-
-
-def post_request(url: str, payload: dict):
-    response = requests.post(url, json=payload)
-    response.raise_for_status()
-    return response
-
-import os
-import requests
-
 def post_file_to_saveData(file_path: str, azimuth_res=1, slope_res=1):
     endpoint = "http://savedata:8505/saveDataFile"
     with open(file_path, "rb") as f:
