@@ -1,7 +1,9 @@
 {
   "devDependencies": {
+    "@types/prop-types": "^15.7.15",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.1",
+    "@types/react-transition-group": "^4.4.12",
     "@vitejs/plugin-react": "^5.0.4",
     "babel-plugin-react-compiler": "^19.1.0-rc.3",
     "vite": "^7.1.9"
@@ -11,9 +13,14 @@
   },
   "dependencies": {
     "@react-three/fiber": "^9.3.0",
+    "@tailwindcss/vite": "^4.1.14",
     "@types/three": "^0.180.0",
+    "prop-types": "^15.8.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-dropzone": "^14.3.8",
+    "react-transition-group": "^4.4.5",
+    "tailwindcss": "^4.1.14",
     "three": "^0.180.0"
   }
 }
