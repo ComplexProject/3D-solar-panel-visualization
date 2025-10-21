@@ -4,6 +4,7 @@ import { CSSTransition } from 'react-transition-group'
 import SideMenu from './SideMenu'
 import TotalEnergy from './EnergyResultsComponents/TotalEnergy'
 import UsedParameters from './EnergyResultsComponents/UsedParameters'
+import OptimalSolarPlacement from './EnergyResultsComponents/OptimalSolarPlacement'
 
 function App() {
   const [showSideMenu, setShowSideMenu] = useState(false)
@@ -36,26 +37,54 @@ function App() {
       </div>
       <div className='px-12 py-16 flex flex-col h-full w-full gap-11 bg-[#F8F8F8]'>
         <h1 className=' font-bold text-5xl'>Results</h1>
-        <div className='w-full h-full flex flex-row gap-16'>
-          <div className='bg-white p-11 gap-10 drop-shadow rounded-2xl w-full flex flex-col'>
-            <h1 className=' text-2xl font-bold'>Optimal solar placement</h1>
-            <div className='grid grid-cols-2 gap-5'>
-              <div>HI</div>
-              <div>HI</div>
-              <div>HI</div>
-              <div>HI</div>
+
+          <div className='w-full h-full flex flex-row gap-10'>
+            <div className='bg-white p-11 gap-10 drop-shadow rounded-2xl w-full flex flex-col basis-[80%]'>
+
+              <h1 className=' text-2xl font-bold'>Optimal solar placement</h1>
+              <div className='grid grid-cols-2 gap-5'>
+                <OptimalSolarPlacement />
+                <OptimalSolarPlacement />
+                <OptimalSolarPlacement />
+                <OptimalSolarPlacement />
+              </div>
             </div>
-          </div>
-          <div className='bg-white gap-10 p-11 drop-shadow rounded-2xl w-full flex flex-col'>
-            <h1 className='font-bold text-2xl'>Produced solar energy</h1>
-            <div className='flex flex-col gap-5'>
-              <div>HI</div>
-              <div>HI</div>
-              <div>HI</div>
-              <div>HI</div>
+
+            <div className='bg-white drop-shadow rounded-2xl w-full flex flex-col basis-1/3'>
+              <h1 className='font-bold text-2xl p-10'>Produced solar energy</h1>
+
+              <hr />
+
+              <div className='px-10 py-1 text-2xl'>
+                  <div className='flex justify-between py-5'>
+                    <div>PV 1</div>
+                    <div>5 kWp</div>
+                  </div>
+                  <hr />
+
+                  <div className='flex justify-between py-5'>
+                    <div>PV 1</div>
+                    <div>5 kWp</div>
+                  </div>
+                  <hr />
+
+                  <div className='flex justify-between py-5'>
+                    <div>PV 1</div>
+                    <div>5 kWp</div>
+                  </div>
+                  <hr />
+
+                  <div className='flex justify-between py-5'>
+                    <div>PV 1</div>
+                    <div>5 kWp</div>
+                  </div>
+                  <hr />
+
+              </div>
             </div>
+
           </div>
-        </div>
+
         <div className='w-full h-full flex flex-row gap-16'>
           <TotalEnergy title='Total energy demand' results={1234} />
           <TotalEnergy title='Energy from the grid' results={1234} />
