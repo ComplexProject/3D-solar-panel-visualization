@@ -4,6 +4,8 @@ import { CSSTransition } from 'react-transition-group'
 import SideMenu from './SideMenu'
 import TotalEnergy from './EnergyResultsComponents/TotalEnergy'
 import UsedParameters from './EnergyResultsComponents/UsedParameters'
+import ApiTesting from './ApiTesting'
+
 
 function App() {
   const [showSideMenu, setShowSideMenu] = useState(false)
@@ -79,7 +81,9 @@ function App() {
           </div>
         </div>
       </div>
+      <ApiTesting/>
     </>
+
   )
 }
 

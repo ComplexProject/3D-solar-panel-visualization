@@ -33,7 +33,7 @@ function SideMenu({nodeRef, onClick} : SideMenuProps) {
             </div>
             <div className="flex flex-row justify-center items-center gap-5 px-5">
                 {showAdvancedSettings ? <FormButton buttonText='Go back' isClosingButton={true} onClick={() => setShowAdvancedSettings(false)}/> : <FormButton buttonText='Close' isClosingButton={true} onClick={onClick}/>}
-                {showAdvancedSettings ? <FormButton buttonText='Save'/> : <FormButton buttonText='Calculate'/>}
+                {showAdvancedSettings ? <FormButton buttonText='Save' type='submit' form='advanced-settings-form'/> : <FormButton buttonText='Calculate' type="submit" form="parameter-form"/>}
             </div>
         </div>
     );
