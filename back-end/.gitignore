@@ -1,0 +1,5 @@
+*.mat
+*.pkl
+_pycache_
+octave-workspace
+.env
