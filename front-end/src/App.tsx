@@ -5,6 +5,7 @@ import SideMenu from './SideMenu'
 import TotalEnergy from './EnergyResultsComponents/TotalEnergy'
 import UsedParameters from './EnergyResultsComponents/UsedParameters'
 import OptimalSolarPlacement from './EnergyResultsComponents/OptimalSolarPlacement'
+import ProducedSolarEnergy from './EnergyResultsComponents/ProducedSolarEnergy'
 
 function App() {
   const [showSideMenu, setShowSideMenu] = useState(false)
@@ -43,43 +44,23 @@ function App() {
 
               <h1 className=' text-2xl font-bold'>Optimal solar placement</h1>
               <div className='grid grid-cols-2 gap-5'>
-                <OptimalSolarPlacement />
-                <OptimalSolarPlacement />
-                <OptimalSolarPlacement />
-                <OptimalSolarPlacement />
+                <OptimalSolarPlacement panelNumber={1} azimuth={5} slope={10} />
+                <OptimalSolarPlacement panelNumber={2} azimuth={0} slope={50} />
+                <OptimalSolarPlacement panelNumber={3} azimuth={134} slope={8} />
+                <OptimalSolarPlacement panelNumber={4} azimuth={20} slope={20} />
               </div>
             </div>
 
             <div className='bg-white drop-shadow rounded-2xl w-full flex flex-col basis-1/3'>
               <h1 className='font-bold text-2xl p-10'>Produced solar energy</h1>
 
-              <hr />
+              <hr className='border-1'/>
 
               <div className='px-10 py-1 text-2xl'>
-                  <div className='flex justify-between py-5'>
-                    <div>PV 1</div>
-                    <div>5 kWp</div>
-                  </div>
-                  <hr />
-
-                  <div className='flex justify-between py-5'>
-                    <div>PV 1</div>
-                    <div>5 kWp</div>
-                  </div>
-                  <hr />
-
-                  <div className='flex justify-between py-5'>
-                    <div>PV 1</div>
-                    <div>5 kWp</div>
-                  </div>
-                  <hr />
-
-                  <div className='flex justify-between py-5'>
-                    <div>PV 1</div>
-                    <div>5 kWp</div>
-                  </div>
-                  <hr />
-
+                <ProducedSolarEnergy panelNumber={1} producedEnergy={5}/>
+                <ProducedSolarEnergy panelNumber={2} producedEnergy={1}/>
+                <ProducedSolarEnergy panelNumber={3} producedEnergy={1}/>
+                <ProducedSolarEnergy panelNumber={4} producedEnergy={1}/>
               </div>
             </div>
 
