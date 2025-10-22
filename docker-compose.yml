@@ -6,15 +6,18 @@ services:
       context: ./front-end
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://backend:8510
     depends_on:
       - backend
+    command: ["npm", "run", "dev", "--", "--host"] 
 
   backend:
     build:
       context: ./back-end
       dockerfile: Dockerfile
     environment:
-      - VITE_API_URL=http://backend:8510
+      - ENV=development
     ports:
       - "8510:8510"
