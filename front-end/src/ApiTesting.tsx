@@ -1,4 +1,3 @@
-
 interface GeocodingResult {
   latitude: number;
   longitude: number;
@@ -11,6 +10,19 @@ interface Coordinate {
   longitude: number;
 }
 
+/**
+ * Haversine formula to calculate distance between two points
+ * And calculate the distance between 2 coordinates to see how apart they are
+ * https://www.movable-type.co.uk/scripts/latlong.html
+ * 
+ * R - the earth radius in kilometers
+ * a - square half of the length between coordinates
+ * c - angular distance in radians
+ * 
+ * @param coord1 reference coordinates
+ * @param coord2 new coordinates
+ * @returns distance between the coordinates
+ */
 function calculateDistance(coord1: Coordinate, coord2: Coordinate): number {
   const R = 6371;
   const dLat = toRadians(coord2.latitude - coord1.latitude);
