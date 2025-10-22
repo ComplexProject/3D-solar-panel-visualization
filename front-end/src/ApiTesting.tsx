@@ -1,7 +1,3 @@
-interface Coordinate {
-  latitude: number;
-  longitude: number;
-}
 
 interface GeocodingResult {
   latitude: number;
@@ -10,8 +6,13 @@ interface GeocodingResult {
   country: string;
 }
 
+interface Coordinate {
+  latitude: number;
+  longitude: number;
+}
+
 function calculateDistance(coord1: Coordinate, coord2: Coordinate): number {
-  const R = 6371; // Earth's radius in kilometers
+  const R = 6371;
   const dLat = toRadians(coord2.latitude - coord1.latitude);
   const dLon = toRadians(coord2.longitude - coord1.longitude);
 
@@ -57,14 +58,6 @@ export async function GetGeocodingData(city:string) {
     //   };
 
     //   const distance = calculateDistance(referenceCoords, newCoords);
-
-    //   if (distance <= 25) {
-    //     setMessage(`📍 Distance: ${distance.toFixed(2)} km - Use the same weather`);
-    //   } else {
-    //     setMessage(`📍 Distance: ${distance.toFixed(2)} km - Use new weather`);
-    //   }
-    // }
-
     return data[0];
   } catch (error) {
     console.error('Error:', error instanceof Error ? error.message : 'Unknown error');
