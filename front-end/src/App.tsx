@@ -53,38 +53,45 @@ function App() {
       <div className='px-12 py-16 flex flex-col h-full w-full gap-11 bg-[#F8F8F8]'>
         <h1 className='font-bold text-5xl'>Results</h1>
 
-        {dummyData && (
-          <div className='mb-6 p-4 bg-white rounded-lg drop-shadow'>
-            <h2 className='text-2xl font-bold'>Dummy Data from API:</h2>
-            <pre>{JSON.stringify(dummyData, null, 2)}</pre>
-          </div>
-        )}
-
         <div className='w-full h-full flex flex-row gap-16'>
           <div className='bg-white p-11 gap-10 drop-shadow rounded-2xl w-full flex flex-col'>
             <h1 className='text-2xl font-bold'>Optimal solar placement</h1>
             <div className='grid grid-cols-2 gap-5'>
-              <div>HI</div>
-              <div>HI</div>
-              <div>HI</div>
-              <div>HI</div>
+              {dummyData ? (
+                dummyData.solarPanels.map((panel, index) => (
+                  <div key={index} className='p-4 bg-gray-50 rounded-lg border border-gray-200'>
+                    <p><strong>Azimuth:</strong> {panel.azimuth}°</p>
+                    <p><strong>Slope:</strong> {panel.slope}°</p>
+                  </div>
+                ))
+              ) : (
+                <p>Loading panels...</p>
+              )}
             </div>
           </div>
           <div className='bg-white gap-10 p-11 drop-shadow rounded-2xl w-full flex flex-col'>
             <h1 className='font-bold text-2xl'>Produced solar energy</h1>
             <div className='flex flex-col gap-5'>
-              <div>HI</div>
-              <div>HI</div>
-              <div>HI</div>
+              <div>HI</div> 
+              <div>HI</div> 
+              <div>HI</div> 
               <div>HI</div>
             </div>
           </div>
         </div>
+
         <div className='w-full h-full flex flex-row gap-16'>
-          <TotalEnergy title='Total energy demand' results={1234} />
-          <TotalEnergy title='Energy from the grid' results={1234} />
-          <TotalEnergy title='PV Energy production' results={40} />
+          {dummyData ? (
+            <>
+              <TotalEnergy title='Total energy demand' results={dummyData.totalEnergy} />
+              <TotalEnergy title='Energy from the grid' results={dummyData.energyFromGrid} />
+              <TotalEnergy title='PV Energy production' results={dummyData.pvProduction} />
+            </>
+          ) : (
+            <p>Loading data...</p>
+          )}
         </div>
+
         <div className='bg-white w-full h-full flex flex-col p-11 gap-10 drop-shadow rounded-2xl'>
           <h1 className='text-2xl font-bold'>Used parameters</h1>
           <div className='grid grid-cols-3 gap-16'>
