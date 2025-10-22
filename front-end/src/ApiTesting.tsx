@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 interface Coordinate {
   latitude: number;
   longitude: number;
@@ -34,10 +32,6 @@ function toRadians(degrees: number): number {
 
 export async function GetGeocodingData(city:string) {
   const apiKey = import.meta.env.VITE_API_KEY;
-  // const referenceCoords: Coordinate = {
-  //   latitude: 51.4988,  // Example: Rotterdam coordinates
-  //   longitude: 4.2917
-  // };
   try {
     const response = await fetch(
       `https://api.api-ninjas.com/v1/geocoding?city=${city}&country=NL`,
