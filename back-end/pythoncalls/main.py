@@ -55,6 +55,31 @@ def getData(
     year: int
 ):
 
+    combined_file = f"combined_azires_{azimuth}_sloperes_{slope}.pkl"
+
+    # EARLY RETURN if combined file exists
+    if os.path.exists(combined_file):
+        print(f">> Combined file already exists: {combined_file}, skipping all computation.")
+        with open(combined_file, "rb") as f:
+            combined_data = pickle.load(f)
+
+        num_slopes = len(combined_data["all_Ppv_data"])
+        num_azimuths = len(combined_data["all_Ppv_data"][0])
+        all_Ppv_cell = np.empty((num_slopes, num_azimuths), dtype=object)
+        all_year_sum_numeric = np.zeros((num_slopes, num_azimuths))
+
+        for s in range(num_slopes):
+            for a in range(num_azimuths):
+                hourly = combined_data["all_Ppv_data"][s][a]
+                all_Ppv_cell[s, a] = np.asarray(hourly, dtype=float)
+                all_year_sum_numeric[s, a] = float(combined_data["all_year_sum"][s][a])
+
+        return {
+            "hourly_shape": all_Ppv_cell.shape,
+            "yearly_sum_shape": all_year_sum_numeric.shape,
+            "yearly_sum": all_year_sum_numeric.tolist(),
+        }
+
     # =========================
     # Simulation Parameters
     # =========================

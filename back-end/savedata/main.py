@@ -12,17 +12,16 @@ app = FastAPI()
 @app.post("/saveDataFile")
 async def saveDataFile(file: UploadFile = File(...), azimuth_res: int = 1, slope_res: int = 1):
     try:
-        try:
-            file_content = await file.read()
-            data = pickle.loads(file_content)
-        except Exception as e:
-            return {"status": "error", "message": f"Failed to unpickle file: {e}"}
+        # Load pickle
+        data = pickle.loads(await file.read())
 
+        # Extract arrays
         all_Ppv_data = data.get("all_Ppv_data") if isinstance(data, dict) else None
         all_year_sum = data.get("all_year_sum") if isinstance(data, dict) else None
 
-        if isinstance(data, list):
-            if all(isinstance(row, (list, np.ndarray)) for row in data):
+        # Fallback for list-only pickles
+        if all_Ppv_data is None and isinstance(data, list):
+            if all(isinstance(row, (list, np.ndarray, int, float)) for row in data):
                 all_Ppv_data = data
             else:
                 all_year_sum = data
@@ -35,19 +34,26 @@ async def saveDataFile(file: UploadFile = File(...), azimuth_res: int = 1, slope
 
         saved_files = {}
 
+        # --- Save all_Ppv_data ---
         if all_Ppv_data is not None:
-            all_Ppv_cell = np.array(all_Ppv_data, dtype=object)
+            try:
+                # Try converting to numeric array first (fastest)
+                all_Ppv_np = np.array(all_Ppv_data, dtype=np.float64)
+            except:
+                # fallback for irregular nested lists
+                all_Ppv_np = np.array(all_Ppv_data, dtype=object)
+
             mat_file_ppv = os.path.join(save_dir, f"all_Ppv_data_azires_{azimuth_res}_sloperes_{slope_res}.mat")
-            scipy.io.savemat(mat_file_ppv, {"all_Ppv_data": all_Ppv_cell}, do_compression=True)
+            scipy.io.savemat(mat_file_ppv, {"all_Ppv_data": all_Ppv_np}, do_compression=False)
             saved_files["ppv_mat"] = mat_file_ppv
 
+        # --- Save all_year_sum ---
         if all_year_sum is not None:
-            all_year_sum_numeric = np.array(all_year_sum)
+            all_year_sum_np = np.array(all_year_sum, dtype=np.float64)
             mat_file_year = os.path.join(save_dir, f"all_year_sum_azires_{azimuth_res}_sloperes_{slope_res}.mat")
-            scipy.io.savemat(mat_file_year, {"all_year_sum": all_year_sum_numeric}, do_compression=True)
+            scipy.io.savemat(mat_file_year, {"all_year_sum": all_year_sum_np}, do_compression=False)
             saved_files["year_mat"] = mat_file_year
 
-        print("> Saved .mat files:", saved_files)
         return {"status": "success", **saved_files}
 
     except Exception as e:
