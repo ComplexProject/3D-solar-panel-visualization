@@ -12,7 +12,6 @@ interface GeocodingResult {
   country: string;
 }
 
-// Haversine formula to calculate distance between two coordinates
 function calculateDistance(coord1: Coordinate, coord2: Coordinate): number {
   const R = 6371; // Earth's radius in kilometers
   const dLat = toRadians(coord2.latitude - coord1.latitude);
@@ -33,12 +32,12 @@ function toRadians(degrees: number): number {
   return degrees * (Math.PI / 180);
 }
 
-export async function GetGeocodingData(city:string,apiKey:string,setResult:any,setMessage:any) {
-  // Reference coordinates (you can set these to your current location)
-  const referenceCoords: Coordinate = {
-    latitude: 51.4988,  // Example: Rotterdam coordinates
-    longitude: 4.2917
-  };
+export async function GetGeocodingData(city:string) {
+  const apiKey = import.meta.env.VITE_API_KEY;
+  // const referenceCoords: Coordinate = {
+  //   latitude: 51.4988,  // Example: Rotterdam coordinates
+  //   longitude: 4.2917
+  // };
   try {
     const response = await fetch(
       `https://api.api-ninjas.com/v1/geocoding?city=${city}&country=NL`,
@@ -56,71 +55,24 @@ export async function GetGeocodingData(city:string,apiKey:string,setResult:any,s
     }
 
     const data: GeocodingResult[] = await response.json();
-    console.log(data);
-    setResult(data);
 
-    // Check distance for each result
-    if (data && data.length > 0) {
-      const newCoords: Coordinate = {
-        latitude: data[0].latitude,
-        longitude: data[0].longitude
-      };
+    // if (data && data.length > 0) {
+    //   const newCoords: Coordinate = {
+    //     latitude: data[0].latitude,
+    //     longitude: data[0].longitude
+    //   };
 
-      const distance = calculateDistance(referenceCoords, newCoords);
+    //   const distance = calculateDistance(referenceCoords, newCoords);
 
-      if (distance <= 25) {
-        setMessage(`📍 Distance: ${distance.toFixed(2)} km - Use the same weather`);
-      } else {
-        setMessage(`📍 Distance: ${distance.toFixed(2)} km - Use new weather`);
-      }
-    }
+    //   if (distance <= 25) {
+    //     setMessage(`📍 Distance: ${distance.toFixed(2)} km - Use the same weather`);
+    //   } else {
+    //     setMessage(`📍 Distance: ${distance.toFixed(2)} km - Use new weather`);
+    //   }
+    // }
 
-    return data;
+    return data[0];
   } catch (error) {
     console.error('Error:', error instanceof Error ? error.message : 'Unknown error');
-    setMessage('Error fetching data');
   }
 }
-
-function checkForData(result: any) {
-  if (result != null) {
-    return (
-      result && <pre>{JSON.stringify(result[0], null, 2)}</pre>
-    )
-  }
-  return (
-    <p>There's no data</p>
-  )
-}
-
-function ApiTesting() {
-  const [result, setResult] = useState<GeocodingResult[] | null>(null);
-  const [message, setMessage] = useState<string>("");
-
-  const apiKey = import.meta.env.VITE_API_KEY;
-  const city = 'Rotterdam';
-
-  return (
-    <div>
-      <h1>Geocoding Data</h1>
-      <button onClick={() => GetGeocodingData(city, apiKey, setResult, setMessage)}>Get Data</button>
-      <br />
-
-      {message && (
-        <div style={{
-          margin: '10px 0',
-          padding: '10px',
-          backgroundColor: message.includes('same weather') ? '#d4edda' : '#f8d7da',
-          border: `1px solid ${message.includes('same weather') ? '#c3e6cb' : '#f5c6cb'}`,
-          borderRadius: '4px'
-        }}>
-          <strong>{message}</strong>
-        </div>
-      )}
-      {checkForData(result)}
-    </div>
-  );
-}
-
-
-export default ApiTesting;

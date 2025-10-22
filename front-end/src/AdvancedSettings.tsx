@@ -54,11 +54,11 @@ function AdvancedSettings() {
     <form id='advanced-settings-form' onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[0.965rem] w-full h-full">
       <div>
         <label htmlFor="latitude">Latitude</label><br />
-        <input className={inputClass} type="number" id="latitude" {...register("latitude")} /><br/>
+        <input className={inputClass} type="float" id="latitude" {...register("latitude")} /><br/>
       </div>
       <div>
         <label htmlFor="longitude">Longitude</label><br />
-        <input className={inputClass} type="number" id="longitude" {...register("longitude")} /><br/>
+        <input className={inputClass} type="float" id="longitude" {...register("longitude")} /><br/>
       </div>
       <div>
         <label htmlFor="year">Year</label><br />

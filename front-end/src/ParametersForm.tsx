@@ -1,6 +1,7 @@
 import StyledDropzone from './DropZone'
 import { useForm } from 'react-hook-form'
 import { useState, useEffect } from 'react';
+import { GetGeocodingData } from './ApiTesting';
 
 const inputClass = 'px-2 py-0.5 hover:border-[#006FAA] focus:ring-1 focus:outline-none focus:ring-[#006FAA] border shadow-md border-[#808080] w-full rounded-[7px]'
 
@@ -31,10 +32,18 @@ function ParameterForm() {
         console.log(data);
     }
 
-    const handleCityBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const handleCityBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
         const cityValue = e.target.value;
         localStorage.setItem("city", JSON.stringify(cityValue));
         setFormData(prev => ({ ...prev, city: cityValue }));
+        const locationData = await GetGeocodingData(cityValue);
+        if (locationData) {
+            localStorage.setItem("latitude", JSON.stringify(locationData.latitude));
+            localStorage.setItem("longitude", JSON.stringify(locationData.longitude));
+        } else {
+            localStorage.removeItem("latitude");
+            localStorage.removeItem("longitude");
+        }
     }
 
     const handlePowerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,25 +56,11 @@ function ParameterForm() {
         <form id='parameter-form' onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4 w-full h-full'>
             <div>
                 <label htmlFor="city">City</label><br />
-                <input 
-                    className={inputClass} 
-                    type="text" 
-                    {...register("city", { 
-                        onBlur: handleCityBlur 
-                    })} 
-                    id="city"
-                /><br />
+                <input className={inputClass} type="text" {...register("city", { onBlur: handleCityBlur })} id="city"/><br />
             </div>
             <div>
                 <label htmlFor="power">Maximum PV power (kWp)</label><br />
-                <input 
-                    className={inputClass} 
-                    type="text" 
-                    {...register("power", {
-                        onChange: handlePowerChange
-                    })} 
-                    id="power"
-                /><br />
+                <input className={inputClass} type="text" {...register("power", { onChange: handlePowerChange })} id="power"/><br />
             </div>
             <div>
                 <label htmlFor="file">Upload demand profile</label><br />
