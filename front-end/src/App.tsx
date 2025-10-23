@@ -4,11 +4,18 @@ import { CSSTransition } from 'react-transition-group'
 import SideMenu from './SideMenu'
 import TotalEnergy from './EnergyResultsComponents/TotalEnergy'
 import UsedParameters from './EnergyResultsComponents/UsedParameters'
-import { getDummyData, type DummyData } from './api'
+import {getDummyData} from './api'
 
 function App() {
   const [showSideMenu, setShowSideMenu] = useState(false)
-  const [dummyData, setDummyData] = useState<DummyData | null>(null) 
+  type Panel = { azimuth: number; slope: number };
+  type DummyData = {
+    totalEnergy: number;
+    energyFromGrid: number;
+    pvProduction: number;
+    solarPanels: Panel[];
+  };
+  const [dummyData, setDummyData] = useState<DummyData | null>(null)
   const nodeRef = useRef(null)
   const pullTabRef = useRef(null)
 

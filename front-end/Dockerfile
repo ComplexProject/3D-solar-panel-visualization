@@ -1,13 +1,14 @@
-FROM node:20 AS build
+FROM python:latest
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+COPY requirements.txt ./
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
 
 COPY . .
-RUN npm run build
 
-EXPOSE 5173
+ENV PORT=8510
+EXPOSE $PORT
 
-CMD ["npm", "run", "dev"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8510", "--reload"]
