@@ -38,42 +38,39 @@ function App() {
       </div>
       <div className='px-12 py-16 flex flex-col h-full w-full gap-11 bg-[#F8F8F8]'>
         <h1 className=' font-bold text-5xl'>Results</h1>
-
           <div className='w-full h-full flex flex-row gap-10'>
-            <div className='bg-white p-11 gap-10 drop-shadow rounded-2xl w-full flex flex-col basis-[80%]'>
-
+            <div className='bg-white p-11 gap-10 drop-shadow rounded-2xl w-2/3 h-fit flex flex-col basis-[80%]'>
               <h1 className=' text-2xl font-bold'>Optimal solar placement</h1>
-              <div className='grid grid-cols-2 gap-5'>
+              <div className='grid grid-rows-2 grid-flow-col gap-10 w-full  overflow-x-auto overflow-y-visible'>
                 <OptimalSolarPlacement panelNumber={1} azimuth={5} slope={10} />
                 <OptimalSolarPlacement panelNumber={2} azimuth={0} slope={50} />
-                <OptimalSolarPlacement panelNumber={3} azimuth={134} slope={8} />
-                <OptimalSolarPlacement panelNumber={4} azimuth={20} slope={20} />
+                <OptimalSolarPlacement panelNumber={3} azimuth={15} slope={50} />
+                <OptimalSolarPlacement panelNumber={4} azimuth={25} slope={40} />
+                <OptimalSolarPlacement panelNumber={5} azimuth={70} slope={33} />
+                <OptimalSolarPlacement panelNumber={6} azimuth={5} slope={40} />
               </div>
             </div>
-
             <div className='bg-white drop-shadow rounded-2xl w-full flex flex-col basis-1/3'>
               <h1 className='font-bold text-2xl p-10'>Produced solar energy</h1>
-
               <hr className='border-1'/>
-
-              <div className='px-10 py-1 text-2xl'>
+              <div className='px-10 py-1 text-2xl divide-y divide-black max-h-[300px] overflow-auto'>
                 <ProducedSolarEnergy panelNumber={1} producedEnergy={5}/>
-                <ProducedSolarEnergy panelNumber={2} producedEnergy={1}/>
-                <ProducedSolarEnergy panelNumber={3} producedEnergy={1}/>
-                <ProducedSolarEnergy panelNumber={4} producedEnergy={1}/>
+                <ProducedSolarEnergy panelNumber={2} producedEnergy={30}/>
+                <ProducedSolarEnergy panelNumber={3} producedEnergy={60}/>
+                <ProducedSolarEnergy panelNumber={4} producedEnergy={15}/>
+                <ProducedSolarEnergy panelNumber={5} producedEnergy={37}/>
+                <ProducedSolarEnergy panelNumber={6} producedEnergy={23}/>
               </div>
             </div>
-
           </div>
-
-        <div className='w-full h-full flex flex-row gap-16'>
+        <div className='w-full h-full flex flex-row gap-10'>
           <TotalEnergy title='Total energy demand' results={1234} />
           <TotalEnergy title='Energy from the grid' results={1234} />
           <TotalEnergy title='PV Energy production' results={40} />
         </div>
         <div className='bg-white w-full h-full flex flex-col p-11 gap-10 drop-shadow rounded-2xl'>
           <h1 className=' text-2xl font-bold'>Used parameters</h1>
-          <div className='grid grid-cols-3 gap-16'>
+          <div className='grid grid-cols-3 gap-10'>
             <UsedParameters title='Latitude' parameter='51.498'/>
             <UsedParameters title='Longitude' parameter='3.618'/>
             <UsedParameters title='Slope increment' parameter='2° increment'/>

@@ -10,7 +10,6 @@ function producedSolarEnergy({panelNumber, producedEnergy}: Props) {
                 <div>PV {panelNumber}</div>
                 <div>{producedEnergy} kWp</div>
             </div>
-            <hr />
         </>
     )
 }
