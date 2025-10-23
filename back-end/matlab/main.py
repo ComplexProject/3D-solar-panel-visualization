@@ -8,9 +8,9 @@ app = FastAPI()
 
 
 @app.get("/runMatlab")
-def runMatlab(number1,number2):
+def runMatlab():
     result = subprocess.run(
-        ["octave", "add_numbers.m",number1,number2], 
+        ["octave", "add_numbers.m","Pd.mat","all_ppv.mat"], 
         capture_output=True, 
         text=True)
     print(result.stdout)

@@ -1,11 +1,17 @@
 args = argv(); 
 
-if numel(args) < 2
-    error('You must provide two numbers, e.g., octave add_numbers.m 3 5');
-end
+pd_filename = args{1};
+all_ppv_data_filename = args{2};
 
-x = str2double(args{1});
-y = str2double(args{2});
-z = x + y;
 
-printf('Added together %g and %g equals %g\n', x, y, z);
+pd_data = load(pd_filename);
+pd_vars = fieldnames(pd_data);
+Pd = pd_data.(pd_vars{1}); 
+Pd_initial = Pd;  
+
+% Load second file
+ppv_data = load(all_ppv_data_filename);
+ppv_vars = fieldnames(ppv_data);
+all_Ppv_data = ppv_data.(ppv_vars{1});  
+
+

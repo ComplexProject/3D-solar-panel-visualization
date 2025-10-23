@@ -10,18 +10,21 @@
 
 args = argv(); 
 
-filename = args{1};
+pd_filename = args{1};
+all_ppv_data_filename = args{2};
 
 
-data = load(filename);
+pd_data = load(pd_filename);
+pd_vars = fieldnames(pd_data);
+Pd = pd_data.(pd_vars{1}); 
+Pd_initial = Pd;  
 
-vars = fieldnames(data);
+% Load second file
+ppv_data = load(all_ppv_data_filename);
+ppv_vars = fieldnames(ppv_data);
+all_Ppv_data = ppv_data.(ppv_vars{1});  
 
-varName = vars{1};
-Pd = data.(varName);
 
-
-Pd_initial = Pd;
 
 
 
