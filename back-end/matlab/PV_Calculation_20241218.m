@@ -3,11 +3,28 @@
 % Copyrights HyMatters Research & Consultancy BV
 %
 % Daniel Hof, Bemmel, 03 December 2024
-
-if strcmp(messages, 'on')
-  disp('> Start calculations for different PV orientations ...')
-end
 %
+%
+% Added changes to make it run with other services
+% Jessica Dinova, Simon Manassé, Middelburg, 23 October 2025
+
+args = argv(); 
+
+filename = args{1};
+
+
+data = load(filename);
+
+vars = fieldnames(data);
+
+varName = vars{1};
+Pd = data.(varName);
+
+
+Pd_initial = Pd;
+
+
+
 
 % Pgrid first iterration
 sum_Pgrid_old = sum(Pd);
