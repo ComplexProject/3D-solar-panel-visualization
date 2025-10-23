@@ -2,20 +2,23 @@ import subprocess
 import uvicorn
 from fastapi import FastAPI
 import os
+import json
 
-MATLAB = int(os.getenv("MATLAB", 1000))
+MATLAB_PORT = int(os.getenv("MATLAB", 1000))
 app = FastAPI()
 
-
 @app.get("/runMatlab")
-def runMatlab():
+def runMatlab(azimuth: int, slope: int):
     result = subprocess.run(
-        ["octave", "add_numbers.m","Pd.mat","all_ppv.mat"], 
-        capture_output=True, 
-        text=True)
-    print(result.stdout)
-    return result.stdout
+        ["octave", "calculation.m", "Pd.mat", "all_ppv.mat", str(azimuth), str(slope)],
+        capture_output=True,
+        text=True
+    )
+    
+    if result.returncode != 0:
+        return {"error": result.stderr}
+    
+    return {"output": json.loads(result.stdout)}
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=MATLAB, log_level="info")
+    uvicorn.run(app, host="0.0.0.0", port=MATLAB_PORT, log_level="info")

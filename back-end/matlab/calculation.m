@@ -8,10 +8,17 @@
 % Added changes to make it run with other services
 % Jessica Dinova, Simon Manassé, Middelburg, 23 October 2025
 
+
+messages = 'on';  
+
+
+% Taking in argument from python
 args = argv(); 
 
 pd_filename = args{1};
 all_ppv_data_filename = args{2};
+azimuth = str2double(args{3});
+slope = str2double(args{4});
 
 
 pd_data = load(pd_filename);
@@ -23,6 +30,28 @@ Pd_initial = Pd;
 ppv_data = load(all_ppv_data_filename);
 ppv_vars = fieldnames(ppv_data);
 all_Ppv_data = ppv_data.(ppv_vars{1});  
+
+
+azimuth_res = azimuth;       
+slope_res = slope;
+
+% Predifined variables
+x_azimuth = -90:azimuth_res:90;
+y_slope =  0:size(all_Ppv_data, 1)-1;
+simulation_summary = zeros(400, 4);                            
+orientation_summary = zeros(400, 2);
+Pd_summary = cell(400, 1);
+electricity_costs = 0.13/1000;        
+PV_t = 20;     
+Ppv_max = 10;
+PV_cost = 1200;
+PV_capex = PV_cost * Ppv_max;
+cost_reduction =inf;
+azimuth_array = [-90:azimuth_res:90];
+slope_array = [0:slope_res:90];
+PV_distribution = zeros(length(slope_array),length(azimuth_array));
+
+
 
 
 
@@ -67,9 +96,6 @@ while cost_reduction > PV_capex            % maybe better to rename Pgrid to Pd
   % Save the demand profile inside a cell array [400 by 2]
   Pd_summary{i} = Pd;
 
-  if strcmp (messages, 'on')
-    disp(['>> Current iteration: ' num2str(i) '.   Usable energy from PV: ' num2str(Pusable/1000) ' [kWh/year].   Electricity from grid: ' num2str(sum(Pd)/1000) ' [kWh/year].'])
-  end
 
   % Increase variable for keeping track of the itteration
   i = i + 1;
@@ -99,29 +125,40 @@ Ppv_SO_percentage = 100/sum(Pd_initial)*Ppv_usable_SO_total;
 
 
 % Generate automated text which describes how much [kWp] has a given orientation
-if strcmp(messages, 'on')
+% if strcmp(messages, 'on')
 
-  disp('> Summary of all PV orientations and capacities:')
+%   disp('> Summary of all PV orientations and capacities:')
 
-  for a = 1:size(all_Ppv_data, 2)
+%   for a = 1:size(all_Ppv_data, 2)
 
+%     for s = 1:size(all_Ppv_data, 1)
+
+%       if PV_distribution(s, a) ~= 0
+%         disp(['>> ' num2str(PV_distribution(s,a)) ' kWp with ' num2str(x_azimuth(a)) '° azimuth and ' num2str(y_slope(s)) '° slope.'])
+%       end
+
+%     end
+
+%   end
+
+%   disp(['> In total ' num2str(sum(PV_distribution(:))) ' [kWp] of PV can be used effectively.'])
+
+% end
+
+fprintf('{\n');
+panel_idx = 1;
+for a = 1:size(all_Ppv_data, 2)
     for s = 1:size(all_Ppv_data, 1)
-
-      if PV_distribution(s, a) ~= 0
-        disp(['>> ' num2str(PV_distribution(s,a)) ' kWp with ' num2str(x_azimuth(a)) '° azimuth and ' num2str(y_slope(s)) '° slope.'])
-      end
-
+        if PV_distribution(s, a) ~= 0
+            fprintf('  "panel%d": {"kpw": %d, "azimuth": %d, "slope": %d}', ...
+                    panel_idx, PV_distribution(s,a), x_azimuth(a), y_slope(s));
+            if panel_idx < sum(PV_distribution(:)~=0)
+                fprintf(',\n');
+            else
+                fprintf('\n');
+            end
+            panel_idx = panel_idx + 1;
+        end
     end
-
-  end
-
-  disp(['> In total ' num2str(sum(PV_distribution(:))) ' [kWp] of PV can be used effectively.'])
-
 end
-%
-
-
-if strcmp(messages, 'on')
-  disp('> Optimalisation of PV distribution complete.')
- end
-%
+fprintf('}\n');
