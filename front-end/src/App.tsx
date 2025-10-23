@@ -34,7 +34,7 @@ function App() {
   return (
     <>
       <div className='h-screen w-full bg-red-50'>
-          <div 
+            <div 
           ref={pullTabRef} 
           className={`absolute right-0 top-1/4 h-24 flex items-center px-5 bg-[#F8F8F8] rounded-l-4xl drop-shadow cursor-pointer transition-all duration-150
             ${showSideMenu ? 'lg:w-[30%] md:w-[58%] sm:w-[60%]' : 'w-[5.5rem]'}`} 
