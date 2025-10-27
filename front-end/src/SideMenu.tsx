@@ -13,7 +13,7 @@ function SideMenu({nodeRef, onClick} : SideMenuProps) {
     const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
 
     return (
-        <div ref={nodeRef} className="flex flex-col py-6 rounded-l-3xl px-4 gap-5 lg:w-1/4 md:w-1/2 sm:w-1/2 relative drop-shadow bg-[#F8F8F8]">
+        <div ref={nodeRef} className="flex z-40 flex-col py-6 rounded-l-3xl px-4 gap-5 lg:w-1/4 md:w-1/2 sm:w-1/2 relative drop-shadow bg-[#F8F8F8]">
             <div className='flex flex-row justify-between'>
                 <h1 className="font-bold text-3xl">{showAdvancedSettings ? "Advanced settings" : "Parameters"}</h1>
                  <button className='pt-2 justify-center items-center hover:scale-105 hover:cursor-pointer'
