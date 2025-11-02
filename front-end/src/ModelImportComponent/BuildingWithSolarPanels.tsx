@@ -41,7 +41,7 @@ function pickRoofTop(root: Object3D | null): Object3D | null {
     const normals = o.geometry.getAttribute("normal")
     if (!normals) return
 
-    // how much the normals point upward on average.
+    // Measures how strongly the surface normals point upward on average.
     nmat.getNormalMatrix(o.matrixWorld)
     let upness = 0
     const step = Math.max(1, Math.floor(normals.count / 2000)) 
@@ -50,7 +50,7 @@ function pickRoofTop(root: Object3D | null): Object3D | null {
       upness += Math.max(0, n.dot(up))
     }
 
-    // Favor larger flat-ish areas near the top.
+    // Favor larger flat areas near the top.
     const areaXZ = Math.max(1e-6, (box.max.x - box.min.x) * (box.max.z - box.min.z))
     const score = upness * areaXZ
     if (score > best.score) best = { mesh: o, score }
@@ -61,7 +61,7 @@ function pickRoofTop(root: Object3D | null): Object3D | null {
 
 // 
 // Load the panel once and extract:
-// - panel width (X), depth (Z), and the "thin axis" (tAxis) used to align to roof normals.
+// panel width (X), depth (Z), and the "thin axis" (tAxis) used to align to roof normals.
 // 
 function usePanelFootprint(url: string) {
   const gltf = useGLTF(url) as any
@@ -74,7 +74,7 @@ function usePanelFootprint(url: string) {
     const box = new Box3().setFromObject(mesh)
     const size = box.getSize(new Vector3())
 
-    // We consider the SMALLEST model dimension as the "thin axis".
+    // consider the SMALLEST model dimension as the "thin axis".
     // Panels are flat, so that axis should align with a roof normal after rotation.
     const dims: [number, number, number] = [size.x, size.y, size.z]
     const minIdx = dims.indexOf(Math.min(...dims))
@@ -87,7 +87,7 @@ function usePanelFootprint(url: string) {
       widthX: Math.max(1e-6, size.x),
       depthZ: Math.max(1e-6, size.z),
       tAxis,            // local "thin axis" used for alignment
-      minY: box.min.y,  // used to float the panel just above the roof (prevents clipping)
+      minY: box.min.y,  // used to float the panel just above the roof
     }
   }, [gltf])
 }
@@ -138,14 +138,14 @@ export default function BuildingWithSolarPanels() {
       rows = Math.max(1, FIXED_ROWS)
       
     } else {
-      // AUTO FIT: choose scale so we can fit TARGET_ACROSS panels across the long side.
+      // autofit it to choose scale so we can fit TARGET_ACROSS panels across the long side.
       const T = Math.max(1, Math.floor(TARGET_ACROSS))
-      let s = acrossSpan / (T * baseAcross)     // scale needed to reach T across
-      if (!UPSCALE_PANELS) s = Math.min(1, s)   // optional clamp: never enlarge
-      s = Math.max(0.001, s)                    // avoid zero/negatives
+      let s = acrossSpan / (T * baseAcross)     // compute the scale factor needed so this object spans the target length T.
+      if (!UPSCALE_PANELS) s = Math.min(1, s)   // optionally clamp the computed scale to [MinScale, MaxScale] to limit extremes.
+      s = Math.max(0.001, s)                    // ensure the scale is > 0 to avoid degenerates (replace zeros/negatives with a small epsilon).
       scale = [Math.abs(BASE_PANEL_SCALE[0]) * s, BASE_PANEL_SCALE[1], Math.abs(BASE_PANEL_SCALE[2]) * s]
 
-      // Effective panel size *after* the chosen scale.
+      // Effective panel size after the chosen scale.
       const effX = panel.widthX * scale[0]
       const effZ = panel.depthZ * scale[2]
 
@@ -169,8 +169,10 @@ export default function BuildingWithSolarPanels() {
     const stepX = cols > 1 ? (xMax - xMin) / (cols - 1) : 0
     const stepZ = rows > 1 ? (zMax - zMin) / (rows - 1) : 0
 
-    // For each grid cell: drop a ray from above -> find roof point + normal.
-    // Then: place panel slightly above (PANEL_LIFT) and rotate so "thin axis" faces the roof normal.
+    // For each grid cell:
+    // 1) Raycast from above to find the roof hit point (hitPoint) and surface normal (hitNormal).
+    // 2) Position the panel at hitPoint + hitNormal * PANEL_LIFT.
+    // 3) Rotate the panel so its thin axis is aligned with hitNormal.
     const ray = new Raycaster()
     const modelSizeY = new Box3().setFromObject(house).getSize(new Vector3()).y
     const castHeight = modelSizeY + 10 
