@@ -1,8 +1,15 @@
 from fastapi import FastAPI
-import os
+
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 @app.get("/getDummy")
 def getDummy():
     return {"totalEnergy": 3000,
@@ -21,4 +28,4 @@ def getDummy():
 
 if __name__ == "__main__":
 	import uvicorn
-	uvicorn.run(app, host="127.0.0.1", port=8510)
+	uvicorn.run(app, host="127.0.0.1", port=8510, reload=True)
