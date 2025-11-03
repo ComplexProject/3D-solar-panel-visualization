@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8511:8511"
+    depends_on:
+      - dummydata
+
+  dummydata:
+    build: ./front-end/dummyDocker
+    expose:
+      - "8510"
