@@ -2,9 +2,9 @@ import './App.css'
 import { useState, useRef } from 'react'
 import { CSSTransition } from 'react-transition-group'
 import SideMenu from './SideMenu'
-import TotalEnergy from './EnergyResultsComponents/TotalEnergy'
-import UsedParameters from './EnergyResultsComponents/UsedParameters'
-import { Settings, FastArrowLeft, IconoirProvider } from 'iconoir-react';
+import TotalEnergy from './energyResultsComponents/TotalEnergy'
+import UsedParameters from './energyResultsComponents/UsedParameters'
+import { FastArrowLeft, IconoirProvider } from 'iconoir-react';
 
 function App() {
   const [showSideMenu, setShowSideMenu] = useState(false)

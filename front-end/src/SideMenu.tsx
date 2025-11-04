@@ -1,13 +1,23 @@
 import { useState } from 'react';
 import type { RefObject } from 'react';
-import ParameterForm from './ParametersForm';
-import AdvancedSettings from './AdvancedSettings';
-import FormButton from './FormButton';
+import ParameterForm from './formComponents/ParametersForm';
+import AdvancedSettings from './formComponents/AdvancedSettings';
+import FormButton from './formComponents/FormButton';
 import { Settings, Xmark, IconoirProvider } from 'iconoir-react';
+import { sendFormData } from './utils/sendFormData';
 
 type SideMenuProps = {
     nodeRef: RefObject<HTMLDivElement | null>;
     onClick?: () => void;
+}
+
+const calculate = async () => {
+    try {
+        const res = await sendFormData();
+        console.log("send", res);
+    } catch (err) {
+        console.error("error", err)
+    }
 }
 
 function SideMenu({ nodeRef, onClick }: SideMenuProps) {
@@ -37,7 +47,7 @@ function SideMenu({ nodeRef, onClick }: SideMenuProps) {
                 </div>
                 <div className="flex flex-row justify-center items-center gap-5 px-5">
                     {showAdvancedSettings ? <FormButton buttonText='Go back' isClosingButton={true} onClick={() => setShowAdvancedSettings(false)} /> : <FormButton buttonText='Close' isClosingButton={true} onClick={onClick} />}
-                    {showAdvancedSettings ? <FormButton buttonText='Save' type='submit' form='advanced-settings-form' /> : <FormButton buttonText='Calculate' type="submit" form="parameter-form" />}
+                    {showAdvancedSettings ? <FormButton buttonText='Save' type='submit' form='advanced-settings-form' /> : <FormButton buttonText='Calculate'  form="parameter-form" onClick={calculate} />}
                 </div>
             </div>
         </>
