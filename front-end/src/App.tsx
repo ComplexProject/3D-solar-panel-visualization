@@ -37,11 +37,17 @@ function App() {
         </div>
       </div>
       <div className='px-12 py-16 flex flex-col h-full w-full gap-11 bg-[#F8F8F8]'>
-        <h1 className=' font-bold text-5xl'>Results</h1>
+        <div className='flex justify-between items-center'>
+          <h1 className='font-bold text-5xl'>Results</h1>
+          <div className='flex'>
+            <h2 className='text-3xl pr-2'>Year:</h2>
+            <h2 className='text-3xl font-bold'>2024</h2>
+          </div>
+        </div>
           <div className='w-full h-full flex flex-row gap-10'>
-            <div className='bg-white p-11 gap-10 drop-shadow rounded-2xl w-2/3 h-fit flex flex-col basis-[80%]'>
+            <div className='bg-white p-10 gap-10 drop-shadow rounded-2xl w-2/3 h-fit flex flex-col min-w-0'>
               <h1 className=' text-2xl font-bold'>Optimal solar placement</h1>
-              <div className='grid grid-rows-2 grid-flow-col gap-10 w-full  overflow-x-auto overflow-y-visible'>
+              <div className='grid grid-rows-2 grid-flow-col gap-10 w-full overflow-x-auto overflow-y-visible'>
                 <OptimalSolarPlacement panelNumber={1} azimuth={5} slope={10} />
                 <OptimalSolarPlacement panelNumber={2} azimuth={0} slope={50} />
                 <OptimalSolarPlacement panelNumber={3} azimuth={15} slope={50} />
@@ -50,7 +56,7 @@ function App() {
                 <OptimalSolarPlacement panelNumber={6} azimuth={5} slope={40} />
               </div>
             </div>
-            <div className='bg-white drop-shadow rounded-2xl w-full flex flex-col basis-1/3'>
+            <div className='bg-white drop-shadow rounded-2xl flex flex-col w-1/3 min-w-0 '>
               <h1 className='font-bold text-2xl p-10'>Produced solar energy</h1>
               <hr className='border-1'/>
               <div className='px-10 py-1 text-2xl divide-y divide-black max-h-[300px] overflow-auto'>
@@ -62,11 +68,16 @@ function App() {
                 <ProducedSolarEnergy panelNumber={6} producedEnergy={23}/>
               </div>
             </div>
+            
           </div>
         <div className='w-full h-full flex flex-row gap-10'>
-          <TotalEnergy title='Total energy demand' results={1234} />
-          <TotalEnergy title='Energy from the grid' results={1234} />
-          <TotalEnergy title='PV Energy production' results={40} />
+          <div className='flex w-2/3 gap-10'>
+            <TotalEnergy title='Total energy demand' results={1234} />
+            <TotalEnergy title='Energy from the grid' results={1234} />
+          </div>
+          <div className='w-1/3'>
+            <TotalEnergy title='PV Energy production' results={40} />
+          </div>
         </div>
         <div className='bg-white w-full h-full flex flex-col p-11 gap-10 drop-shadow rounded-2xl'>
           <h1 className=' text-2xl font-bold'>Used parameters</h1>
