@@ -1,6 +1,4 @@
 *.mat
 *.pkl
-*/_pycache_
 octave-workspace
 .env
-__pycache__

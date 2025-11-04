@@ -106,7 +106,6 @@ async def saveDataFile(file: UploadFile = File(...), azimuth_res: int = 1, slope
 def getData(
     azimuth: int,
     slope: int,
-    ppv_max: int,
     latit: float,
     longit: float,
     year: int
