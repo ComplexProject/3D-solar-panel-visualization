@@ -71,7 +71,7 @@ def save_pv_and_year(all_Ppv_data, all_year_sum, azimuth, slope, save_dir="data"
 # ------------------------
 def post_file_to_saveData(file_path: str, azimuth_res=1, slope_res=1):
     endpoint = "http://savedata:8505/saveDataFile"
-    with open(file_path, "rb") as f:
+    with open(f"data/{file_path}", "rb") as f:
         files = {"file": (os.path.basename(file_path), f, "application/octet-stream")}
         params = {"azimuth_res": azimuth_res, "slope_res": slope_res}
         response = requests.post(endpoint, files=files, params=params)
@@ -215,7 +215,7 @@ def getData(
         pickle.dump(combined_data, f)
 
     save_pv_and_year(all_Ppv_data, all_year_sum, azimuth, slope)
-    post_file_to_saveData(combined_file, azimuth_res=azimuth, slope_res=slope)
+    post_file_to_saveData(f"all_Ppv_data_azires_{azimuth}_sloperes_{slope}.mat", azimuth_res=azimuth, slope_res=slope)
 
     # Return shapes for verification
     all_Ppv_cell = np.empty((num_slopes, num_azimuths), dtype=object)
