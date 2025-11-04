@@ -1,19 +1,36 @@
 import './App.css'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { CSSTransition } from 'react-transition-group'
 import SideMenu from './SideMenu'
 import TotalEnergy from './energyResultsComponents/TotalEnergy'
 import UsedParameters from './energyResultsComponents/UsedParameters'
 import { FastArrowLeft, IconoirProvider } from 'iconoir-react';
+import {getDummyData} from './api'
 
 function App() {
   const [showSideMenu, setShowSideMenu] = useState(false)
+  type Panel = { azimuth: number; slope: number };
+  type DummyData = {
+    totalEnergy: number;
+    energyFromGrid: number;
+    pvProduction: number;
+    solarPanels: Panel[];
+  };
+  const [dummyData, setDummyData] = useState<DummyData | null>(null)
   const nodeRef = useRef(null)
   const pullTabRef = useRef(null)
 
   const closeSideMenu = () => {
     setShowSideMenu(false)
   }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getDummyData()
+      setDummyData(data)
+    }
+    fetchData()
+  }, [])
 
   return (
     <>
@@ -53,10 +70,16 @@ function App() {
           <div className='bg-white p-11 gap-10 drop-shadow rounded-2xl w-full flex flex-col'>
             <h1 className=' text-2xl font-bold'>Optimal solar placement</h1>
             <div className='grid grid-cols-2 gap-5'>
-              <div>HI</div>
-              <div>HI</div>
-              <div>HI</div>
-              <div>HI</div>
+              {dummyData ? (
+                dummyData.solarPanels.map((panel, index) => (
+                  <div key={index} className='p-4 bg-gray-50 rounded-lg border border-gray-200'>
+                    <p><strong>Azimuth:</strong> {panel.azimuth}°</p>
+                    <p><strong>Slope:</strong> {panel.slope}°</p>
+                  </div>
+                ))
+              ) : (
+                <p>Loading panels...</p>
+              )}
             </div>
           </div>
           <div className='bg-white gap-10 p-11 drop-shadow rounded-2xl w-full flex flex-col'>
@@ -69,11 +92,19 @@ function App() {
             </div>
           </div>
         </div>
+
         <div className='w-full h-full flex flex-row gap-16'>
-          <TotalEnergy title='Total energy demand' results={1234} />
-          <TotalEnergy title='Energy from the grid' results={1234} />
-          <TotalEnergy title='PV Energy production' results={40} />
+          {dummyData ? (
+            <>
+              <TotalEnergy title='Total energy demand' results={dummyData.totalEnergy} />
+              <TotalEnergy title='Energy from the grid' results={dummyData.energyFromGrid} />
+              <TotalEnergy title='PV Energy production' results={dummyData.pvProduction} />
+            </>
+          ) : (
+            <p>Loading data...</p>
+          )}
         </div>
+
         <div className='bg-white w-full h-full flex flex-col p-11 gap-10 drop-shadow rounded-2xl'>
           <h1 className=' text-2xl font-bold'>Used parameters</h1>
           <div className='grid grid-cols-3 gap-16'>
