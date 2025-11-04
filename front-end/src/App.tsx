@@ -8,7 +8,6 @@ import OptimalSolarPlacement from './EnergyResultsComponents/OptimalSolarPlaceme
 import ProducedSolarEnergy from './EnergyResultsComponents/ProducedSolarEnergy'
 import {getDummyData} from './api'
 
-
 function App() {
   const [showSideMenu, setShowSideMenu] = useState(false)
   type Panel = { azimuth: number; slope: number };
@@ -61,7 +60,6 @@ function App() {
         </div>
       </div>
       <div className='px-12 py-16 flex flex-col h-full w-full gap-11 bg-[#F8F8F8]'>
-
         <div className='flex justify-between items-center'>
           <h1 className='font-bold text-5xl'>Results</h1>
           <div className='flex'>
@@ -76,7 +74,7 @@ function App() {
                 {dummyData ? (
                   dummyData.solarPanels.map((panel, index) => (
                     // TODO: add key={index} to OptimalSolarPlacement component, to remove error, 
-                    // TODO: panelnumber starts counting from zero, change it so it starts counting from 1
+                    // TODO: panelnumber starts counting from zero on the page, change it so it starts counting from 1
                     <OptimalSolarPlacement panelNumber={index} azimuth={panel.azimuth} slope={panel.slope} />
                   ))
                   ) : (
@@ -88,15 +86,14 @@ function App() {
               <h1 className='font-bold text-2xl p-10'>Produced solar energy</h1>
               <hr className='border-1'/>
               <div className='px-10 py-1 text-2xl divide-y divide-black max-h-[300px] overflow-auto'>
-                <ProducedSolarEnergy panelNumber={1} producedEnergy={5}/>
-                <ProducedSolarEnergy panelNumber={2} producedEnergy={30}/>
-                <ProducedSolarEnergy panelNumber={3} producedEnergy={60}/>
-                <ProducedSolarEnergy panelNumber={4} producedEnergy={15}/>
-                <ProducedSolarEnergy panelNumber={5} producedEnergy={37}/>
-                <ProducedSolarEnergy panelNumber={6} producedEnergy={23}/>
+                <ProducedSolarEnergy panelNumber={1} producedEnergy={5} />
+                <ProducedSolarEnergy panelNumber={2} producedEnergy={30} />
+                <ProducedSolarEnergy panelNumber={3} producedEnergy={60} />
+                <ProducedSolarEnergy panelNumber={4} producedEnergy={15} />
+                <ProducedSolarEnergy panelNumber={5} producedEnergy={37} />
+                <ProducedSolarEnergy panelNumber={6} producedEnergy={23} />
               </div>
             </div>
-            
           </div>
         <div className='w-full h-full flex flex-row gap-10'>
           {dummyData ? (
