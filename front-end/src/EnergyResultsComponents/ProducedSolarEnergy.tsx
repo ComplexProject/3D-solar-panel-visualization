@@ -3,7 +3,7 @@ type Props= {
     producedEnergy: number
 }
 
-function producedSolarEnergy({panelNumber, producedEnergy}: Props) {
+function ProducedSolarEnergy({panelNumber, producedEnergy}: Props) {
     return (
         <>
             <div className='flex justify-between py-5'>
@@ -14,4 +14,4 @@ function producedSolarEnergy({panelNumber, producedEnergy}: Props) {
     )
 }
 
-export default producedSolarEnergy
+export default ProducedSolarEnergy

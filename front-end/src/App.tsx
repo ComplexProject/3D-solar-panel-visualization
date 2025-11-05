@@ -4,7 +4,7 @@ import { CSSTransition } from 'react-transition-group'
 import SideMenu from './SideMenu'
 import TotalEnergy from './EnergyResultsComponents/TotalEnergy'
 import UsedParameters from './EnergyResultsComponents/UsedParameters'
-import OptimalSolarPlacement from './EnergyResultsComponents/OptimalSolarPlacement'
+import SolarPlacementCard from './EnergyResultsComponents/SolarPlacementCard'
 import ProducedSolarEnergy from './EnergyResultsComponents/ProducedSolarEnergy'
 import {getDummyData} from './api'
 
@@ -73,9 +73,7 @@ function App() {
               <div className='grid grid-rows-2 grid-flow-col gap-10 w-full overflow-x-auto overflow-y-visible'>
                 {dummyData ? (
                   dummyData.solarPanels.map((panel, index) => (
-                    // TODO: add key={index} to OptimalSolarPlacement component, to remove error, 
-                    // TODO: panelnumber starts counting from zero on the page, change it so it starts counting from 1
-                    <OptimalSolarPlacement panelNumber={index} azimuth={panel.azimuth} slope={panel.slope} />
+                    <SolarPlacementCard key={index} panelNumber={index + 1} azimuth={panel.azimuth} slope={panel.slope} />
                   ))
                   ) : (
                     <p>Loading panels...</p>

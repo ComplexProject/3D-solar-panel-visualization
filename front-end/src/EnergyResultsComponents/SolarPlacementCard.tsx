@@ -4,7 +4,7 @@ type Props = {
     slope: number
 }
 
-function optimalSolarPlacement({panelNumber, azimuth, slope} : Props) {
+function SolarPlacementCard({panelNumber, azimuth, slope} : Props) {
     return (
         <div className='bg-[#F3F3F3] min-w-[25vw] m-1 rounded-2xl drop-shadow text-xl'>
             <div className="m-4 mx-8 font-bold">PV {panelNumber}</div>
@@ -23,4 +23,4 @@ function optimalSolarPlacement({panelNumber, azimuth, slope} : Props) {
     )
 }
 
-export default optimalSolarPlacement
+export default SolarPlacementCard
