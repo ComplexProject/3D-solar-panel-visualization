@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react';
 const inputClass = 'px-2 py-0.5 hover:border-[#006FAA] focus:ring-1 focus:outline-none focus:ring-[#006FAA] border shadow-md border-[#808080] w-full rounded-[7px]'
 
 interface FormData {
-  latitude: string;
-  longitude: string;
-  year: string;
-  azimuthIncrement: string;
-  slopeIncrement: string;
+  latitude: number;
+  longitude: number;
+  year: number;
+  azimuthIncrement: number;
+  slopeIncrement: number;
 }
 
 function AdvancedSettings() {
@@ -22,25 +22,23 @@ function AdvancedSettings() {
     const savedSlopeIncrement = localStorage.getItem("slopeIncrement");
 
     return {
-      latitude: savedLatitude ? JSON.parse(savedLatitude) : "",
-      longitude: savedLongitude ? JSON.parse(savedLongitude) : "",
-      year: savedYear ? JSON.parse(savedYear) : 2024,
-      azimuthIncrement: savedAzimuthIncrement ? JSON.parse(savedAzimuthIncrement) : 5,
-      slopeIncrement: savedSlopeIncrement ? JSON.parse(savedSlopeIncrement) : 2,
+        latitude: savedLatitude ? JSON.parse(savedLatitude) : 0,
+        longitude: savedLongitude ? JSON.parse(savedLongitude) : 0,
+        year: savedYear ? JSON.parse(savedYear) : 2024,
+        azimuthIncrement: savedAzimuthIncrement ? JSON.parse(savedAzimuthIncrement) : 5,
+        slopeIncrement: savedSlopeIncrement ? JSON.parse(savedSlopeIncrement) : 2,
     };
   });
 
   useEffect(() => {
-    setValue("latitude", formData.latitude);
-    setValue("longitude", formData.longitude);
-    setValue("year", formData.year);
-    setValue("azimuthIncrement", formData.azimuthIncrement);
-    setValue("slopeIncrement", formData.slopeIncrement);
+      setValue("latitude", formData.latitude);
+      setValue("longitude", formData.longitude);
+      setValue("year", formData.year);
+      setValue("azimuthIncrement", formData.azimuthIncrement);
+      setValue("slopeIncrement", formData.slopeIncrement);
   }, [setValue, formData]);
 
-  const onSubmit = (data: FormData) => {
-    console.log(data);
-    
+  const onSubmit = (data: FormData) => {    
     localStorage.setItem("latitude", JSON.stringify(data.latitude));
     localStorage.setItem("longitude", JSON.stringify(data.longitude));
     localStorage.setItem("year", JSON.stringify(data.year));
@@ -62,7 +60,7 @@ function AdvancedSettings() {
       </div>
       <div>
         <label htmlFor="year">Year</label><br />
-        <input className={inputClass} type="text" id="year" {...register("year")} /><br/>
+        <input className={inputClass} type="number" id="year" {...register("year")} /><br/>
       </div>
       <div>
         <label htmlFor="azimuthIncrement">Azimuth increment</label><br />

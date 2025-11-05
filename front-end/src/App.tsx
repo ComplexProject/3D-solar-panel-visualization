@@ -2,6 +2,7 @@ import './App.css'
 import { useState, useRef, useEffect } from 'react'
 import { CSSTransition } from 'react-transition-group'
 import SideMenu from './SideMenu'
+import { FastArrowLeft, IconoirProvider } from 'iconoir-react';
 import TotalEnergy from './EnergyResultsComponents/TotalEnergy'
 import UsedParameters from './EnergyResultsComponents/UsedParameters'
 import ModelViewer from './ModelImportComponent/ModelViewer'
@@ -35,17 +36,36 @@ function App() {
 
   return (
     <>
-      <div className="h-screen w-full bg-red-50 relative">
-        <div className="relative h-full w-full">
+      <div className='h-screen w-full bg-red-50'>
+          <div className="relative h-full w-full">
           <ModelViewer>
             <BuildingWithSolarPanels />
           </ModelViewer>
-          <div
-            ref={pullTabRef}
-            className={`absolute right-0 top-1/4 h-24 flex items-center px-5 bg-[#F8F8F8] rounded-l-4xl drop-shadow cursor-pointer transition-all duration-150
-        ${showSideMenu ? 'lg:w-[30%] md:w-[58%] sm:w-[60%]' : 'w-[5.5rem]'}`}
-            onClick={() => setShowSideMenu(!showSideMenu)}
-            style={{ zIndex: 20 }}
+        <div
+          ref={pullTabRef}
+          className={`absolute right-0 top-1/4 h-24 flex items-center px-5 bg-[#F8F8F8] rounded-l-4xl drop-shadow cursor-pointer transition-all duration-150
+            ${showSideMenu ? 'lg:w-[30%] md:w-[58%] sm:w-[60%]' : 'w-[5.5rem]'}`}
+          onClick={() => setShowSideMenu(!showSideMenu)}
+          style={{ zIndex: 20 }}
+        >
+          <IconoirProvider
+            iconProps={{
+              color: '#000000',
+              strokeWidth: 1.5,
+              width: '2.6rem',
+              height: '2.6rem',
+            }}
+          >
+            <FastArrowLeft />
+          </IconoirProvider>
+        </div>
+        <div className='absolute right-0 top-1/6 lg:w-1/4 md:w-1/2 sm:w-1/2 overflow-x-hidden py-1 pl-1'>
+          <CSSTransition
+            in={showSideMenu}
+            timeout={150}
+            classNames="sideMenuSlide"
+            unmountOnExit
+            nodeRef={nodeRef}
           >
             <svg width="42px" height="42px" viewBox="0 0 24 24" strokeWidth="1.5" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000">
               <path d="M11 6L5 12L11 18" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>

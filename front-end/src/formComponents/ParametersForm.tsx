@@ -1,36 +1,32 @@
 import StyledDropzone from './DropZone'
 import { useForm } from 'react-hook-form'
 import { useState, useEffect } from 'react';
-import { GetGeocodingData } from './ApiTesting';
+import { GetGeocodingData } from '../utils/apiTesting';
 
 const inputClass = 'px-2 py-0.5 hover:border-[#006FAA] focus:ring-1 focus:outline-none focus:ring-[#006FAA] border shadow-md border-[#808080] w-full rounded-[7px]'
 
 interface FormData {
   city: string;
-  power: string;
+  power: number;
 }
 
 function ParameterForm() {
-    const { register, handleSubmit, setValue } = useForm<FormData>();
+    const { register, setValue } = useForm<FormData>();
     
     const [formData, setFormData] = useState<FormData>(() => {
         const savedCity = localStorage.getItem("city");
         const savedPower = localStorage.getItem("power");
         
         return {
-            city: savedCity ? JSON.parse(savedCity) : "",
-            power: savedPower ? JSON.parse(savedPower) : "",
-        };
+        city: savedCity ? JSON.parse(savedCity) : undefined,
+        power: savedPower ? JSON.parse(savedPower) : undefined,
+    };
     });
 
     useEffect(() => {
         setValue("city", formData.city);
         setValue("power", formData.power);
     }, [setValue, formData]);
-
-    const onSubmit = (data: FormData) => {
-        console.log(data);
-    }
 
     const handleCityBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
         const cityValue = e.target.value;
@@ -47,20 +43,21 @@ function ParameterForm() {
     }
 
     const handlePowerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const powerValue = e.target.value;
-        localStorage.setItem("power", JSON.stringify(powerValue));
-        setFormData(prev => ({ ...prev, power: powerValue }));
+        const value = e.target.value;
+        const powerNumber = value === "" ? 0 : parseFloat(value);
+        localStorage.setItem("power", JSON.stringify(powerNumber));
+        setFormData(prev => ({ ...prev, power: powerNumber }));
     }
 
     return(
-        <form id='parameter-form' onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4 w-full h-full'>
+        <form id='parameter-form'  className='flex flex-col gap-4 w-full h-full'>
             <div>
                 <label htmlFor="city">City</label><br />
                 <input className={inputClass} type="text" {...register("city", { onBlur: handleCityBlur })} id="city"/><br />
             </div>
             <div>
                 <label htmlFor="power">Maximum PV power (kWp)</label><br />
-                <input className={inputClass} type="text" {...register("power", { onChange: handlePowerChange })} id="power"/><br />
+                <input className={inputClass} type="number" step={0.1} {...register("power", { onChange: handlePowerChange })} id="power"/><br />
             </div>
             <div>
                 <label htmlFor="file">Upload demand profile</label><br />
