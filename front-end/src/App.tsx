@@ -2,9 +2,11 @@ import './App.css'
 import { useState, useRef, useEffect } from 'react'
 import { CSSTransition } from 'react-transition-group'
 import SideMenu from './SideMenu'
-import { FastArrowLeft, IconoirProvider } from 'iconoir-react';
 import TotalEnergy from './energyResultsComponents/TotalEnergy'
 import UsedParameters from './energyResultsComponents/UsedParameters'
+import SolarPlacementCard from './energyResultsComponents/SolarPlacementCard'
+import ProducedSolarEnergy from './energyResultsComponents/ProducedSolarEnergy'
+import { FastArrowLeft, IconoirProvider } from 'iconoir-react';
 import ModelViewer from './ModelImportComponent/ModelViewer'
 import BuildingWithSolarPanels from './ModelImportComponent/BuildingWithSolarPanels'
 import { getDummyData } from './api'
@@ -74,60 +76,67 @@ function App() {
       </div>
 
       <div className='px-12 py-16 flex flex-col h-full w-full gap-11 bg-[#F8F8F8]'>
-        <h1 className=' font-bold text-5xl'>Results</h1>
-        <div className='w-full h-full flex flex-row gap-16'>
-          <div className='bg-white p-11 gap-10 drop-shadow rounded-2xl w-full flex flex-col'>
-            <h1 className=' text-2xl font-bold'>Optimal solar placement</h1>
-            <div className='grid grid-cols-2 gap-5'>
-              {dummyData ? (
-                dummyData.solarPanels.map((panel, index) => (
-                  <div key={index} className='p-4 bg-gray-50 rounded-lg border border-gray-200'>
-                    <p><strong>Azimuth:</strong> {panel.azimuth}°</p>
-                    <p><strong>Slope:</strong> {panel.slope}°</p>
-                  </div>
-                ))
-              ) : (
-                <p>Loading panels...</p>
-              )}
-            </div>
-          </div>
-          <div className='bg-white gap-10 p-11 drop-shadow rounded-2xl w-full flex flex-col'>
-            <h1 className='font-bold text-2xl'>Produced solar energy</h1>
-            <div className='flex flex-col gap-5'>
-              <div>HI</div>
-              <div>HI</div>
-              <div>HI</div>
-              <div>HI</div>
-            </div>
+        <div className='flex justify-between items-center'>
+          <h1 className='font-bold text-5xl'>Results</h1>
+          <div className='flex'>
+            <h2 className='text-3xl pr-2'>Year:</h2>
+            <h2 className='text-3xl font-bold'>2024</h2>
           </div>
         </div>
-
-        <div className='w-full h-full flex flex-row gap-16'>
+          <div className='w-full h-full flex flex-row gap-10'>
+            <div className='bg-white p-10 gap-10 drop-shadow rounded-2xl w-2/3 h-fit flex flex-col min-w-0'>
+              <h1 className=' text-2xl font-bold'>Optimal solar placement</h1>
+              <div className='grid grid-rows-2 grid-flow-col gap-10 w-full overflow-x-auto overflow-y-visible'>
+                {dummyData ? (
+                  dummyData.solarPanels.map((panel, index) => (
+                    <SolarPlacementCard key={index} panelNumber={index + 1} azimuth={panel.azimuth} slope={panel.slope} />
+                  ))
+                  ) : (
+                    <p>Loading panels...</p>
+                  )}
+              </div>
+            </div>
+            <div className='bg-white drop-shadow rounded-2xl flex flex-col w-1/3 min-w-0 '>
+              <h1 className='font-bold text-2xl p-10'>Produced solar energy</h1>
+              <hr className='border-1'/>
+              <div className='px-10 py-1 text-2xl divide-y divide-black max-h-[300px] overflow-auto'>
+                <ProducedSolarEnergy panelNumber={1} producedEnergy={5} />
+                <ProducedSolarEnergy panelNumber={2} producedEnergy={30} />
+                <ProducedSolarEnergy panelNumber={3} producedEnergy={60} />
+                <ProducedSolarEnergy panelNumber={4} producedEnergy={15} />
+                <ProducedSolarEnergy panelNumber={5} producedEnergy={37} />
+                <ProducedSolarEnergy panelNumber={6} producedEnergy={23} />
+              </div>
+            </div>
+          </div>
+        <div className='w-full h-full flex flex-row gap-10'>
           {dummyData ? (
             <>
-              <TotalEnergy title='Total energy demand' results={dummyData.totalEnergy} />
-              <TotalEnergy title='Energy from the grid' results={dummyData.energyFromGrid} />
-              <TotalEnergy title='PV Energy production' results={dummyData.pvProduction} />
+              <div className='flex w-2/3 gap-10'>
+                <TotalEnergy title='Total energy demand' results={dummyData.totalEnergy} />
+                <TotalEnergy title='Energy from the grid' results={dummyData.energyFromGrid} />
+              </div>
+              <div className='w-1/3'>
+                <TotalEnergy title='PV Energy production' results={dummyData.pvProduction} />
+              </div>
             </>
-          ) : (
+            ) : (
             <p>Loading data...</p>
           )}
         </div>
-
         <div className='bg-white w-full h-full flex flex-col p-11 gap-10 drop-shadow rounded-2xl'>
           <h1 className=' text-2xl font-bold'>Used parameters</h1>
-          <div className='grid grid-cols-3 gap-16'>
-            <UsedParameters title='Latitude' parameter='51.498' />
-            <UsedParameters title='Longitude' parameter='3.618' />
-            <UsedParameters title='Slope increment' parameter='2° increment' />
-            <UsedParameters title='Azimuth increment' parameter='5° increment' />
-            <UsedParameters title='PV max power' parameter='10 kWp' />
-            <UsedParameters title='PV longevity' parameter='15 years' />
+          <div className='grid grid-cols-3 gap-10'>
+            <UsedParameters title='Latitude' parameter='51.498'/>
+            <UsedParameters title='Longitude' parameter='3.618'/>
+            <UsedParameters title='Slope increment' parameter='2° increment'/>
+            <UsedParameters title='Azimuth increment' parameter='5° increment'/>
+            <UsedParameters title='PV max power' parameter='10 kWp'/>
+            <UsedParameters title='PV longevity' parameter='15 years'/>
           </div>
         </div>
       </div>
     </>
-
   )
 }
 
