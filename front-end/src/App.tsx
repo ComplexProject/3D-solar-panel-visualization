@@ -3,8 +3,8 @@ import { useState, useRef, useEffect } from 'react'
 import { CSSTransition } from 'react-transition-group'
 import SideMenu from './SideMenu'
 import { FastArrowLeft, IconoirProvider } from 'iconoir-react';
-import TotalEnergy from './EnergyResultsComponents/TotalEnergy'
-import UsedParameters from './EnergyResultsComponents/UsedParameters'
+import TotalEnergy from './energyResultsComponents/TotalEnergy'
+import UsedParameters from './energyResultsComponents/UsedParameters'
 import ModelViewer from './ModelImportComponent/ModelViewer'
 import BuildingWithSolarPanels from './ModelImportComponent/BuildingWithSolarPanels'
 import { getDummyData } from './api'
@@ -58,19 +58,6 @@ function App() {
           >
             <FastArrowLeft />
           </IconoirProvider>
-        </div>
-        <div className='absolute right-0 top-1/6 lg:w-1/4 md:w-1/2 sm:w-1/2 overflow-x-hidden py-1 pl-1'>
-          <CSSTransition
-            in={showSideMenu}
-            timeout={150}
-            classNames="sideMenuSlide"
-            unmountOnExit
-            nodeRef={nodeRef}
-          >
-            <svg width="42px" height="42px" viewBox="0 0 24 24" strokeWidth="1.5" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000">
-              <path d="M11 6L5 12L11 18" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
-              <path d="M19 6L13 12L19 18" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
-            </svg>
           </div>
           <div className={`absolute right-0 top-1/6 transition-all duration-150 ${showSideMenu ? 'lg:w-1/4 md:w-1/2 sm:w-1/2' : 'w-0'} overflow-x-hidden py-1 pl-1`} style={{ zIndex: 30 }}>
             <CSSTransition
