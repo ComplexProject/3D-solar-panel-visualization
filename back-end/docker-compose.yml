@@ -23,6 +23,17 @@ services:
       - ./savedata:/app
     networks:
       - apinetwork
+  matlab:
+    env_file:
+      - .env
+    container_name: matlab
+    build: ./matlab
+    ports:
+      - "${MATLAB}:${MATLAB}"
+    volumes:
+      - ./matlab:/app
+    networks:
+      - apinetwork
 
     
 networks:
