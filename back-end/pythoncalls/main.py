@@ -235,4 +235,5 @@ def getData(
 # ------------------------
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=API_PORT)
+    port = int(os.getenv("PYTHON", "8503"))
+    uvicorn.run(app, host="127.0.0.1", port=port)

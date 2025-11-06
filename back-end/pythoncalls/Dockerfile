@@ -10,5 +10,5 @@ RUN pip install -r requirements.txt
 COPY . . 
 
 
-EXPOSE ${API_PORT}
-CMD uvicorn main:app --host 0.0.0.0 --port ${API_PORT} --reload 
+EXPOSE ${PYTHON}
+CMD uvicorn main:app --host 0.0.0.0 --port ${PYTHON} --reload

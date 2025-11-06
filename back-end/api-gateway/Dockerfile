@@ -9,7 +9,7 @@ RUN pip install --upgrade pip && \
 
 COPY . .
 
-ENV PORT=8510
-EXPOSE $PORT
+ENV API_PORT=${API_PORT}
+EXPOSE ${API_PORT}
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8510", "--reload"]
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${API_PORT:-8501} --reload"]
