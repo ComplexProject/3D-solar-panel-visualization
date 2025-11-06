@@ -14,9 +14,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-
-@app.api_route("/{service}/{path:path}", methods=["GET", "POST"])
 async def proxy(service: str, path: str, request: Request):
     service = service.upper()
 
