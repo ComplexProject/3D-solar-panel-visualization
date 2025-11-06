@@ -39,10 +39,11 @@ function App() {
   return (
     <>
       <div className='h-screen w-full bg-red-50'>
-          <div className="relative h-full w-full">
+        <div className="relative h-full w-full">
           <ModelViewer>
             <BuildingWithSolarPanels />
           </ModelViewer>
+        </div>
         <div
           ref={pullTabRef}
           className={`absolute right-0 top-1/4 h-24 flex items-center px-5 bg-[#F8F8F8] z-20 rounded-l-4xl drop-shadow cursor-pointer transition-all duration-150
@@ -71,7 +72,6 @@ function App() {
               <SideMenu nodeRef={nodeRef} onClick={closeSideMenu} />
             </CSSTransition>
           </div>
-        </div>
       </div>
 
       <div className='px-12 py-16 flex flex-col h-full w-full gap-11 bg-[#F8F8F8]'>
