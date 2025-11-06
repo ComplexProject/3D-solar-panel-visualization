@@ -14,14 +14,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-async def proxy(service: str, path: str, request: Request):
-    service = service.upper()
-
-    body = await request.json() if request.method != "GET" else dict(request.query_params)
-    headers = dict(request.headers)
-
-    return await response.json()
-
 # @app.get("/dummy")
 # async def get_dummy():
 #     async with httpx.AsyncClient() as client:
