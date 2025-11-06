@@ -1,33 +1,46 @@
+version: "3.9"
+
 services:
-  python:
-    env_file:
-      - .env
-    container_name: python
-    build: ./pythoncalls
+  api-gateway:
+    env_file: ./.env
+    build: ./api-gateway
     ports:
       - "${API_PORT}:${API_PORT}"
+    depends_on:
+      - python
+      - savedata
+      - matlab
+    networks:
+      - apinetwork
+
+  python:
+    env_file: ./.env
+    build: ./pythoncalls
+    container_name: python
+    ports:
+      - "${PYTHON}:${PYTHON}"
     volumes:
       - ./pythoncalls:/app
     networks:
       - apinetwork
     depends_on:
       - savedata
+
   savedata:
-    env_file:
-      - .env
-    container_name: savedata
+    env_file: ./.env
     build: ./savedata
+    container_name: savedata
     ports:
       - "${SAVED_DATA}:${SAVED_DATA}"
     volumes:
       - ./savedata:/app
     networks:
       - apinetwork
+
   matlab:
-    env_file:
-      - .env
-    container_name: matlab
+    env_file: ./.env
     build: ./matlab
+    container_name: matlab
     ports:
       - "${MATLAB}:${MATLAB}"
     volumes:
@@ -35,7 +48,6 @@ services:
     networks:
       - apinetwork
 
-    
 networks:
   apinetwork:
     driver: bridge
