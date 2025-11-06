@@ -61,7 +61,7 @@ function App() {
             <FastArrowLeft />
           </IconoirProvider>
           </div>
-          <div className={`absolute right-0 top-1/6 transition-all duration-150 z-30 ${showSideMenu ? 'lg:w-1/4 md:w-1/2 sm:w-1/2' : 'w-0'} overflow-x-hidden py-1 pl-1`}>
+          <div className='absolute right-0 top-1/6 lg:w-1/4 md:w-1/2 sm:w-1/2 z-30 overflow-x-hidden py-1 pl-1'>
             <CSSTransition
               in={showSideMenu}
               timeout={150}
