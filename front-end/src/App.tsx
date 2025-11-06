@@ -45,10 +45,9 @@ function App() {
           </ModelViewer>
         <div
           ref={pullTabRef}
-          className={`absolute right-0 top-1/4 h-24 flex items-center px-5 bg-[#F8F8F8] rounded-l-4xl drop-shadow cursor-pointer transition-all duration-150
+          className={`absolute right-0 top-1/4 h-24 flex items-center px-5 bg-[#F8F8F8] z-20 rounded-l-4xl drop-shadow cursor-pointer transition-all duration-150
             ${showSideMenu ? 'lg:w-[30%] md:w-[58%] sm:w-[60%]' : 'w-[5.5rem]'}`}
           onClick={() => setShowSideMenu(!showSideMenu)}
-          style={{ zIndex: 20 }}
         >
           <IconoirProvider
             iconProps={{
@@ -61,7 +60,7 @@ function App() {
             <FastArrowLeft />
           </IconoirProvider>
           </div>
-          <div className={`absolute right-0 top-1/6 transition-all duration-150 ${showSideMenu ? 'lg:w-1/4 md:w-1/2 sm:w-1/2' : 'w-0'} overflow-x-hidden py-1 pl-1`} style={{ zIndex: 30 }}>
+          <div className={`absolute right-0 top-1/6 transition-all duration-150 z-30 ${showSideMenu ? 'lg:w-1/4 md:w-1/2 sm:w-1/2' : 'w-0'} overflow-x-hidden py-1 pl-1`}>
             <CSSTransition
               in={showSideMenu}
               timeout={150}

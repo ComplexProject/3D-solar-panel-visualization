@@ -32,7 +32,8 @@ function StyledDropzone() {
     getInputProps,
     isFocused,
     isDragAccept,
-    isDragReject
+    isDragReject,
+    open
   } = useDropzone({
     accept: { 'image/*': [] },
     maxFiles: 1,
@@ -100,7 +101,7 @@ function StyledDropzone() {
       </>)
       }
       <p>Or</p>
-      <button className=' rounded-[10px] bg-[#D9D9D9] h-8 px-3.5 hover:cursor-pointer hover:bg-[#a8a8a8]'>
+      <button className='rounded-[10px] bg-[#D9D9D9] h-8 px-3.5 hover:cursor-pointer hover:bg-[#a8a8a8]' type='button' onClick={open}>
         {!file ? "Browse files" : "Choose a different file"}
       </button>
     </div>
