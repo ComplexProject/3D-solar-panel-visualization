@@ -20,7 +20,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-API_PORT = int(os.getenv("API_PORT", 1000))
+PYTHON = int(os.getenv("PYTHON", 8503))
 
 # ------------------------
 # Helper: Save PV and yearly sums as .pkl and .mat (cell array compatible)
@@ -235,5 +235,4 @@ def getData(
 # ------------------------
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("PYTHON", "8503"))
-    uvicorn.run(app, host="127.0.0.1", port=port)
+    uvicorn.run(app, host="127.0.0.1", port=PYTHON)
