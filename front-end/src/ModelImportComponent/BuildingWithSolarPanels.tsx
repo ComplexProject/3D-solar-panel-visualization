@@ -1,24 +1,45 @@
-import { useMemo, useState, useCallback } from "react"
-import { Box3, Matrix3, Object3D, Quaternion, Raycaster, Vector3 } from "three"
+import { useMemo, useState, useCallback, useEffect } from "react" // +useEffect
+import { Box3, Matrix3, Matrix4, Object3D, Quaternion, Raycaster, Vector3 } from "three"
 import { useGLTF } from "@react-three/drei"
 import BuildingModel from "./BuildingModel"
 import SolarPanels from "./SolarPanels"
 
-const BUILDING_URL = "/models/Building/scene.gltf"       
-const PANEL_URL    = "/models/SolarPanel/scene.gltf"     
+const BUILDING_URL = "/models/Building/scene.gltf"
+const PANEL_URL = "/models/SolarPanel/scene.gltf"
 
-const BASE_PANEL_SCALE: [number, number, number] = [1, 1, 1] 
-const ROOF_MARGIN_X = 0.5      
-const ROOF_MARGIN_Z = 0.5      
-const PANEL_LIFT    = 0.05     
-const TARGET_ACROSS = 16       
-const UPSCALE_PANELS = false 
-const MAX_PANELS = 50         
+type PanelOverride = { azimuth?: number; slope?: number }
+const DEG = Math.PI / 180
+
+const BASE_PANEL_SCALE: [number, number, number] = [1, 1, 1]
+const ROOF_MARGIN_X = 0.5
+const ROOF_MARGIN_Z = 0.5
+const PANEL_LIFT = 0.05
+const TARGET_ACROSS = 16
+const UPSCALE_PANELS = false
+const MAX_PANELS = 30
 
 const USE_FIXED_GRID = false
-const FIXED_COLS = 8  
-const FIXED_ROWS = 3  
+const FIXED_COLS = 8
+const FIXED_ROWS = 3
 
+// getDummy for [{azimuth,slope}, ...] ---
+function usePanelOverrides(pollMs = 3000) {
+  const [overrides, setOverrides] = useState<PanelOverride[]>([])
+  useEffect(() => {
+    let alive = true
+    const load = async () => {
+      try {
+        const r = await fetch("http://127.0.0.1:8510/getDummy")
+        const json = await r.json()
+        if (alive && Array.isArray(json?.solarPanels)) setOverrides(json.solarPanels as PanelOverride[])
+      } catch { }
+    }
+    load()
+    const id = setInterval(load, pollMs)
+    return () => { alive = false; clearInterval(id) }
+  }, [pollMs])
+  return overrides
+}
 
 function pickRoofTop(root: Object3D | null): Object3D | null {
   if (!root) return null
@@ -44,7 +65,7 @@ function pickRoofTop(root: Object3D | null): Object3D | null {
     // Measures how strongly the surface normals point upward on average.
     nmat.getNormalMatrix(o.matrixWorld)
     let upness = 0
-    const step = Math.max(1, Math.floor(normals.count / 2000)) 
+    const step = Math.max(1, Math.floor(normals.count / 2000))
     for (let i = 0; i < normals.count; i += step) {
       n.set(normals.getX(i), normals.getY(i), normals.getZ(i)).applyMatrix3(nmat).normalize()
       upness += Math.max(0, n.dot(up))
@@ -80,23 +101,27 @@ function usePanelFootprint(url: string) {
     const minIdx = dims.indexOf(Math.min(...dims))
     const tAxis =
       minIdx === 0 ? new Vector3(1, 0, 0)
-    : minIdx === 1 ? new Vector3(0, 1, 0)
-                   : new Vector3(0, 0, 1)
+        : minIdx === 1 ? new Vector3(0, 1, 0)
+          : new Vector3(0, 0, 1)
 
     return {
-      widthX: Math.max(1e-6, size.x),
-      depthZ: Math.max(1e-6, size.z),
-      tAxis,            // local "thin axis" used for alignment
-      minY: box.min.y,  // used to float the panel just above the roof
-    }
+  widthX: Math.max(1e-6, size.x),
+  depthZ: Math.max(1e-6, size.z),
+  tAxis,                      
+  uAxis:                      
+    (minIdx === 0) ? new Vector3(0, 0, 1) :
+    (minIdx === 1) ? new Vector3(1, 0, 0) :
+                     new Vector3(1, 0, 0),
+  minY: box.min.y,
+}
   }, [gltf])
 }
-
 
 export default function BuildingWithSolarPanels() {
   const [house, setHouse] = useState<Object3D | null>(null)
   const captureHouse = useCallback((o: Object3D | null) => setHouse(o), [])
   const panel = usePanelFootprint(PANEL_URL)
+  const overrides = usePanelOverrides() // NEW: live azimuth/slope data
 
   const data = useMemo(() => {
     // No building or no panel yet -> nothing to place.
@@ -136,7 +161,7 @@ export default function BuildingWithSolarPanels() {
     if (USE_FIXED_GRID) {
       cols = Math.max(1, FIXED_COLS)
       rows = Math.max(1, FIXED_ROWS)
-      
+
     } else {
       // autofit it to choose scale so we can fit TARGET_ACROSS panels across the long side.
       const T = Math.max(1, Math.floor(TARGET_ACROSS))
@@ -175,8 +200,8 @@ export default function BuildingWithSolarPanels() {
     // 3) Rotate the panel so its thin axis is aligned with hitNormal.
     const ray = new Raycaster()
     const modelSizeY = new Box3().setFromObject(house).getSize(new Vector3()).y
-    const castHeight = modelSizeY + 10 
-    const lift = PANEL_LIFT + (-panel.minY * Math.abs(scale[1])) 
+    const castHeight = modelSizeY + 10
+    const lift = PANEL_LIFT + (-panel.minY * Math.abs(scale[1]))
 
     const up = new Vector3(0, 1, 0)
     const positions: [number, number, number][] = []
@@ -203,7 +228,59 @@ export default function BuildingWithSolarPanels() {
 
         // Final position + orientation:
         const p = hit.point.clone().addScaledVector(up, lift)
-        const q = new Quaternion().setFromUnitVectors(panel.tAxis.clone().normalize(), normal)
+
+        // --- NEW: choose override for this panel (cycles through array) ---
+        const panelIndex = positions.length
+        const ov = overrides.length ? overrides[panelIndex % overrides.length] : undefined
+        console.log("panel", panelIndex, "override:", ov)
+
+        // --- NEW: apply azimuth/slope relative to roof normal ---
+        // brief: keep both a target normal and a heading so we control roll around the normal.
+        let desiredNormal = normal.clone()
+        let desiredHeading = new Vector3()
+        if (ov) {
+          const az = (ov.azimuth ?? 0) * DEG
+          const sl = (ov.slope ?? 0) * DEG
+
+          // build a stable basis on the roof plane
+          const ref = Math.abs(normal.y) < 0.99 ? new Vector3(0, 1, 0) : new Vector3(1, 0, 0)
+          const U = new Vector3().crossVectors(ref, normal).normalize()   // axis 1 on the roof plane
+          const V = new Vector3().crossVectors(normal, U).normalize()     // axis 2 on the roof plane
+
+          // azimuth: 0° along U, 90° along V (swap cos/sin if your zero-direction feels wrong)
+          const heading2D = U.clone()
+            .multiplyScalar(Math.cos(az))
+            .add(V.clone().multiplyScalar(Math.sin(az)))
+            .normalize()
+
+          // tilt away from roof normal by 'slope' toward that heading
+          desiredNormal = normal.clone()
+            .multiplyScalar(Math.cos(sl))
+            .add(heading2D.clone().multiplyScalar(Math.sin(sl)))
+            .normalize()
+          desiredHeading.copy(heading2D)
+        } else {
+          // default heading follows the first tangent axis
+          const ref = Math.abs(normal.y) < 0.99 ? new Vector3(0, 1, 0) : new Vector3(1, 0, 0)
+          const U = new Vector3().crossVectors(ref, normal).normalize()
+          desiredHeading.copy(U)
+        }
+
+        // --- NEW: construct full orientation using local panel basis -> world basis ---
+        // brief: align panel normal, then fix roll so panel's "forward" tracks desiredHeading on the roof plane.
+        const localNormal = panel.tAxis.clone().normalize()
+        const localRight = panel.uAxis.clone().normalize()
+        const localForward = new Vector3().crossVectors(localNormal, localRight).normalize()
+
+        const forward = desiredHeading.clone().projectOnPlane(desiredNormal).normalize()
+        const fallback = Math.abs(desiredNormal.y) > 0.99 ? new Vector3(0, 0, 1) : new Vector3(0, 1, 0)
+        if (forward.lengthSq() < 1e-12) forward.copy(new Vector3().crossVectors(desiredNormal, fallback).normalize())
+        const right = new Vector3().crossVectors(forward, desiredNormal).normalize()
+
+        const targetMatrix = new Matrix4().makeBasis(right, forward, desiredNormal)
+        const localMatrix = new Matrix4().makeBasis(localRight, localForward, localNormal)
+        const rotMatrix = targetMatrix.clone().multiply(localMatrix.clone().invert())
+        const q = new Quaternion().setFromRotationMatrix(rotMatrix)
 
         positions.push([p.x, p.y, p.z])
         orientations.push(q)
@@ -211,7 +288,7 @@ export default function BuildingWithSolarPanels() {
     }
 
     return { positions, orientations, scale }
-  }, [house, panel])
+  }, [house, panel, overrides]) // +overrides so updates re-render
 
   return (
     <group>
@@ -227,3 +304,4 @@ export default function BuildingWithSolarPanels() {
     </group>
   )
 }
+
