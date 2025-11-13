@@ -7,8 +7,8 @@ import SolarPanels from "./SolarPanels"
 const BUILDING_URL = "/models/Building/scene.gltf"
 const PANEL_URL = "/models/SolarPanel/scene.gltf"
 
-type PanelOverride = { azimuth?: number; slope?: number } 
-const DEG = Math.PI / 180 
+type PanelOverride = { azimuth?: number; slope?: number }
+const DEG = Math.PI / 180
 
 const BASE_PANEL_SCALE: [number, number, number] = [1, 1, 1] // default panel scale before fitting
 const ROOF_MARGIN_X = 0.5 // margin from roof edges to avoid overhang
@@ -19,7 +19,7 @@ const UPSCALE_PANELS = false // whether to allow panels to be upscaled beyond ba
 const MAX_PANELS = 30 // safety cap on total number of panels to place
 
 const USE_FIXED_GRID = false // if true, use FIXED_COLS/ROWS instead of auto-fitting
-const FIXED_COLS = 8 
+const FIXED_COLS = 8
 const FIXED_ROWS = 3
 
 // getDummy for {azimuth,slope} 
@@ -35,9 +35,14 @@ function usePanelOverrides(pollMs = 3000) {
       } catch { }
     }
     load()
-    const id = setInterval(load, pollMs)
-    return () => { alive = false; clearInterval(id) }
-  }, [pollMs])
+
+    //   const id = setInterval(load, pollMs)
+    //   return () => { alive = false; clearInterval(id) }
+    // }, [pollMs])
+
+    return () => { alive = false }
+  }, [])
+
   return overrides
 }
 
@@ -105,15 +110,15 @@ function usePanelFootprint(url: string) {
           : new Vector3(0, 0, 1)
 
     return {
-  widthX: Math.max(1e-6, size.x),
-  depthZ: Math.max(1e-6, size.z),
-  tAxis,                      
-  uAxis:                      
-    (minIdx === 0) ? new Vector3(0, 0, 1) :
-    (minIdx === 1) ? new Vector3(1, 0, 0) :
-                     new Vector3(1, 0, 0),
-  minY: box.min.y,
-}
+      widthX: Math.max(1e-6, size.x),
+      depthZ: Math.max(1e-6, size.z),
+      tAxis,
+      uAxis:
+        (minIdx === 0) ? new Vector3(0, 0, 1) :
+          (minIdx === 1) ? new Vector3(1, 0, 0) :
+            new Vector3(1, 0, 0),
+      minY: box.min.y,
+    }
   }, [gltf])
 }
 
