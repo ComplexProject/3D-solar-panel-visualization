@@ -10,7 +10,7 @@ import { FastArrowLeft, IconoirProvider } from 'iconoir-react';
 import ModelViewer from './ModelImportComponent/ModelViewer'
 import BuildingWithSolarPanels from './ModelImportComponent/BuildingWithSolarPanels'
 import { getDummyData } from './api'
-import LoadingMessage from './statusMessage/loadingMessage'
+import LoadingMessage from './statusMessageComponents/loadingMessage'
 
 function App() {
   const [showSideMenu, setShowSideMenu] = useState(false)
