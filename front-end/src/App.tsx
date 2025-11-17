@@ -10,6 +10,7 @@ import { FastArrowLeft, IconoirProvider } from 'iconoir-react';
 import ModelViewer from './ModelImportComponent/ModelViewer'
 import BuildingWithSolarPanels from './ModelImportComponent/BuildingWithSolarPanels'
 import { getDummyData } from './api'
+import LoadingMessage from './statusMessage/loadingMessage'
 
 function App() {
   const [showSideMenu, setShowSideMenu] = useState(false)
@@ -139,7 +140,7 @@ function App() {
           </div>
         </>
         :
-        <h1>Loading, Please Wait</h1>
+        <LoadingMessage />
         } 
       </div>
     </> 
