@@ -33,15 +33,8 @@ function App() {
 
   useEffect(() => {
     // const fetchData = async () => {
-    //   try {
-    //     const data = await getDummyData()
-    //     setDummyData(data)
-    //   } catch (err) {
-    //     console.log(err)
-    //     setFailedFetch(prev => !prev)
-    //   }
-    //   // const data = await getDummyData()
-    //   // setDummyData(data)
+    //   const data = await getDummyData()
+    //   setDummyData(data)
     // }
     // fetchData()
     const API_URL = "http://localhost:8510";
