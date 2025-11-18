@@ -122,7 +122,11 @@ function usePanelFootprint(url: string) {
   }, [gltf])
 }
 
-export default function BuildingWithSolarPanels() {
+type BuildingWithSolarPanelsProps = {
+  onLoadingChange?: (isLoading: boolean) => void
+}
+
+export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWithSolarPanelsProps = {}) {
   const [house, setHouse] = useState<Object3D | null>(null)
   const captureHouse = useCallback((o: Object3D | null) => setHouse(o), [])
   const panel = usePanelFootprint(PANEL_URL)
@@ -294,6 +298,13 @@ export default function BuildingWithSolarPanels() {
     return { positions, orientations, scale }
   }, [house, panel, overrides]) // overrides to update re-rendered panels
 
+  // Track loading state - model is loaded when we have house, panel, and positions calculated
+  useEffect(() => {
+    const isLoading = !house || !panel || data.positions.length === 0
+    console.log("BuildingWithSolarPanels loading state:", { isLoading, hasHouse: !!house, hasPanel: !!panel, positionsCount: data.positions.length })
+    onLoadingChange?.(isLoading)
+  }, [house, panel, data.positions.length, onLoadingChange])
+
   return (
     <group>
       <BuildingModel key={BUILDING_URL} ref={captureHouse} url={BUILDING_URL} />
@@ -308,4 +319,6 @@ export default function BuildingWithSolarPanels() {
     </group>
   )
 }
+
+
 
