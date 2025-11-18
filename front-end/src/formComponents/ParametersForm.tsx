@@ -2,7 +2,8 @@ import StyledDropzone from './DropZone'
 import { useForm } from 'react-hook-form'
 import { useState, useEffect } from 'react';
 import { GetGeocodingData } from '../utils/apiTesting';
-import { IconoirProvider, InfoCircle, Triangle } from 'iconoir-react';
+import { IconoirProvider, InfoCircle } from 'iconoir-react';
+import ToolTip from './ToolTip';
 
 const inputClass = 'px-2 py-0.5 hover:border-[#006FAA] focus:ring-1 focus:outline-none focus:ring-[#006FAA] border shadow-md border-[#808080] w-full rounded-[7px]'
 
@@ -73,22 +74,7 @@ function ParameterForm() {
                         <p className='text-red-500'>*</p>
                     </div>
                     <div className='cursor-pointer flex items-center group '>
-                        <div className='absolute z-50 pl-5 pr-4 hidden group-hover:flex right-14 justify-center items-center drop-shadow-xl'>
-                            <div className='bg-gray-300 p-1 rounded-md px-1.5'>
-                                <p>Headers required: bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla</p>
-                            </div>
-                            <IconoirProvider
-                                iconProps={{
-                                    className:'rotate-90 absolute right-2',
-                                    fill:'#d1d5dc',
-                                    color: '#d1d5dc',
-                                    strokeWidth: 1.5,
-                                    width: '0.9rem',
-                                    height: '0.9rem',
-                                }}>
-                                <Triangle />
-                            </IconoirProvider>
-                        </div>
+                        <ToolTip toolTipText='Headers required: bla, bla, bla, bla, bla, bla, bla'/>
                         <IconoirProvider
                             iconProps={{
                                 className: 'hover:scale-110',
