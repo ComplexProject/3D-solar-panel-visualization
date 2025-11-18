@@ -9,8 +9,9 @@ import ProducedSolarEnergy from './energyResultsComponents/ProducedSolarEnergy'
 import { FastArrowLeft, IconoirProvider } from 'iconoir-react';
 import ModelViewer from './ModelImportComponent/ModelViewer'
 import BuildingWithSolarPanels from './ModelImportComponent/BuildingWithSolarPanels'
-import { getDummyData } from './api'
+// import { getDummyData } from './api'
 import LoadingMessage from './statusMessageComponents/loadingMessage'
+import ErrorMessage from './statusMessageComponents/errorMessage'
 
 function App() {
   const [showSideMenu, setShowSideMenu] = useState(false)
@@ -22,6 +23,7 @@ function App() {
     solarPanels: Panel[];
   };
   const [dummyData, setDummyData] = useState<DummyData | null>(null)
+  const [failedFetch, setFailedFetch] = useState(false)
   const nodeRef = useRef(null)
   const pullTabRef = useRef(null)
 
@@ -30,11 +32,25 @@ function App() {
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getDummyData()
-      setDummyData(data)
-    }
-    fetchData()
+    // const fetchData = async () => {
+    //   try {
+    //     const data = await getDummyData()
+    //     setDummyData(data)
+    //   } catch (err) {
+    //     console.log(err)
+    //     setFailedFetch(prev => !prev)
+    //   }
+    //   // const data = await getDummyData()
+    //   // setDummyData(data)
+    // }
+    // fetchData()
+    const API_URL = "http://localhost:8510";
+    fetch(`${API_URL}/getDummy`)
+      .then(response => response.json())
+      .then(json => setDummyData(json))
+      .catch(error => {
+        console.error(error), setFailedFetch(true)
+  })
   }, [])
 
   return (
@@ -140,7 +156,9 @@ function App() {
           </div>
         </>
         :
-        <LoadingMessage />
+        <>
+          {failedFetch ? <ErrorMessage /> : <LoadingMessage />}
+        </>
         } 
       </div>
     </> 
