@@ -13,7 +13,7 @@ const DEG = Math.PI / 180
 const BASE_PANEL_SCALE: [number, number, number] = [1, 1, 1] // default panel scale before fitting
 const ROOF_MARGIN_X = 0.5 // margin from roof edges to avoid overhang
 const ROOF_MARGIN_Z = 0.5 // 
-const PANEL_LIFT = 0.10 // lift panels above roof to avoid z-fighting
+const PANEL_LIFT = 0.4 // lift panels above roof to avoid z-fighting
 const PANEL_GAP_X = 0.22 // gap between panels in X direction
 const PANEL_GAP_Z = 0.22 // gap between panels in Z direction
 const TARGET_ACROSS = 16 // target number of panels across the long roof side
@@ -198,6 +198,7 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
       rows = longIsX ? Math.max(1, Math.round(depthZ / effZ)) : T
     }
 
+    // Step spacing: distance between panel centers = panel size + gap
     const effX = panel.widthX * scale[0]
     const effZ = panel.depthZ * scale[2]
 
@@ -208,6 +209,11 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
      const stepX = effX + PANEL_GAP_X
      const stepZ = effZ + PANEL_GAP_Z
 
+     // Get ground level (minimum Y of the building) to prevent panels from going through ground
+    const buildingBox = new Box3().setFromObject(house)
+    const groundLevel = buildingBox.min.y
+    const lift = PANEL_LIFT + (-panel.minY * Math.abs(scale[1]))
+
     // For each grid cell:
     // 1) Raycast from above to find the roof hit point (hitPoint) and surface normal (hitNormal).
     // 2) Position the panel at hitPoint + hitNormal * PANEL_LIFT.
@@ -215,7 +221,7 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
     const ray = new Raycaster()
     const modelSizeY = new Box3().setFromObject(house).getSize(new Vector3()).y
     const castHeight = modelSizeY + 10
-    const lift = PANEL_LIFT + (-panel.minY * Math.abs(scale[1]))
+    
 
     const up = new Vector3(0, 1, 0)
     const positions: [number, number, number][] = []
@@ -243,6 +249,12 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
 
         // Final position + orientation:
         const p = hit.point.clone().addScaledVector(up, lift)
+
+        // Ensure panel is above ground level (prevent going through ground)
+        const minY = groundLevel + 0.1 // Small safety margin above ground
+        if (p.y < minY) {
+          p.y = minY
+        }
 
         // choose override for this panel (cycles through array)
         const panelIndex = positions.length

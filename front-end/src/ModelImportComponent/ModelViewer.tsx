@@ -1,6 +1,44 @@
 import { Canvas } from "@react-three/fiber"
 import { Environment, OrbitControls, PerspectiveCamera, Bounds } from "@react-three/drei"
 import { Suspense, useState, useRef, useEffect, cloneElement, isValidElement } from "react"
+import { useThree } from "@react-three/fiber"
+
+// Custom OrbitControls component that enables zoom only when Shift is held
+function OrbitControlsWithShiftZoom(props: any) {
+  const controlsRef = useRef<any>(null)
+  const { camera, gl } = useThree()
+
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (e.shiftKey && controlsRef.current) {
+        e.preventDefault()
+        // Manually handle zoom when shift is pressed
+        const delta = e.deltaY
+        const zoomSpeed = 0.8
+        const distance = camera.position.distanceTo(controlsRef.current.target)
+        const newDistance = distance + delta * zoomSpeed * 0.01
+        
+        // zoom distance
+        const minDistance = 10
+        const maxDistance = 1000
+        const clampedDistance = Math.max(minDistance, Math.min(maxDistance, newDistance))
+        
+        // Zoom by moving camera along the line from target to camera
+        const direction = camera.position.clone().sub(controlsRef.current.target).normalize()
+        camera.position.copy(controlsRef.current.target).add(direction.multiplyScalar(clampedDistance))
+        camera.updateProjectionMatrix()
+      }
+    }
+
+    gl.domElement.addEventListener("wheel", handleWheel, { passive: false })
+
+    return () => {
+      gl.domElement.removeEventListener("wheel", handleWheel)
+    }
+  }, [camera, gl])
+
+  return <OrbitControls ref={controlsRef} {...props} />
+}
 
 export default function ModelViewer({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
@@ -65,8 +103,8 @@ export default function ModelViewer({ children }: { children: React.ReactNode })
             <hemisphereLight intensity={1.2} groundColor="#ffffff" />
             <directionalLight position={[10, 10, 5]} intensity={1.2} castShadow />
             <Environment preset="city" />
-            <PerspectiveCamera makeDefault fov={70} near={0.1} far={5000} position={[50, 130, 90]} />
-            <OrbitControls
+            <PerspectiveCamera makeDefault fov={70} near={0.1} far={5000} position={[55, 120, -120]} />
+            <OrbitControlsWithShiftZoom
               makeDefault
               target={[0, 0, 0]}
               enableRotate={isReady}
