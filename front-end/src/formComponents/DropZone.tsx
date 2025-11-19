@@ -1,5 +1,4 @@
-import { useMemo } from 'react';
-import { useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { IconoirProvider, CloudUpload, SmallLampAlt } from 'iconoir-react';
 
@@ -17,6 +16,7 @@ const rejectStyle: React.CSSProperties = {
 
 function StyledDropzone() {
   const [file, setFile] = useState<File | undefined>(undefined);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const saveFile = (file: File) => {
    const fileData = {
@@ -27,6 +27,15 @@ function StyledDropzone() {
    localStorage.setItem("demandProfile", JSON.stringify(fileData));
   };
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const newFile = files[0];
+      setFile(newFile);
+      saveFile(newFile);
+    }
+  };
+
   const {
     getRootProps,
     getInputProps,
@@ -35,7 +44,9 @@ function StyledDropzone() {
     isDragReject,
     open
   } = useDropzone({
-    accept: { 'image/*': [] },
+    accept: { 'application/json': [],
+              'text/csv': [],
+     },
     maxFiles: 1,
     onDrop: (acceptedFiles) => {
       if (acceptedFiles.length > 0) {
@@ -59,7 +70,7 @@ function StyledDropzone() {
   return (
   <div className="container">
     <div {...getRootProps({ style })} className='flex flex-col h-[9.2rem] justify-center items-center p-5 border-2 rounded-xl hover:cursor-pointer hover:border-[#006FAA] border-[#808080] border-dashed'>
-      <input {...getInputProps()} />
+      <input {...getInputProps()} ref={inputRef} onChange={handleFileChange} />
       {!file ? (<>
         <div className="flex-shrink-0">
           <IconoirProvider
@@ -101,7 +112,9 @@ function StyledDropzone() {
       </>)
       }
       <p>Or</p>
-      <button className='rounded-[10px] bg-[#D9D9D9] h-8 px-3.5 hover:cursor-pointer hover:bg-[#a8a8a8]' type='button' onClick={open}>
+      <button className='rounded-[10px] bg-[#D9D9D9] h-8 px-3.5 hover:cursor-pointer hover:bg-[#a8a8a8]' type='button'
+          onClick={() => inputRef.current?.click()} 
+        >
         {!file ? "Browse files" : "Choose a different file"}
       </button>
     </div>
