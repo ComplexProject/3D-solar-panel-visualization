@@ -13,10 +13,12 @@ const DEG = Math.PI / 180
 const BASE_PANEL_SCALE: [number, number, number] = [1, 1, 1] // default panel scale before fitting
 const ROOF_MARGIN_X = 0.5 // margin from roof edges to avoid overhang
 const ROOF_MARGIN_Z = 0.5 // 
-const PANEL_LIFT = 0.05 // lift panels above roof to avoid z-fighting
+const PANEL_LIFT = 0.10 // lift panels above roof to avoid z-fighting
+const PANEL_GAP_X = 0.22 // gap between panels in X direction
+const PANEL_GAP_Z = 0.22 // gap between panels in Z direction
 const TARGET_ACROSS = 16 // target number of panels across the long roof side
 const UPSCALE_PANELS = false // whether to allow panels to be upscaled beyond base size
-const MAX_PANELS = 30 // safety cap on total number of panels to place
+const MAX_PANELS = 40 // safety cap on total number of panels to place
 
 const USE_FIXED_GRID = false // if true, use FIXED_COLS/ROWS instead of auto-fitting
 const FIXED_COLS = 8
@@ -196,12 +198,15 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
       rows = longIsX ? Math.max(1, Math.round(depthZ / effZ)) : T
     }
 
+    const effX = panel.widthX * scale[0]
+    const effZ = panel.depthZ * scale[2]
+
     // Safety cap.
     const total = Math.min(MAX_PANELS, rows * cols)
 
     // Step spacing from min to max (0 when there’s only 1).
-    const stepX = cols > 1 ? (xMax - xMin) / (cols - 1) : 0
-    const stepZ = rows > 1 ? (zMax - zMin) / (rows - 1) : 0
+     const stepX = effX + PANEL_GAP_X
+     const stepZ = effZ + PANEL_GAP_Z
 
     // For each grid cell:
     // 1) Raycast from above to find the roof hit point (hitPoint) and surface normal (hitNormal).
@@ -220,8 +225,9 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
       for (let c = 0; c < cols; c++) {
         if (positions.length >= total) break
 
-        const x = xMin + (cols === 1 ? 0 : c * stepX)
-        const z = zMin + (rows === 1 ? 0 : r * stepZ)
+        
+        const x = xMin + (cols === 1 ? 0 : c * (stepX + PANEL_GAP_X))
+        const z = zMin + (rows === 1 ? 0 : r * (stepZ + PANEL_GAP_Z))
 
         ray.set(new Vector3(x, roofBox.max.y + castHeight, z), new Vector3(0, -1, 0))
         const hits = ray.intersectObject(roof as any, true)
