@@ -241,7 +241,6 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
         // choose override for this panel (cycles through array)
         const panelIndex = positions.length
         const ov = overrides.length ? overrides[panelIndex % overrides.length] : undefined
-        console.log("panel", panelIndex, "override:", ov)
 
         // apply azimuth/slope relative to roof normal 
         let desiredNormal = normal.clone()
@@ -301,7 +300,6 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
   // Track loading state - model is loaded when we have house, panel, and positions calculated
   useEffect(() => {
     const isLoading = !house || !panel || data.positions.length === 0
-    console.log("BuildingWithSolarPanels loading state:", { isLoading, hasHouse: !!house, hasPanel: !!panel, positionsCount: data.positions.length })
     onLoadingChange?.(isLoading)
   }, [house, panel, data.positions.length, onLoadingChange])
 
