@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useEffect } from "react" // +useEffect
+import { useMemo, useState, useCallback, useEffect } from "react" 
 import { Box3, Matrix3, Matrix4, Object3D, Quaternion, Raycaster, Vector3 } from "three"
 import { useGLTF } from "@react-three/drei"
 import BuildingModel from "./BuildingModel"
@@ -214,7 +214,7 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
     const groundLevel = buildingBox.min.y
     const lift = PANEL_LIFT + (-panel.minY * Math.abs(scale[1]))
 
-        // Use raycasting to find the roof surface (invisible plane) at each panel position
+    // Use raycasting to find the roof surface (invisible plane) at each panel position
     const ray = new Raycaster()
     const modelSizeY = new Box3().setFromObject(house).getSize(new Vector3()).y
     const castHeight = modelSizeY + 10
