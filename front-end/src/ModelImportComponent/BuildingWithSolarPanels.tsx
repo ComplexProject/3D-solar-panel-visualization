@@ -214,19 +214,16 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
     const groundLevel = buildingBox.min.y
     const lift = PANEL_LIFT + (-panel.minY * Math.abs(scale[1]))
 
-    // For each grid cell:
-    // 1) Raycast from above to find the roof hit point (hitPoint) and surface normal (hitNormal).
-    // 2) Position the panel at hitPoint + hitNormal * PANEL_LIFT.
-    // 3) Rotate the panel so its thin axis is aligned with hitNormal.
+        // Use raycasting to find the roof surface (invisible plane) at each panel position
     const ray = new Raycaster()
     const modelSizeY = new Box3().setFromObject(house).getSize(new Vector3()).y
     const castHeight = modelSizeY + 10
     
-
     const up = new Vector3(0, 1, 0)
     const positions: [number, number, number][] = []
     const orientations: Quaternion[] = []
 
+    // For each grid cell, raycast to find the roof surface (the invisible plane)
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         if (positions.length >= total) break
@@ -235,6 +232,7 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
         const x = xMin + (cols === 1 ? 0 : c * (stepX + PANEL_GAP_X))
         const z = zMin + (rows === 1 ? 0 : r * (stepZ + PANEL_GAP_Z))
 
+        // Raycast from above to find the roof hit point (the invisible plane surface)
         ray.set(new Vector3(x, roofBox.max.y + castHeight, z), new Vector3(0, -1, 0))
         const hits = ray.intersectObject(roof as any, true)
         if (!hits.length) continue
