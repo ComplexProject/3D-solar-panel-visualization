@@ -21,7 +21,7 @@ export async function sendFormData() {
     formData.append('maxPower', savedPower.toString());
     formData.append('demandProfile', file);
 
-    const url = `http://localhost:8510/sendForm`;
+    const url = `http://localhost:8515/sendForm`;
     
     const resp = await fetch(url, {
         method: "POST",
