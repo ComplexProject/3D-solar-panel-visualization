@@ -22,7 +22,7 @@ const calculate = async () => {
 
 function SideMenu({ nodeRef, onClick }: SideMenuProps) {
     const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
-
+    const maxHeight = !showAdvancedSettings ? '22.968rem' : '14.394rem';
     return (
         <>
             <div ref={nodeRef} className="flex flex-col py-6 rounded-l-3xl px-4 gap-5 w-full relative drop-shadow bg-[#F8F8F8]">
@@ -42,7 +42,7 @@ function SideMenu({ nodeRef, onClick }: SideMenuProps) {
                         </IconoirProvider>
                     </button>
                 </div>
-                <div className="flex flex-col drop-shadow py-5 px-8 bg-white rounded-2xl">
+                <div className="flex flex-col drop-shadow transition-all duration-[230ms] ease-in-out py-5 px-8 bg-white rounded-2xl overflow-hidden" style={{ height: maxHeight}}>
                     {showAdvancedSettings ? <AdvancedSettings /> : <ParameterForm />}
                 </div>
                 <div className="flex flex-row justify-center items-center gap-5 px-5">
