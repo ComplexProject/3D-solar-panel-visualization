@@ -92,7 +92,6 @@ function App() {
           <></>
           }
         </div>
-      
         { dummyData ? 
         <>
           <div className='w-full h-full flex flex-row gap-10'>
