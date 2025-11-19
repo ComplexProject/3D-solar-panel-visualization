@@ -1,8 +1,8 @@
-import { useMemo, useState, useCallback, useEffect } from "react" 
 import { Box3, Matrix3, Matrix4, Object3D, Quaternion, Raycaster, Vector3 } from "three"
 import { useGLTF } from "@react-three/drei"
 import BuildingModel from "./BuildingModel"
 import SolarPanels from "./SolarPanels"
+import { useMemo, useState, useCallback, useEffect } from "react" 
 
 const BUILDING_URL = "/models/Building/scene.gltf"
 const PANEL_URL = "/models/SolarPanel/scene.gltf"
@@ -18,7 +18,7 @@ const PANEL_GAP_X = 0.22 // gap between panels in X direction
 const PANEL_GAP_Z = 0.22 // gap between panels in Z direction
 const TARGET_ACROSS = 16 // target number of panels across the long roof side
 const UPSCALE_PANELS = false // whether to allow panels to be upscaled beyond base size
-const MAX_PANELS = 40 // safety cap on total number of panels to place
+const MAX_PANELS = 20 // safety cap on total number of panels to place
 
 const USE_FIXED_GRID = false // if true, use FIXED_COLS/ROWS instead of auto-fitting
 const FIXED_COLS = 8
