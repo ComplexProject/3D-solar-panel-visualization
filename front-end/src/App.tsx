@@ -9,7 +9,7 @@ import ProducedSolarEnergy from './energyResultsComponents/ProducedSolarEnergy'
 import { FastArrowLeft, IconoirProvider } from 'iconoir-react';
 import ModelViewer from './ModelImportComponent/ModelViewer'
 import BuildingWithSolarPanels from './ModelImportComponent/BuildingWithSolarPanels'
-// import { getDummyData } from './api'
+import { getDummyData } from './api'
 import LoadingMessage from './statusMessageComponents/loadingMessage'
 import ErrorMessage from './statusMessageComponents/errorMessage'
 
@@ -32,18 +32,15 @@ function App() {
   }
 
   useEffect(() => {
-    // const fetchData = async () => {
-    //   const data = await getDummyData()
-    //   setDummyData(data)
-    // }
-    // fetchData()
-    const API_URL = "http://localhost:8510";
-    fetch(`${API_URL}/getDummy`)
-      .then(response => response.json())
-      .then(json => setDummyData(json))
-      .catch(error => {
-        console.error(error), setFailedFetch(true)
-  })
+    const fetchData = async () => {
+    const data = await getDummyData()
+    if (!data) {
+      setFailedFetch(true)
+      } else {
+        setDummyData(data)
+      }
+    }
+    fetchData()
   }, [])
 
   return (
