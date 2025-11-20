@@ -74,7 +74,7 @@ function ParameterForm() {
                         <p className='text-red-500'>*</p>
                     </div>
                     <div className='cursor-pointer flex items-center group '>
-                        <ToolTip toolTipText='Headers required: bla, bla, bla, bla, bla, bla, bla'/>
+                        <ToolTip toolTipText='The file must include only one column'/>
                         <IconoirProvider
                             iconProps={{
                                 className: 'hover:scale-110',
