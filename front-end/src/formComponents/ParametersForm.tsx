@@ -10,10 +10,11 @@ const inputClass = 'px-2 py-0.5 hover:border-[#006FAA] focus:ring-1 focus:outlin
 interface FormData {
     city: string;
     power: number;
+    cityFailed?: boolean;
 }
 
 function ParameterForm() {
-    const { register, setValue } = useForm<FormData>();
+    const { register, setValue, setError, formState: {errors} } = useForm<FormData>();
 
     const [formData, setFormData] = useState<FormData>(() => {
         const savedCity = localStorage.getItem("city");
@@ -36,9 +37,15 @@ function ParameterForm() {
         setFormData(prev => ({ ...prev, city: cityValue }));
         const locationData = await GetGeocodingData(cityValue);
         if (locationData) {
+            console.log(locationData)
             localStorage.setItem("latitude", JSON.stringify(locationData.latitude));
             localStorage.setItem("longitude", JSON.stringify(locationData.longitude));
         } else {
+            setError("cityFailed", {
+                message: 'city fetch failed',
+            })
+            console.log(locationData)
+
             localStorage.removeItem("latitude");
             localStorage.removeItem("longitude");
         }
@@ -58,7 +65,12 @@ function ParameterForm() {
                     <label htmlFor="city">City</label>
                     <p className='text-red-500'>*</p>
                 </div>
-                <input className={inputClass} type="text" placeholder='Middelburg' {...register("city", { onBlur: handleCityBlur })} id="city" /><br />
+
+                <input className={inputClass} type="text" placeholder='Middelburg' {...register("city", { onBlur: handleCityBlur })} id="city" />
+
+                <p>{errors.cityFailed?.message}</p>
+
+                <br />
             </div>
             <div>
                 <div className='flex flex-row gap-1'>

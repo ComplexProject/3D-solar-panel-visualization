@@ -237,7 +237,7 @@ export default function BuildingWithSolarPanels() {
         // choose override for this panel (cycles through array)
         const panelIndex = positions.length
         const ov = overrides.length ? overrides[panelIndex % overrides.length] : undefined
-        console.log("panel", panelIndex, "override:", ov)
+        // console.log("panel", panelIndex, "override:", ov)
 
         // apply azimuth/slope relative to roof normal 
         let desiredNormal = normal.clone()
