@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useEffect } from "react" // +useEffect
+import { useMemo, useState, useCallback, useEffect } from "react" 
 import { Box3, Matrix3, Matrix4, Object3D, Quaternion, Raycaster, Vector3 } from "three"
 import { useGLTF } from "@react-three/drei"
 import BuildingModel from "./BuildingModel"
@@ -13,7 +13,9 @@ const DEG = Math.PI / 180
 const BASE_PANEL_SCALE: [number, number, number] = [1, 1, 1] // default panel scale before fitting
 const ROOF_MARGIN_X = 0.5 // margin from roof edges to avoid overhang
 const ROOF_MARGIN_Z = 0.5 // 
-const PANEL_LIFT = 0.05 // lift panels above roof to avoid z-fighting
+const PANEL_LIFT = 0.4 // lift panels above roof to avoid z-fighting
+const PANEL_GAP_X = 0.22 // gap between panels in X direction
+const PANEL_GAP_Z = 0.22 // gap between panels in Z direction
 const TARGET_ACROSS = 16 // target number of panels across the long roof side
 const UPSCALE_PANELS = false // whether to allow panels to be upscaled beyond base size
 const MAX_PANELS = 30 // safety cap on total number of panels to place
@@ -122,7 +124,11 @@ function usePanelFootprint(url: string) {
   }, [gltf])
 }
 
-export default function BuildingWithSolarPanels() {
+type BuildingWithSolarPanelsProps = {
+  onLoadingChange?: (isLoading: boolean) => void
+}
+
+export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWithSolarPanelsProps = {}) {
   const [house, setHouse] = useState<Object3D | null>(null)
   const captureHouse = useCallback((o: Object3D | null) => setHouse(o), [])
   const panel = usePanelFootprint(PANEL_URL)
@@ -192,33 +198,41 @@ export default function BuildingWithSolarPanels() {
       rows = longIsX ? Math.max(1, Math.round(depthZ / effZ)) : T
     }
 
+    // Step spacing: distance between panel centers = panel size + gap
+    const effX = panel.widthX * scale[0]
+    const effZ = panel.depthZ * scale[2]
+
     // Safety cap.
     const total = Math.min(MAX_PANELS, rows * cols)
 
     // Step spacing from min to max (0 when there’s only 1).
-    const stepX = cols > 1 ? (xMax - xMin) / (cols - 1) : 0
-    const stepZ = rows > 1 ? (zMax - zMin) / (rows - 1) : 0
+     const stepX = effX + PANEL_GAP_X
+     const stepZ = effZ + PANEL_GAP_Z
 
-    // For each grid cell:
-    // 1) Raycast from above to find the roof hit point (hitPoint) and surface normal (hitNormal).
-    // 2) Position the panel at hitPoint + hitNormal * PANEL_LIFT.
-    // 3) Rotate the panel so its thin axis is aligned with hitNormal.
+     // Get ground level (minimum Y of the building) to prevent panels from going through ground
+    const buildingBox = new Box3().setFromObject(house)
+    const groundLevel = buildingBox.min.y
+    const lift = PANEL_LIFT + (-panel.minY * Math.abs(scale[1]))
+
+    // Use raycasting to find the roof surface (invisible plane) at each panel position
     const ray = new Raycaster()
     const modelSizeY = new Box3().setFromObject(house).getSize(new Vector3()).y
     const castHeight = modelSizeY + 10
-    const lift = PANEL_LIFT + (-panel.minY * Math.abs(scale[1]))
-
+    
     const up = new Vector3(0, 1, 0)
     const positions: [number, number, number][] = []
     const orientations: Quaternion[] = []
 
+    // For each grid cell, raycast to find the roof surface (the invisible plane)
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         if (positions.length >= total) break
 
-        const x = xMin + (cols === 1 ? 0 : c * stepX)
-        const z = zMin + (rows === 1 ? 0 : r * stepZ)
+        
+        const x = xMin + (cols === 1 ? 0 : c * (stepX + PANEL_GAP_X))
+        const z = zMin + (rows === 1 ? 0 : r * (stepZ + PANEL_GAP_Z))
 
+        // Raycast from above to find the roof hit point (the invisible plane surface)
         ray.set(new Vector3(x, roofBox.max.y + castHeight, z), new Vector3(0, -1, 0))
         const hits = ray.intersectObject(roof as any, true)
         if (!hits.length) continue
@@ -234,10 +248,15 @@ export default function BuildingWithSolarPanels() {
         // Final position + orientation:
         const p = hit.point.clone().addScaledVector(up, lift)
 
+        // Ensure panel is above ground level (prevent going through ground)
+        const minY = groundLevel + 0.1 // Small safety margin above ground
+        if (p.y < minY) {
+          p.y = minY
+        }
+
         // choose override for this panel (cycles through array)
         const panelIndex = positions.length
         const ov = overrides.length ? overrides[panelIndex % overrides.length] : undefined
-        console.log("panel", panelIndex, "override:", ov)
 
         // apply azimuth/slope relative to roof normal 
         let desiredNormal = normal.clone()
@@ -294,6 +313,12 @@ export default function BuildingWithSolarPanels() {
     return { positions, orientations, scale }
   }, [house, panel, overrides]) // overrides to update re-rendered panels
 
+  // Track loading state - model is loaded when we have house, panel, and positions calculated
+  useEffect(() => {
+    const isLoading = !house || !panel || data.positions.length === 0
+    onLoadingChange?.(isLoading)
+  }, [house, panel, data.positions.length, onLoadingChange])
+
   return (
     <group>
       <BuildingModel key={BUILDING_URL} ref={captureHouse} url={BUILDING_URL} />
@@ -308,4 +333,6 @@ export default function BuildingWithSolarPanels() {
     </group>
   )
 }
+
+
 
