@@ -11,8 +11,9 @@ app = FastAPI()
 
 
 @app.post("/saveDataFile")
-async def saveDataFile(file: UploadFile = File(...), azimuth_res: int = 1, slope_res: int = 1):
-    with open(f"data/{file.filename}", "wb") as buffer:
+async def saveDataFile(file: UploadFile = File(...), azimuth_res: int = 1, slope_res: int = 1,year =2019):
+    os.makedirs(f"data/{year}", exist_ok=True)
+    with open(f"/app/data/{year}/{file.filename}", "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     print("it worked i guess")
 
