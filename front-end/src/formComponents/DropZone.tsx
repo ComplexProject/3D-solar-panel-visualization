@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { IconoirProvider, CloudUpload, SmallLampAlt } from 'iconoir-react';
 
@@ -16,7 +16,6 @@ const rejectStyle: React.CSSProperties = {
 
 function StyledDropzone() {
   const [file, setFile] = useState<File | undefined>(undefined);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const saveFile = (file: File) => {
    const fileData = {
@@ -25,15 +24,6 @@ function StyledDropzone() {
     file: file
    };
    localStorage.setItem("demandProfile", JSON.stringify(fileData));
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      const newFile = files[0];
-      setFile(newFile);
-      saveFile(newFile);
-    }
   };
 
   const {
@@ -70,7 +60,7 @@ function StyledDropzone() {
   return (
   <div className="container">
     <div {...getRootProps({ style })} className='flex flex-col h-[9.2rem] justify-center items-center p-5 border-2 rounded-xl hover:cursor-pointer hover:border-[#006FAA] border-[#808080] border-dashed'>
-      <input {...getInputProps()} ref={inputRef} onChange={handleFileChange} />
+      <input {...getInputProps()} />
       {!file ? (<>
         <div className="flex-shrink-0">
           <IconoirProvider
@@ -113,8 +103,7 @@ function StyledDropzone() {
       }
       <p>Or</p>
       <button className='rounded-[10px] bg-[#D9D9D9] h-8 px-3.5 hover:cursor-pointer hover:bg-[#a8a8a8]' type='button'
-          onClick={() => inputRef.current?.click()} 
-        >
+          onClick= {open}>
         {!file ? "Browse files" : "Choose a different file"}
       </button>
     </div>
