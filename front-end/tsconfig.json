@@ -1,7 +1,7 @@
 {
   "files": [],
   "compilerOptions": {
-    "types": ["node", "react", "react-dom"]
+    "types": ["node", "react", "react-dom", "vitest/globals"],
   },
   "references": [
     { "path": "./tsconfig.app.json" },
