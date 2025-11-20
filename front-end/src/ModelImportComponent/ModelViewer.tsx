@@ -20,7 +20,7 @@ function OrbitControlsWithShiftZoom(props: any) {
         
         // zoom distance
         const minDistance = 10
-        const maxDistance = 1000
+        const maxDistance = 25
         const clampedDistance = Math.max(minDistance, Math.min(maxDistance, newDistance))
         
         // Zoom by moving camera along the line from target to camera
