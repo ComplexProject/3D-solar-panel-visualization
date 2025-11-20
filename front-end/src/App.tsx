@@ -12,6 +12,7 @@ import BuildingWithSolarPanels from './ModelImportComponent/BuildingWithSolarPan
 import { getDummyData } from './api'
 import LoadingMessage from './statusMessageComponents/loadingMessage'
 import ErrorMessage from './statusMessageComponents/errorMessage'
+import Header from './Header'
 
 function App() {
   const [showSideMenu, setShowSideMenu] = useState(false)
@@ -46,6 +47,7 @@ function App() {
   return (
     <>
       <div className='h-screen w-full bg-red-50'>
+        <Header/>
         <div className="relative h-full w-full">
           <ModelViewer>
             <BuildingWithSolarPanels />
