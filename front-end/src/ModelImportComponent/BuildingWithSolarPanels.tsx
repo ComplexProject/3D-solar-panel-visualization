@@ -1,8 +1,8 @@
+import { useMemo, useState, useCallback, useEffect } from "react" 
 import { Box3, Matrix3, Matrix4, Object3D, Quaternion, Raycaster, Vector3 } from "three"
 import { useGLTF } from "@react-three/drei"
 import BuildingModel from "./BuildingModel"
 import SolarPanels from "./SolarPanels"
-import { useMemo, useState, useCallback, useEffect } from "react" 
 
 const BUILDING_URL = "/models/Building/scene.gltf"
 const PANEL_URL = "/models/SolarPanel/scene.gltf"
