@@ -17,8 +17,6 @@ async def send_form(
     latitude: float = Form(...),
     longitude: float = Form(...),
     year: int = Form(...),
-    azimuthIncrement: float = Form(...),
-    slopeIncrement: float = Form(...),
     maxPower: float = Form(...),
     demandProfile: UploadFile = File(...)
 ):
@@ -30,8 +28,6 @@ async def send_form(
         "latitude": latitude,
         "longitude": longitude,
         "year": year,
-        "azimuth_increment": azimuthIncrement,
-        "slope_increment": slopeIncrement,
         "file_received": True,
         "filename": demandProfile.filename
     }

@@ -31,16 +31,12 @@ describe('Advanced Settings', () => {
         localStorage.setItem("latitude", JSON.stringify(45.0));
         localStorage.setItem("longitude", JSON.stringify(-93));
         localStorage.setItem("year", JSON.stringify(2023));
-        localStorage.setItem("azimuthIncrement", JSON.stringify(10));
-        localStorage.setItem("slopeIncrement", JSON.stringify(3));
 
         render(<AdvancedSettings />);
 
         expect(screen.getByDisplayValue('45')).toBeInTheDocument();
         expect(screen.getByDisplayValue('-93')).toBeInTheDocument();
         expect(screen.getByDisplayValue('2023')).toBeInTheDocument();
-        expect(screen.getByDisplayValue('10')).toBeInTheDocument();
-        expect(screen.getByDisplayValue('3')).toBeInTheDocument();
     });
 
     // it('Should save form values to localStorage on submit', () => {
@@ -73,8 +69,6 @@ describe('Advanced Settings', () => {
         expect(screen.getByLabelText(/latitude/i)).toHaveValue("0");
         expect(screen.getByLabelText(/longitude/i)).toHaveValue("0");
         expect(screen.getByLabelText(/year/i)).toHaveValue(2024);
-        expect(screen.getByLabelText(/azimuth increment/i)).toHaveValue(5);
-        expect(screen.getByLabelText(/slope increment/i)).toHaveValue(2);
     });
 });
 
