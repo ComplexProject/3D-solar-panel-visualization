@@ -1,5 +1,4 @@
-import { useMemo } from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { IconoirProvider, CloudUpload, SmallLampAlt } from 'iconoir-react';
 
@@ -35,7 +34,9 @@ function StyledDropzone() {
     isDragReject,
     open
   } = useDropzone({
-    accept: { 'image/*': [] },
+    accept: { 'application/json': [],
+              'text/csv': [],
+     },
     maxFiles: 1,
     onDrop: (acceptedFiles) => {
       if (acceptedFiles.length > 0) {
@@ -101,7 +102,8 @@ function StyledDropzone() {
       </>)
       }
       <p>Or</p>
-      <button className='rounded-[10px] bg-[#D9D9D9] h-8 px-3.5 hover:cursor-pointer hover:bg-[#a8a8a8]' type='button' onClick={open}>
+      <button className='rounded-[10px] bg-[#D9D9D9] h-8 px-3.5 hover:cursor-pointer hover:bg-[#a8a8a8]' type='button'
+          onClick= {open}>
         {!file ? "Browse files" : "Choose a different file"}
       </button>
     </div>
