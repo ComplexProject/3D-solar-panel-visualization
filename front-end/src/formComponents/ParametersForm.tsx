@@ -42,7 +42,7 @@ function ParameterForm() {
             localStorage.setItem("longitude", JSON.stringify(locationData.longitude));
         } else {
             setError("cityFailed", {
-                message: 'city fetch failed',
+                message: 'City not found',
             })
             console.log(locationData)
 
@@ -65,12 +65,8 @@ function ParameterForm() {
                     <label htmlFor="city">City</label>
                     <p className='text-red-500'>*</p>
                 </div>
-
-                <input className={inputClass} type="text" placeholder='Middelburg' {...register("city", { onBlur: handleCityBlur })} id="city" />
-
-                <p>{errors.cityFailed?.message}</p>
-
-                <br />
+                <input className={`${errors.cityFailed ? 'bg-[#FFDEDE]' : null} ${inputClass}`} type="text" placeholder='Middelburg' {...register("city", { onBlur: handleCityBlur })} id="city" />
+                {errors.cityFailed ? <p className='text-[#FF0000] text-sm'>{errors.cityFailed?.message}</p> : null}
             </div>
             <div>
                 <div className='flex flex-row gap-1'>
