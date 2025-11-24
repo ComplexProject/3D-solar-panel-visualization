@@ -10,10 +10,11 @@ const inputClass = 'px-2 py-0.5 hover:border-[#006FAA] focus:ring-1 focus:outlin
 interface FormData {
     city: string;
     power: number;
+    cityFetchFailed?: boolean;
 }
 
 function ParameterForm() {
-    const { register, setValue } = useForm<FormData>();
+    const { register, setValue, setError, formState: {errors}, clearErrors } = useForm<FormData>();
 
     const [formData, setFormData] = useState<FormData>(() => {
         const savedCity = localStorage.getItem("city");
@@ -36,9 +37,15 @@ function ParameterForm() {
         setFormData(prev => ({ ...prev, city: cityValue }));
         const locationData = await GetGeocodingData(cityValue);
         if (locationData) {
+            if (errors.cityFetchFailed) {
+                clearErrors('cityFetchFailed')
+            }
             localStorage.setItem("latitude", JSON.stringify(locationData.latitude));
             localStorage.setItem("longitude", JSON.stringify(locationData.longitude));
         } else {
+            setError("cityFetchFailed", {
+                message: 'City not found',
+            })
             localStorage.removeItem("latitude");
             localStorage.removeItem("longitude");
         }
@@ -58,7 +65,8 @@ function ParameterForm() {
                     <label htmlFor="city">City</label>
                     <p className='text-red-500'>*</p>
                 </div>
-                <input className={inputClass} type="text" placeholder='Middelburg' {...register("city", { onBlur: handleCityBlur })} id="city" /><br />
+                <input className={`${errors.cityFetchFailed ? 'bg-[#FFDEDE]' : null} ${inputClass}`} type="text" placeholder='Middelburg' {...register("city", { onBlur: handleCityBlur })} id="city" />
+                {errors.cityFetchFailed ? <p className='text-[#FF0000] text-sm'>{errors.cityFetchFailed?.message}</p> : null}
             </div>
             <div>
                 <div className='flex flex-row gap-1'>
