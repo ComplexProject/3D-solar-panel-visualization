@@ -56,12 +56,36 @@ export async function GetGeocodingData(city:string) {
         },
       }
     );
+      
+if (!response.ok) {
+      let message = `Request failed with status ${response.status}`;
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      switch (response.status) {
+        case 400:
+          message = "Bad request (400). Check your parameters.";
+          break;
+        case 404:
+          message = "Not found (404). City not found.";
+          break;
+        case 500:
+          message = "Server error (500). Try again later.";
+          break;
+      }
+
+      throw new Error(message);
     }
 
     const data: GeocodingResult[] = await response.json();
+    try {
+    } catch {
+      throw new Error("Failed to parse JSON response.");
+    }
+
+    if (!data || (Array.isArray(data) && data.length === 0)) {
+      throw new Error("No results for this city.");
+    }
+
+    return data;
 
     // if (data && data.length > 0) {
     //   const newCoords: Coordinate = {
