@@ -48,12 +48,12 @@ function AdvancedSettings() {
       <div className='group'>
         <label htmlFor="latitude">{predefinedCity() ? `Latitude for ${predefinedCity()}` : 'Latitude'}</label><br />
         <input className={inputClass} type="float" id="latitude" disabled={predefinedCity()} {...register("latitude")} /><br/>
-        {predefinedCity() ? <ToolTip toolTipText='City is already predifined' toolTipPosition='bottom'/> : ''}
+        {predefinedCity() ? <ToolTip toolTipText='City is already predefined' toolTipPosition='bottom'/> : ''}
       </div>
       <div className='group'>
         <label htmlFor="longitude">{predefinedCity() ? `Longitude for ${predefinedCity()}` : 'Longitude'}</label><br />
         <input className={inputClass} type="float" id="longitude" disabled={predefinedCity()} {...register("longitude")} /><br/>
-        {predefinedCity() ? <ToolTip toolTipText='City is already predifined' toolTipPosition='bottom'/> : ''}
+        {predefinedCity() ? <ToolTip toolTipText='City is already predefined' toolTipPosition='bottom'/> : ''}
       </div>
       <div>
         <label htmlFor="year">Year</label><br />
