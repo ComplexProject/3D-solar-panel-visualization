@@ -109,7 +109,7 @@ export default function ModelViewer({ children }: { children: React.ReactNode })
               target={[0, 0, 0]}
               enableRotate={isReady}
               enableZoom={false}
-              enablePan={isReady}
+              enablePan={false}
               screenSpacePanning={false}
             />
             <Suspense fallback={null}>
