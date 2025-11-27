@@ -27,6 +27,18 @@ function App() {
   const [failedFetch, setFailedFetch] = useState(false)
   const nodeRef = useRef(null)
   const pullTabRef = useRef(null)
+  const navRef = useRef<HTMLDivElement>(null)
+
+  const handleNav = (direction: string) => {
+    if (direction == "left") {
+      console.log('left')
+      navRef.current?.scrollBy({ left: -200, behavior: "smooth" })
+    }
+    if (direction == "right") {
+      console.log("right")
+      navRef.current?.scrollBy({ left: 200, behavior: "smooth" })
+    }
+  }
 
   const closeSideMenu = () => {
     setShowSideMenu(false)
@@ -99,12 +111,17 @@ function App() {
           <div className='w-full h-full flex flex-row gap-10'>
             <div className='bg-white p-10 gap-10 drop-shadow rounded-2xl w-2/3 flex flex-col min-w-0'>
               <h1 className=' text-2xl font-bold'>Optimal solar placement</h1>
-              <div className='grid grid-rows-2 grid-flow-col gap-10 w-full overflow-x-auto overflow-y-visible'>
+              <button onClick={() => handleNav('left')}>Prev</button>
+              <div ref={navRef} className='grid grid-rows-2 grid-flow-col gap-10 w-full overflow-x-auto overflow-y-visible'>
+                
                 {dummyData && dummyData.solarPanels.map((panel, index) => (
                   <SolarPlacementCard key={index} panelNumber={index + 1} azimuth={panel.azimuth} slope={panel.slope} />
                 ))
                 }
+                <SolarPlacementCard panelNumber={1} azimuth={1} slope={1} />
+                <SolarPlacementCard panelNumber={1} azimuth={1} slope={1} />
               </div>
+              <button onClick={() => handleNav('right')}>Next</button>
             </div>
             <div className='bg-white drop-shadow rounded-2xl flex flex-col w-1/3'>
               <h1 className='font-bold text-2xl p-10'>Produced solar energy</h1>
