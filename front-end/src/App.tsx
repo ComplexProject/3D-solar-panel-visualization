@@ -7,6 +7,8 @@ import UsedParameters from './energyResultsComponents/UsedParameters'
 import SolarPlacementCard from './energyResultsComponents/SolarPlacementCard'
 import ProducedSolarEnergy from './energyResultsComponents/ProducedSolarEnergy'
 import { FastArrowLeft, IconoirProvider } from 'iconoir-react';
+import { ArrowLeftCircleSolid } from 'iconoir-react';
+import { ArrowRightCircleSolid } from 'iconoir-react';
 import ModelViewer from './ModelImportComponent/ModelViewer'
 import BuildingWithSolarPanels from './ModelImportComponent/BuildingWithSolarPanels'
 import { getDummyData } from './api'
@@ -109,11 +111,9 @@ function App() {
         { dummyData ? 
         <>
           <div className='w-full h-full flex flex-row gap-10'>
-            <div className='bg-white p-10 gap-10 drop-shadow rounded-2xl w-2/3 flex flex-col min-w-0'>
-              <h1 className=' text-2xl font-bold'>Optimal solar placement</h1>
-              <button onClick={() => handleNav('left')}>Prev</button>
-              <div ref={navRef} className='grid grid-rows-2 grid-flow-col gap-10 w-full overflow-x-auto overflow-y-visible'>
-                
+            <div className='bg-white p-10 gap-0 drop-shadow rounded-2xl w-2/3 flex flex-col min-w-0'>
+              <h1 className=' text-2xl font-bold'>Optimal solar placement</h1>              
+              <div ref={navRef} className='grid grid-rows-2 grid-flow-col gap-10 w-full overflow-x-auto'>
                 {dummyData && dummyData.solarPanels.map((panel, index) => (
                   <SolarPlacementCard key={index} panelNumber={index + 1} azimuth={panel.azimuth} slope={panel.slope} />
                 ))
@@ -121,8 +121,34 @@ function App() {
                 <SolarPlacementCard panelNumber={1} azimuth={1} slope={1} />
                 <SolarPlacementCard panelNumber={1} azimuth={1} slope={1} />
               </div>
-              <button onClick={() => handleNav('right')}>Next</button>
+              <div className='flex flex-row justify-center gap-5 m-0 p-0'>
+                <button onClick={() => handleNav('left')}>
+                <IconoirProvider
+                  iconProps={{
+                  color: '#000000',
+                  strokeWidth: 1.5,
+                  width: '1.5rem',
+                  height: '1.5rem',
+                }}
+              >
+                <ArrowLeftCircleSolid />
+              </IconoirProvider>
+              </button>
+              <button onClick={() => handleNav('right')}>
+                <IconoirProvider
+                  iconProps={{
+                  color: '#000000',
+                  strokeWidth: 1.5,
+                  width: '1.5rem',
+                  height: '1.5rem',
+                }}
+              >
+                <ArrowRightCircleSolid />
+              </IconoirProvider>
+              </button>
+              </div>
             </div>
+            
             <div className='bg-white drop-shadow rounded-2xl flex flex-col w-1/3'>
               <h1 className='font-bold text-2xl p-10'>Produced solar energy</h1>
               <hr className='border-1'/>
