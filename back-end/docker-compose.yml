@@ -10,6 +10,7 @@ services:
       - python
       - savedata
       - matlab
+      - routerstrategy
     networks:
       - apinetwork
 
@@ -45,6 +46,19 @@ services:
       - "${MATLAB}:${MATLAB}"
     volumes:
       - ./matlab:/app
+    networks:
+      - apinetwork
+
+  routerstrategy:
+    env_file: ./.env
+    build: ./router-strategy
+    container_name: routerstrategy
+    ports:
+      - "8502:8502"
+    depends_on:
+      - matlab
+      - python
+      - savedata
     networks:
       - apinetwork
 
