@@ -69,19 +69,7 @@ def getData(azimuth: int, slope: int, latit: float, longit: float, year: int):
 
     # Early return if file exists
     if os.path.exists(combined_file):
-        # import pickle
-        # with open(combined_file, "rb") as f:
-        #     all_Ppv_data = pickle.load(f)
-
-        # num_slopes = len(all_Ppv_data)
-        # num_azimuths = len(all_Ppv_data[0])
-        # all_Ppv_cell = np.empty((num_slopes, num_azimuths), dtype=object)
-        # for s in range(num_slopes):
-        #     for a in range(num_azimuths):
-        #         all_Ppv_cell[s, a] = np.asarray(all_Ppv_data[s][a], dtype=float)
-        # return {"hourly_shape": all_Ppv_cell.shape}
-        print(f"{combined_file} exists")
-        return {"it work"}
+        return {"it exists"}
     else:
         print(f"{combined_file} doesn't exist")
     # ------------------------
@@ -147,11 +135,8 @@ def getData(azimuth: int, slope: int, latit: float, longit: float, year: int):
             future.result()
 
     # ------------------------
-    # Save results as .pkl and .mat
+    # Save results as .mat
     # ------------------------
-    # import pickle
-    # with open(combined_file, "wb") as f:
-    #     pickle.dump(all_Ppv_data, f)
 
     mat_file = save_pv(all_Ppv_data, azimuth, slope, latit, longit, year)
     post_file_to_saveData(mat_file, azimuth_res=azimuth, slope_res=slope, year=year)

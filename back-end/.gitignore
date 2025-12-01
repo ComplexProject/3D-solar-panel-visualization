@@ -3,4 +3,4 @@
 octave-workspace
 .env
 __pycache__
-!data/
+*.tar.xz
