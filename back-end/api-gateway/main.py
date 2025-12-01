@@ -15,7 +15,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Router Strategy Service URL
+# Router Strategy 
 ROUTER_STRATEGY_URL = os.getenv("ROUTER_STRATEGY_URL", "http://routerstrategy:8502")
 
 @app.post("/run")
@@ -28,7 +28,7 @@ async def run_flow(payload: dict):
             response = await client.post(
                 f"{ROUTER_STRATEGY_URL}/run",
                 json=payload,
-                timeout=300.0  # 5 minute timeout for long-running operations
+                timeout=300.0  
             )
             response.raise_for_status()
             return response.json()
