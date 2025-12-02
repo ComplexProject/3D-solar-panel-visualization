@@ -269,7 +269,11 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
     gridStartX = Math.max(planeXMin, Math.min(clampedXMin + (widthAvailable - totalWidth) / 2, planeXMax - totalWidth))
     gridStartZ = Math.max(planeZMin, Math.min(clampedZMin + (depthAvailable - totalDepth) / 2, planeZMax - totalDepth))
 
-    const total = Math.min(MAX_PANELS, rows * cols)
+    // Limit total panels to the number of overrides from API, or use calculated grid size
+    const maxFromGrid = Math.min(MAX_PANELS, rows * cols)
+    const maxFromAPI = overrides.length > 0 ? overrides.length : maxFromGrid
+    const total = Math.min(maxFromGrid, maxFromAPI)
+
     const lift = PANEL_LIFT + (-panel.minY * Math.abs(scale[1]))
     const up = new Vector3(0, 1, 0)
     const positions: [number, number, number][] = []
