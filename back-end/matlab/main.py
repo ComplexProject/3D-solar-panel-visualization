@@ -9,14 +9,14 @@ MATLAB_PORT = int(os.getenv("MATLAB", 1000))
 app = FastAPI()
 
 @app.get("/runMatlab")
-def runMatlab(azimuth: int, slope: int, demandProfile: str, weatherData:str ):
+def runMatlab(azimuth: int, slope: int, demandProfile: str, weatherData:str ,year:int):
     BASE_URL = "http://savedata:8505/getFile"
 
     filename = weatherData
     save_dir = "tmp/"  
     weather_file_path = os.path.join(save_dir, filename)
 
-    response = requests.get(BASE_URL, params={"filename": filename})
+    response = requests.get(BASE_URL, params={"filename": filename, "year":year})
     if response.status_code == 200:
         with open(weather_file_path, "wb") as f:
             f.write(response.content)
