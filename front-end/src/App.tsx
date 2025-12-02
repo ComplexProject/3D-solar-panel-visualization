@@ -9,6 +9,10 @@ import ProducedSolarEnergy from './energyResultsComponents/ProducedSolarEnergy'
 import { FastArrowLeft, IconoirProvider } from 'iconoir-react';
 import { ArrowLeftCircleSolid } from 'iconoir-react';
 import { ArrowRightCircleSolid } from 'iconoir-react';
+import { ArrowLeft } from 'iconoir-react';
+import { ArrowRight } from 'iconoir-react';
+import { NavArrowLeft } from 'iconoir-react';
+import { NavArrowRight } from 'iconoir-react';
 import ModelViewer from './ModelImportComponent/ModelViewer'
 import BuildingWithSolarPanels from './ModelImportComponent/BuildingWithSolarPanels'
 import { getDummyData } from './api'
@@ -44,6 +48,14 @@ function App() {
 
   const closeSideMenu = () => {
     setShowSideMenu(false)
+  }
+
+  const showNavArrows = (): boolean => {
+    if (dummyData && dummyData?.solarPanels.length > 4) {
+      console.log('true')
+      return true
+    }
+    else return false
   }
 
   useEffect(() => {
@@ -111,42 +123,48 @@ function App() {
         { dummyData ? 
         <>
           <div className='w-full h-full flex flex-row gap-10'>
-            <div className='bg-white p-10 gap-0 drop-shadow rounded-2xl w-2/3 flex flex-col min-w-0'>
-              <h1 className=' text-2xl font-bold'>Optimal solar placement</h1>              
+            <div className='relative bg-white p-10 gap-0 drop-shadow rounded-2xl w-2/3 flex flex-col min-w-0'>
+              <h1 className=' text-2xl font-bold mb-5'>Optimal solar placement</h1>              
               <div ref={navRef} className='grid grid-rows-2 grid-flow-col gap-10 w-full overflow-x-auto'>
                 {dummyData && dummyData.solarPanels.map((panel, index) => (
                   <SolarPlacementCard key={index} panelNumber={index + 1} azimuth={panel.azimuth} slope={panel.slope} />
                 ))
                 }
-                <SolarPlacementCard panelNumber={1} azimuth={1} slope={1} />
-                <SolarPlacementCard panelNumber={1} azimuth={1} slope={1} />
               </div>
-              <div className='flex flex-row justify-center gap-5 m-0 p-0'>
+              {dummyData?.solarPanels.length > 4 ? 
+              <div className='absolute top-[53%] w-full px-10 left-0 right-0 flex flex-row justify-between m-0 p-0'>
                 <button onClick={() => handleNav('left')}>
-                <IconoirProvider
+                  <IconoirProvider
                   iconProps={{
                   color: '#000000',
                   strokeWidth: 1.5,
                   width: '1.5rem',
                   height: '1.5rem',
-                }}
-              >
-                <ArrowLeftCircleSolid />
-              </IconoirProvider>
-              </button>
-              <button onClick={() => handleNav('right')}>
-                <IconoirProvider
-                  iconProps={{
-                  color: '#000000',
-                  strokeWidth: 1.5,
-                  width: '1.5rem',
-                  height: '1.5rem',
-                }}
-              >
-                <ArrowRightCircleSolid />
-              </IconoirProvider>
-              </button>
+                  }}
+                  >
+                  {/* <ArrowLeftCircleSolid /> */}
+                  <ArrowLeft />
+                  {/* <NavArrowLeft /> */}
+                  </IconoirProvider>
+                </button>
+                <button onClick={() => handleNav('right')}>
+                  <IconoirProvider
+                    iconProps={{
+                    color: '#000000',
+                    strokeWidth: 1.5,
+                    width: '1.5rem',
+                    height: '1.5rem',
+                  }}
+                  >
+                  {/* <ArrowRightCircleSolid /> */}
+                  <ArrowRight />
+                  {/* <NavArrowRight /> */}
+                  </IconoirProvider>
+                </button>
               </div>
+              : 
+              null
+              }
             </div>
             
             <div className='bg-white drop-shadow rounded-2xl flex flex-col w-1/3'>
