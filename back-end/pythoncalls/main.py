@@ -67,11 +67,13 @@ def post_file_to_saveData(file_path: str, azimuth_res=1, slope_res=1, year=2019)
 def getData(azimuth: int, slope: int, latit: float, longit: float, year: int):
     combined_file = f"data/{year}/all_Ppv_data_azires_{azimuth}_sloperes_{slope}_{latit:.5f}_{longit:.5f}.mat"
 
-    # Early return if file exists
-    if os.path.exists(combined_file):
-        return {"it exists"}
-    else:
-        print(f"{combined_file} doesn't exist")
+
+    params={"filename":combined_file}
+    if(requests.get("http://savedata:8505/checkFile",params=params)):
+        return combined_file
+    
+    
+    
     # ------------------------
     # Simulation Parameters
     # ------------------------
@@ -141,13 +143,10 @@ def getData(azimuth: int, slope: int, latit: float, longit: float, year: int):
     mat_file = save_pv(all_Ppv_data, azimuth, slope, latit, longit, year)
     post_file_to_saveData(mat_file, azimuth_res=azimuth, slope_res=slope, year=year)
 
-    # Return shapes for verification
-    all_Ppv_cell = np.empty((num_slopes, num_azimuths), dtype=object)
-    for s in range(num_slopes):
-        for a in range(num_azimuths):
-            all_Ppv_cell[s, a] = np.asarray(all_Ppv_data[s][a], dtype=float)
+    if os.path.exists(combined_file):
+        os.remove(combined_file)
 
-    return {"hourly_shape": all_Ppv_cell.shape}
+    return  combined_file
 
 # ------------------------
 # Main

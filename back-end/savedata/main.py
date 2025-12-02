@@ -35,6 +35,12 @@ async def list_saved_files():
     return JSONResponse(content={"saved_files": mat_files})
 
 
+@app.get("/checkFile")
+def checkFile(filename: str):
+    path = os.path.join("/app/data", filename)
+    return {"exists": os.path.isfile(path)}
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=SAVE_DATA, log_level="info")
