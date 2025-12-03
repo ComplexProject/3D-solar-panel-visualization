@@ -26,7 +26,7 @@ function AdvancedSettings() {
     return {
         latitude: savedLatitude ? JSON.parse(savedLatitude) : 0,
         longitude: savedLongitude ? JSON.parse(savedLongitude) : 0,
-        year: savedYear ? JSON.parse(savedYear) : 2024,
+        year: savedYear ? JSON.parse(savedYear) : 2023,
     };
   });
 
