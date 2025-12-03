@@ -145,32 +145,35 @@ Ppv_SO_percentage = 100/sum(Pd_initial)*Ppv_usable_SO_total;
 
 % end
 
-
 % Collect all panels
 panel_idx = 1;
 panels_json = {};
 for a = 1:size(all_Ppv_data, 2)
     for s = 1:size(all_Ppv_data, 1)
         if PV_distribution(s, a) ~= 0
-            panels_json{end+1} = sprintf('"panel%d": {"kpw": %d, "azimuth": %d, "slope": %d}', ...
+            panels_json{end+1} = sprintf('"panel%d": {"kwp": %d, "azimuth": %d, "slope": %d}', ...
                                          panel_idx, PV_distribution(s,a), x_azimuth(a), y_slope(s));
             panel_idx = panel_idx + 1;
         end
     end
 end
 
-% Join panels safely
+% Join panel entries
 panels_str = strjoin(panels_json, ',');
+
+% Create panels JSON object
+panels_object = sprintf('"panels": { %s }', panels_str);
 
 % Add totals
 Ppv_usable = Pd_initial - Pd_summary{end};
 Ppv_usable_tot = sum(Ppv_usable);
 Ppv_percentage = 100 * Ppv_usable_tot / sum(Pd_initial);
 
-% Build JSON string safely
+% Build final JSON string
 json_str = sprintf('{%s,"ppv_usable": %.2f,"ppv_percentage": %.2f,"energy_from_grid": %.2f}', ...
-                   panels_str, Ppv_usable_tot, Ppv_percentage, sum(Pd_initial));
+                   panels_object, Ppv_usable_tot, Ppv_percentage, sum(Pd_initial));
 
 % Print only JSON
 fprintf('%s\n', json_str);
+
 

@@ -1,10 +1,8 @@
-from urllib import response
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+import requests
 import os
 import uvicorn
-import httpx
 
 app = FastAPI()
 
@@ -15,39 +13,51 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Router Strategy 
-ROUTER_STRATEGY_URL = os.getenv("ROUTER_STRATEGY_URL", "http://routerstrategy:8502")
+@app.post("/getData")
+async def getData(
+    latitude: float = Form(...),
+    longitude: float = Form(...),
+    year: int = Form(...),
+    maxPower: float = Form(...),
+    profileDemand: UploadFile = File(...),
+):
+    strategy_port = os.getenv("ROUTER_STRATEGY_PORT", "8502")
+    url = f"http://routerstrategy:{strategy_port}/run"
+    
+    
+    data = {
+        "flow": "python",  
+        "azimuth": 1,
+        "slope": 1,
+        "latitude": latitude,
+        "longitude": longitude,
+        "year": year,
+    }
+    
+    files = {
+        "profileDemand": await profileDemand.read(),
+    }
+    
+    resp = requests.post(url, data=data)
+    resp.raise_for_status()
+    resp_json =resp.json()
+    print(resp_json)
+ 
+    weather_filename = resp_json.get("filename")
 
-@app.post("/run")
-async def run_flow(payload: dict):
-    """
-    Forward requests to the router strategy service.
-    """
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                f"{ROUTER_STRATEGY_URL}/run",
-                json=payload,
-                timeout=300.0  
-            )
-            response.raise_for_status()
-            return response.json()
-    except httpx.HTTPStatusError as e:
-        raise HTTPException(status_code=e.response.status_code, detail=e.response.text)
-    except httpx.RequestError as e:
-        raise HTTPException(status_code=503, detail=f"Router strategy service unavailable: {str(e)}")
 
-# @app.get("/dummy")
-# async def get_dummy():
-#     async with httpx.AsyncClient() as client:
-#         response = await client.get(f"{SERVICES['DUMMY']}getDummy")
-#         return response.json()
-
-# @app.get("/python/{path:path}")
-# async def get_python(path: str):
-#     async with httpx.AsyncClient() as client:
-#         response = await client.get(f"{SERVICES['PYTHON']}{path}")
-#         return response.json()
+    print(weather_filename)
+    data = {
+        "latitude": latitude,
+        "longitude": longitude,
+        "year": year,
+        "flow": "matlab", 
+        "azimuth": 1,
+        "slope": 1,
+        "weatherFile": resp_json.get("filename"),
+    }
+    resp = requests.post(url, files=files,data=data)
+    return resp.json()
 
 @app.get("/")
 def root():

@@ -12,4 +12,4 @@ COPY . .
 ENV API_PORT=${API_PORT}
 EXPOSE ${API_PORT}
 
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${API_PORT:-8501} --reload"]
+CMD uvicorn main:app --host 0.0.0.0 --port ${API_PORT} --reload
