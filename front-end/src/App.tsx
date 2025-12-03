@@ -7,12 +7,8 @@ import UsedParameters from './energyResultsComponents/UsedParameters'
 import SolarPlacementCard from './energyResultsComponents/SolarPlacementCard'
 import ProducedSolarEnergy from './energyResultsComponents/ProducedSolarEnergy'
 import { FastArrowLeft, IconoirProvider } from 'iconoir-react';
-import { ArrowLeftCircleSolid } from 'iconoir-react';
-import { ArrowRightCircleSolid } from 'iconoir-react';
 import { ArrowLeft } from 'iconoir-react';
 import { ArrowRight } from 'iconoir-react';
-import { NavArrowLeft } from 'iconoir-react';
-import { NavArrowRight } from 'iconoir-react';
 import ModelViewer from './ModelImportComponent/ModelViewer'
 import BuildingWithSolarPanels from './ModelImportComponent/BuildingWithSolarPanels'
 import { getDummyData } from './api'
@@ -37,11 +33,9 @@ function App() {
 
   const handleNav = (direction: string) => {
     if (direction == "left") {
-      console.log('left')
       navRef.current?.scrollBy({ left: -200, behavior: "smooth" })
     }
     if (direction == "right") {
-      console.log("right")
       navRef.current?.scrollBy({ left: 200, behavior: "smooth" })
     }
   }
@@ -52,7 +46,6 @@ function App() {
 
   const showNavArrows = (): boolean => {
     if (dummyData && dummyData?.solarPanels.length > 4) {
-      console.log('true')
       return true
     }
     else return false
@@ -142,9 +135,7 @@ function App() {
                   height: '1.5rem',
                   }}
                   >
-                  {/* <ArrowLeftCircleSolid /> */}
-                  <ArrowLeft />
-                  {/* <NavArrowLeft /> */}
+                    <ArrowLeft />
                   </IconoirProvider>
                 </button>
                 <button onClick={() => handleNav('right')}>
@@ -156,9 +147,7 @@ function App() {
                     height: '1.5rem',
                   }}
                   >
-                  {/* <ArrowRightCircleSolid /> */}
-                  <ArrowRight />
-                  {/* <NavArrowRight /> */}
+                    <ArrowRight />
                   </IconoirProvider>
                 </button>
               </div>
@@ -166,7 +155,6 @@ function App() {
               null
               }
             </div>
-            
             <div className='bg-white drop-shadow rounded-2xl flex flex-col w-1/3'>
               <h1 className='font-bold text-2xl p-10'>Produced solar energy</h1>
               <hr className='border-1'/>
