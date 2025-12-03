@@ -19,11 +19,14 @@ async def saveDataFile(file: UploadFile = File(...), azimuth_res: int = 1, slope
 
 
 @app.get("/getFile")
-async def getFile(filename):
-    save_dir = "data/"
+async def getFile(filename: str, year: int):
+    if not filename or filename.strip() == "":
+        return JSONResponse(status_code=400, content={"status": "error", "message": "Filename cannot be empty"})
+    
+    save_dir = f"/app/data/{year}"
     file_path = os.path.join(save_dir, filename)
     if not os.path.exists(file_path):
-        return {"status": "error", "message": f"File '{filename}' not found"}
+        return JSONResponse(status_code=404, content={"status": "error", "message": f"File '{filename}' not found"})
 
     return FileResponse(file_path, media_type='application/octet-stream', filename=filename)
 
@@ -38,6 +41,7 @@ async def list_saved_files():
 @app.get("/checkFile")
 def checkFile(filename: str):
     path = os.path.join("/app/data", filename)
+    print(os.path.exists(path))
     return {"exists": os.path.isfile(path)}
 
 

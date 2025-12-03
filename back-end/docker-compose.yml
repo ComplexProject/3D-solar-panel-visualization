@@ -4,6 +4,8 @@ services:
   api-gateway:
     env_file: ./.env
     build: ./api-gateway
+    volumes:
+      - ./api-gateway:/app
     ports:
       - "${API_PORT}:${API_PORT}"
     depends_on:
@@ -51,8 +53,10 @@ services:
 
   routerstrategy:
     env_file: ./.env
-    build: ./router-strategy
+    build: ./routerstrategy
     container_name: routerstrategy
+    volumes:
+      - ./routerstrategy:/app
     ports:
       - "8502:8502"
     depends_on:

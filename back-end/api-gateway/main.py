@@ -1,6 +1,5 @@
-from urllib import response
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, UploadFile, File
 import requests
 import os
 import uvicorn
@@ -15,24 +14,50 @@ app.add_middleware(
 )
 
 @app.post("/getData")
-def getData(latitude:int, longitude:int,year:int,maxPower:int,profileDemand:UploadFile = File(...),):
-    strategy_port = os.getenv("ROUTER_STRATEGY", "8503")
-    url= f"http://router-strategy:{strategy_port}/run"    
-
-    params = {
-        "flow": "python",
+async def getData(
+    latitude: float = Form(...),
+    longitude: float = Form(...),
+    year: int = Form(...),
+    maxPower: float = Form(...),
+    profileDemand: UploadFile = File(...),
+):
+    strategy_port = os.getenv("ROUTER_STRATEGY_PORT", "8502")
+    url = f"http://routerstrategy:{strategy_port}/run"
+    
+    
+    data = {
+        "flow": "python",  
         "azimuth": 1,
         "slope": 1,
-        "latit": latitude,
-        "longit": longitude,
+        "latitude": latitude,
+        "longitude": longitude,
         "year": year,
     }
-
-    resp = requests.post(url, params=params)
+    
+    files = {
+        "profileDemand": await profileDemand.read(),
+    }
+    
+    resp = requests.post(url, data=data)
     resp.raise_for_status()
+    resp_json =resp.json()
+    print(resp_json)
+ 
+    weather_filename = resp_json.get("filename")
+
+
+    print(weather_filename)
+    data = {
+        "latitude": latitude,
+        "longitude": longitude,
+        "year": year,
+        "flow": "matlab", 
+        "azimuth": 1,
+        "slope": 1,
+        "weatherFile": resp_json.get("filename"),
+    }
+    resp = requests.post(url, files=files,data=data)
     return resp.json()
-
-
 
 @app.get("/")
 def root():
@@ -40,4 +65,4 @@ def root():
 
 if __name__ == "__main__":
     port = int(os.getenv("API_PORT", "8501"))
-    uvicorn.run(app, host="127.0.0.1", port=port, reload=True)
+    uvicorn.run(app, host="0.0.0.0", port=port, reload=True)

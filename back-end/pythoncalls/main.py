@@ -19,7 +19,7 @@ app.add_middleware(
 )
 
 # ------------------------
-# Helper: Save PV as .mat
+# Helper: Save PV as .mat in float32
 # ------------------------
 def save_pv(all_Ppv_data, azimuth, slope, lat, long, year):
     save_dir = f"data/{year}"
@@ -32,19 +32,23 @@ def save_pv(all_Ppv_data, azimuth, slope, lat, long, year):
     for s in range(num_slopes):
         for a in range(num_azimuths):
             hourly = all_Ppv_data[s][a]
+
             if isinstance(hourly, np.ndarray):
-                hourly_array = np.array(hourly, dtype=float)
+                hourly_array = hourly.astype(np.float32)
+
             elif isinstance(hourly, list):
-                hourly_array = np.array(hourly, dtype=float).reshape(-1, 1)
+                hourly_array = np.array(hourly, dtype=np.float32).reshape(-1, 1)
+
             else:
-                hourly_array = np.zeros((8760, 1))
+                hourly_array = np.zeros((8760, 1), dtype=np.float32)
+
             all_Ppv_cell[s, a] = hourly_array
 
-    # Force consistent float formatting in filename
     mat_file_ppv = os.path.join(
         save_dir,
         f"all_Ppv_data_azires_{azimuth}_sloperes_{slope}_{lat:.5f}_{long:.5f}.mat"
     )
+
     scipy.io.savemat(mat_file_ppv, {"all_Ppv_data": all_Ppv_cell}, do_compression=False)
     return mat_file_ppv
 
@@ -66,14 +70,15 @@ def post_file_to_saveData(file_path: str, azimuth_res=1, slope_res=1, year=2019)
 @app.get("/getData")
 def getData(azimuth: int, slope: int, latit: float, longit: float, year: int):
     combined_file = f"data/{year}/all_Ppv_data_azires_{azimuth}_sloperes_{slope}_{latit:.5f}_{longit:.5f}.mat"
+    returnName = f"all_Ppv_data_azires_{azimuth}_sloperes_{slope}_{latit:.5f}_{longit:.5f}.mat"
 
+    # Check if file already exists in savedata
+    params = {"filename": combined_file}
+    response = requests.get("http://savedata:8505/checkFile", params=params)
+    if response.json()["exists"]:
+            return {"filename": returnName}
+   
 
-    params={"filename":combined_file}
-    if(requests.get("http://savedata:8505/checkFile",params=params)):
-        return combined_file
-    
-    
-    
     # ------------------------
     # Simulation Parameters
     # ------------------------
@@ -112,11 +117,11 @@ def getData(azimuth: int, slope: int, latit: float, longit: float, year: int):
             hourly = [[0]] * 8760  # fallback empty array
 
         if "P" in hourly[0]:
-            P_array = np.array([h["P"] for h in hourly], dtype=float).reshape(-1, 1)
+            P_array = np.array([h["P"] for h in hourly], dtype=np.float32).reshape(-1, 1)
         elif "P_ac" in hourly[0]:
-            P_array = np.array([h["P_ac"] for h in hourly], dtype=float).reshape(-1, 1)
+            P_array = np.array([h["P_ac"] for h in hourly], dtype=np.float32).reshape(-1, 1)
         else:
-            P_array = np.zeros((8760, 1))
+            P_array = np.zeros((8760, 1), dtype=np.float32)
 
         if P_array.shape[0] < 8760:
             P_array = np.pad(P_array, ((0, 8760 - P_array.shape[0]), (0, 0)), mode="constant")
@@ -137,16 +142,15 @@ def getData(azimuth: int, slope: int, latit: float, longit: float, year: int):
             future.result()
 
     # ------------------------
-    # Save results as .mat
+    # Save results as .mat (float32)
     # ------------------------
-
     mat_file = save_pv(all_Ppv_data, azimuth, slope, latit, longit, year)
     post_file_to_saveData(mat_file, azimuth_res=azimuth, slope_res=slope, year=year)
 
     if os.path.exists(combined_file):
         os.remove(combined_file)
 
-    return  combined_file
+    return {"filename": returnName}
 
 # ------------------------
 # Main

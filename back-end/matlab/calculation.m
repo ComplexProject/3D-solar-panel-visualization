@@ -151,7 +151,7 @@ panels_json = {};
 for a = 1:size(all_Ppv_data, 2)
     for s = 1:size(all_Ppv_data, 1)
         if PV_distribution(s, a) ~= 0
-            panels_json{end+1} = sprintf('"panel%d": {"kpw": %d, "azimuth": %d, "slope": %d}', ...
+            panels_json{end+1} = sprintf('"panel%d": {"kwp": %d, "azimuth": %d, "slope": %d}', ...
                                          panel_idx, PV_distribution(s,a), x_azimuth(a), y_slope(s));
             panel_idx = panel_idx + 1;
         end

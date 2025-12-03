@@ -1,10 +1,11 @@
 import requests
+import time
 
 BASE_URL = "http://localhost:8503/getData"
 PARAMS_TEMPLATE = {
     "azimuth": 1,
     "slope": 1,
-    "year": 2019
+    "year": 2023
 }
 
 coordinates = [
@@ -68,9 +69,13 @@ for lat, lon in coordinates:
     params["latit"] = lat
     params["longit"] = lon
 
-    try:
-        response = requests.get(BASE_URL, params=params, timeout=3000)
-        response.raise_for_status()
-        print(f"✓ Success for ({lat}, {lon})")
-    except Exception as e:
-        print(f"✗ Error for ({lat}, {lon}): {e}")
+    while True:
+        try:
+            response = requests.get(BASE_URL, params=params, timeout=3000)
+            response.raise_for_status()
+            print(f"✓ Success for ({lat}, {lon})")
+            break  
+        except Exception as e:
+            print(f"✗ Error for ({lat}, {lon}): {e}")
+            print("Retrying in 1 seconds...")
+            time.sleep(1) 
