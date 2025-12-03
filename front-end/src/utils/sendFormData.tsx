@@ -1,4 +1,5 @@
 export async function sendFormData() {
+    const apiPort = import.meta.env.VITE_API_PORT;
     const savedPower = JSON.parse(localStorage.getItem("power") || "0");
     const savedLatitude = JSON.parse(localStorage.getItem("latitude") || "0");
     const savedLongitude = JSON.parse(localStorage.getItem("longitude") || "0");
@@ -15,13 +16,13 @@ export async function sendFormData() {
     const file = new File([blob], fileData.name, { type: fileData.type });
 
     const formData = new FormData();
-    formData.append('latitude', savedLatitude.toString());
-    formData.append('longitude', savedLongitude.toString());
-    formData.append('year', savedYear.toString());
-    formData.append('maxPower', savedPower.toString());
-    formData.append('demandProfile', file);
+    formData.append('latitude', String(savedLatitude));
+    formData.append('longitude', String(savedLongitude));
+    formData.append('year', String(savedYear));
+    formData.append('maxPower', String(savedPower));
+    formData.append('profileDemand', file);
 
-    const url = `http://localhost:8515/sendForm`;
+    const url = `http://localhost:${apiPort}/getData`;
     
     const resp = await fetch(url, {
         method: "POST",

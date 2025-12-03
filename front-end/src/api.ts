@@ -11,3 +11,9 @@ export const getDummyData = async () => {
     return null;
   }
 };
+
+// export const getResult = async () => {
+//   try {
+//     const response = await fetch ()
+//   }
+// }

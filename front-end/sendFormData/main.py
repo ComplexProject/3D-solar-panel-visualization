@@ -21,15 +21,15 @@ async def send_form(
     demandProfile: UploadFile = File(...)
 ):
     with open(f"./{demandProfile.filename}", "wb") as buffer:
-        shutil.copyfileobj(demandProfile.file, buffer)
+      shutil.copyfileobj(demandProfile.file, buffer)
     
     return {
-        "max_power": maxPower,
-        "latitude": latitude,
-        "longitude": longitude,
-        "year": year,
-        "file_received": True,
-        "filename": demandProfile.filename
+      "max_power": maxPower,
+      "latitude": latitude,
+      "longitude": longitude,
+      "year": year,
+      "file_received": True,
+      "filename": demandProfile.filename
     }
 
 if __name__ == "__main__":

@@ -15,9 +15,14 @@ import { getDummyData } from './api'
 import LoadingMessage from './statusMessageComponents/loadingMessage'
 import ErrorMessage from './statusMessageComponents/errorMessage'
 import Header from './Header'
+import React from 'react'
+
+export const CalculationContext = React.createContext<{isCalculationRunning: boolean; setIsCalculationRunning: (value: boolean) => void}>({isCalculationRunning: false, setIsCalculationRunning: () => {}});
 
 function App() {
   const [showSideMenu, setShowSideMenu] = useState(false)
+  const [isCalculationRunning, setIsCalculationRunning] = useState(false)
+
   type Panel = { azimuth: number; slope: number };
   type DummyData = {
     totalEnergy: number;
@@ -97,7 +102,9 @@ function App() {
               unmountOnExit
               nodeRef={nodeRef}
             >
-              <SideMenu nodeRef={nodeRef} onClick={closeSideMenu} />
+              <CalculationContext.Provider value={{ isCalculationRunning: isCalculationRunning, setIsCalculationRunning: setIsCalculationRunning}}>
+                <SideMenu nodeRef={nodeRef} onClick={closeSideMenu} />
+              </CalculationContext.Provider>
             </CSSTransition>
           </div>
       </div>

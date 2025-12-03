@@ -36,6 +36,7 @@ function StyledDropzone() {
   } = useDropzone({
     accept: { 'application/json': [],
               'text/csv': [],
+              'application/x-matlab': ['.mat'],
      },
     maxFiles: 1,
     onDrop: (acceptedFiles) => {

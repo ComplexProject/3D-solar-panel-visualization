@@ -1,28 +1,34 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import type { RefObject } from 'react';
 import ParameterForm from './formComponents/ParametersForm';
 import AdvancedSettings from './formComponents/AdvancedSettings';
 import FormButton from './formComponents/FormButton';
 import { Settings, Xmark, IconoirProvider } from 'iconoir-react';
 import { sendFormData } from './utils/sendFormData';
+import { CalculationContext } from './App';
 
 type SideMenuProps = {
     nodeRef: RefObject<HTMLDivElement | null>;
     onClick?: () => void;
 }
 
-const calculate = async () => {
-    try {
-        const res = await sendFormData();
-        console.log("send", res);
-    } catch (err) {
-        console.error("error", err)
-    }
-}
-
 function SideMenu({ nodeRef, onClick }: SideMenuProps) {
     const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+    const { isCalculationRunning, setIsCalculationRunning} = useContext(CalculationContext);
+
     const maxHeight = !showAdvancedSettings ? '22.968rem' : '14.394rem';
+
+    const calculate = async () => {
+        try {
+            setIsCalculationRunning(true)
+            const res = await sendFormData();
+            console.log("send", res);
+            setIsCalculationRunning(false)
+        } catch (err) {
+            console.error("error", err);
+            setIsCalculationRunning(false)
+        }
+    } 
     return (
         <>
             <div ref={nodeRef} className="flex flex-col py-6 rounded-l-3xl px-4 gap-5 w-full relative drop-shadow bg-[#F8F8F8]">
@@ -43,11 +49,21 @@ function SideMenu({ nodeRef, onClick }: SideMenuProps) {
                     </button>
                 </div>
                 <div className="flex flex-col drop-shadow transition-all duration-[230ms] ease-in-out py-5 px-8 bg-white rounded-2xl">
-                    {showAdvancedSettings ? <AdvancedSettings /> : <ParameterForm />}
+                    {!isCalculationRunning ? 
+                    <> {showAdvancedSettings ? <AdvancedSettings /> : <ParameterForm />} </>
+                    :
+                    <div className='flex flex-col gap-10 p-5 justify-center items-center'>
+                        <div className="relative w-12 h-12">
+                            <div className="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
+                            <div className="absolute inset-0 border-4 border-[#006FAA] rounded-full border-t-transparent animate-spin"></div>
+                        </div>
+                        <p>Calculation is running</p>
+                    </div>
+                    }
                 </div>
                 <div className="flex flex-row justify-center items-center gap-5 px-5">
                     {showAdvancedSettings ? <FormButton buttonText='Go back' isClosingButton={true} onClick={() => setShowAdvancedSettings(false)} /> : <FormButton buttonText='Close' isClosingButton={true} onClick={onClick} />}
-                    {showAdvancedSettings ? <FormButton buttonText='Save' type='submit' form='advanced-settings-form' /> : <FormButton buttonText='Calculate'  form="parameter-form" onClick={calculate} />}
+                    {showAdvancedSettings ? <FormButton buttonText='Save' type='submit' form='advanced-settings-form' /> : <FormButton buttonText='Calculate' form="parameter-form" onClick={calculate} />}
                 </div>
             </div>
         </>
