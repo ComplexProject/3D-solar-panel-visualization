@@ -47,7 +47,6 @@ export default function ModelViewer({ children }: { children: React.ReactNode })
 
   // Handle loading state changes with a small delay to ensure everything is rendered
   const handleLoadingChange = (loading: boolean) => {
-    console.log("Loading state changed:", loading)
     // Clear any pending timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
@@ -57,7 +56,6 @@ export default function ModelViewer({ children }: { children: React.ReactNode })
     if (!loading && !isReady) {
       // Add a delay after loading completes to ensure everything is fully rendered.
       timeoutRef.current = setTimeout(() => {
-        console.log("Model loaded, enabling controls")
         setIsLoading(false)
         setIsReady(true)
         timeoutRef.current = null

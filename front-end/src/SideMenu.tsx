@@ -57,7 +57,7 @@ function SideMenu({ nodeRef, onClick }: SideMenuProps) {
                             <div className="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
                             <div className="absolute inset-0 border-4 border-[#006FAA] rounded-full border-t-transparent animate-spin"></div>
                         </div>
-                        <p>Calculation is running</p>
+                        <p>Calculations are running...</p>
                     </div>
                     }
                 </div>
