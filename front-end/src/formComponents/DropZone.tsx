@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { IconoirProvider, CloudUpload, SmallLampAlt } from 'iconoir-react';
 
@@ -15,7 +15,20 @@ const rejectStyle: React.CSSProperties = {
 };
 
 function StyledDropzone() {
-  const [file, setFile] = useState<File | undefined>(undefined);
+const [file, setFile] = useState<File | undefined>(undefined);
+const [fileName, setFileName] = useState<string>('');
+
+useEffect(() => {
+  const storedFileData = localStorage.getItem("demandProfile");
+  if (storedFileData) {
+    try {
+      const fileData = JSON.parse(storedFileData);
+      setFileName(fileData.name || '');
+    } catch (error) {
+      console.error('Error loading file info:', error);
+    }
+  }
+}, []);
 
 const saveFile = (file: File) => {
     const reader = new FileReader();
@@ -34,7 +47,8 @@ const saveFile = (file: File) => {
             dataUrl: reader.result as string
         };
         localStorage.setItem("demandProfile", JSON.stringify(fileData));
-    };
+        setFileName(file.name);
+      };
     reader.readAsDataURL(file);
 };
 
@@ -50,8 +64,7 @@ const saveFile = (file: File) => {
     'application/json': [],
     'text/csv': ['.csv'],
     'application/x-matlab-data': ['.mat'],
-    'application/octet-stream': ['.mat'],
-    '': ['.mat']
+    'application/octet-stream': ['.mat']
     },
     maxFiles: 1,
     onDrop: (acceptedFiles) => {
@@ -77,7 +90,7 @@ const saveFile = (file: File) => {
   <div className="container">
     <div {...getRootProps({ style })} className='flex flex-col h-[9.2rem] justify-center items-center p-5 border-2 rounded-xl hover:cursor-pointer hover:border-[#006FAA] border-[#808080] border-dashed'>
       <input {...getInputProps()} />
-      {!file ? (<>
+      {!fileName ? (<>
         <div className="flex-shrink-0">
           <IconoirProvider
             iconProps={{
@@ -110,9 +123,9 @@ const saveFile = (file: File) => {
           </div>
           <p
             className='truncate max-w-[160px]'
-            title={file.name}
+            title={fileName}
           >
-            {file.name}
+            {fileName}
           </p>
         </div> 
       </>)
