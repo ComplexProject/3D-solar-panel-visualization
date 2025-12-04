@@ -5,7 +5,7 @@ import AdvancedSettings from './formComponents/AdvancedSettings';
 import FormButton from './formComponents/FormButton';
 import { Settings, Xmark, IconoirProvider } from 'iconoir-react';
 import { sendFormData } from './utils/sendFormData';
-import { CalculationContext } from './App';
+import { CalculationContext, ResultContext } from './App';
 
 type SideMenuProps = {
     nodeRef: RefObject<HTMLDivElement | null>;
@@ -14,19 +14,24 @@ type SideMenuProps = {
 
 function SideMenu({ nodeRef, onClick }: SideMenuProps) {
     const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
-    const { isCalculationRunning, setIsCalculationRunning} = useContext(CalculationContext);
+    const { isCalculationRunning, setIsCalculationRunning } = useContext(CalculationContext);
+    const { setIsResultAvailable, setResultData } = useContext(ResultContext);
 
     const maxHeight = !showAdvancedSettings ? '22.968rem' : '14.394rem';
 
     const calculate = async () => {
         try {
             setIsCalculationRunning(true)
+            setIsResultAvailable(1)
             const res = await sendFormData();
             console.log("send", res);
-            setIsCalculationRunning(false)
+            setResultData(res);
+            setIsCalculationRunning(false);
+            setIsResultAvailable(2);
         } catch (err) {
             console.error("error", err);
             setIsCalculationRunning(false)
+            setIsResultAvailable(3);
         }
     } 
     return (
