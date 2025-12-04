@@ -2,6 +2,7 @@ import { Canvas } from "@react-three/fiber"
 import { Environment, OrbitControls, PerspectiveCamera, Bounds } from "@react-three/drei"
 import { Suspense, useState, useRef, useEffect, cloneElement, isValidElement } from "react"
 import { useThree } from "@react-three/fiber"
+import LoadingMessageModelViewer from "../statusMessageComponents/loadingMessageModelViewer"
 
 // Custom OrbitControls component that enables zoom only when Shift is held
 function OrbitControlsWithShiftZoom(props: any) {
@@ -118,6 +119,7 @@ export default function ModelViewer({ children }: { children: React.ReactNode })
           </Canvas>
         </div>
       </div>
+      <LoadingMessageModelViewer />
       
       {isLoading && (
         <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
