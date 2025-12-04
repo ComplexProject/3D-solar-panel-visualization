@@ -77,7 +77,6 @@ def getData(azimuth: int, slope: int, latit: float, longit: float, year: int):
     response = requests.get("http://savedata:8505/checkFile", params=params)
     if response.json()["exists"]:
             return {"filename": returnName}
-   
 
     # ------------------------
     # Simulation Parameters

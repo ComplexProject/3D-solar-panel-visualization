@@ -17,14 +17,26 @@ const rejectStyle: React.CSSProperties = {
 function StyledDropzone() {
   const [file, setFile] = useState<File | undefined>(undefined);
 
-  const saveFile = (file: File) => {
-   const fileData = {
-    name: file.name,
-    type: file.type,
-    file: file
-   };
-   localStorage.setItem("demandProfile", JSON.stringify(fileData));
-  };
+const saveFile = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+        let fileType = file.type;
+        if (!fileType && file.name.toLowerCase().endsWith('.mat')) {
+            fileType = 'application/x-matlab-data';
+        }
+        
+        const fileData = {
+            name: file.name,
+            originalName: file.name,
+            type: fileType,
+            size: file.size,
+            lastModified: file.lastModified,
+            dataUrl: reader.result as string
+        };
+        localStorage.setItem("demandProfile", JSON.stringify(fileData));
+    };
+    reader.readAsDataURL(file);
+};
 
   const {
     getRootProps,
@@ -34,10 +46,13 @@ function StyledDropzone() {
     isDragReject,
     open
   } = useDropzone({
-    accept: { 'application/json': [],
-              'text/csv': [],
-              'application/x-matlab': ['.mat'],
-     },
+    accept: { 
+    'application/json': [],
+    'text/csv': ['.csv'],
+    'application/x-matlab-data': ['.mat'],
+    'application/octet-stream': ['.mat'],
+    '': ['.mat']
+    },
     maxFiles: 1,
     onDrop: (acceptedFiles) => {
       if (acceptedFiles.length > 0) {
