@@ -14,13 +14,13 @@ function OrbitControlsWithShiftZoom(props: any) {
         e.preventDefault()
         // Manually handle zoom when shift is pressed
         const delta = e.deltaY
-        const zoomSpeed = 1
+        const zoomSpeed = 0.7
         const distance = camera.position.distanceTo(controlsRef.current.target)
         const newDistance = distance + delta * zoomSpeed * 0.01
         
         // zoom distance
-        const minDistance = 20
-        const maxDistance = 80
+        const minDistance = 15
+        const maxDistance = 30
         const clampedDistance = Math.max(minDistance, Math.min(maxDistance, newDistance))
         
         // Zoom by moving camera along the line from target to camera
@@ -47,7 +47,6 @@ export default function ModelViewer({ children }: { children: React.ReactNode })
 
   // Handle loading state changes with a small delay to ensure everything is rendered
   const handleLoadingChange = (loading: boolean) => {
-    console.log("Loading state changed:", loading)
     // Clear any pending timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
@@ -57,7 +56,6 @@ export default function ModelViewer({ children }: { children: React.ReactNode })
     if (!loading && !isReady) {
       // Add a delay after loading completes to ensure everything is fully rendered.
       timeoutRef.current = setTimeout(() => {
-        console.log("Model loaded, enabling controls")
         setIsLoading(false)
         setIsReady(true)
         timeoutRef.current = null
@@ -86,7 +84,6 @@ export default function ModelViewer({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (isLoading) {
       const fallbackTimeout = setTimeout(() => {
-        console.warn("Loading timeout - enabling controls anyway")
         setIsLoading(false)
         setIsReady(true)
       }, 10000)
@@ -103,18 +100,24 @@ export default function ModelViewer({ children }: { children: React.ReactNode })
             <hemisphereLight intensity={1.2} groundColor="#ffffff" />
             <directionalLight position={[10, 10, 5]} intensity={1.2} castShadow />
             <Environment preset="city" />
-            <PerspectiveCamera makeDefault fov={70} near={0.1} far={3000} position={[45, 120, 180]} />
+            <PerspectiveCamera makeDefault fov={45} near={0.1} far={1000} position={[30, 40, 30]} />
             <OrbitControlsWithShiftZoom
               makeDefault
-              target={[0, 50, 0]}
+              target={[0, 0, 0]}
               enableRotate={isReady}
               enableZoom={false}
-              enablePan={false}
+              enablePan={true}
               screenSpacePanning={false}
             />
-            <Suspense fallback={null}>
-              <Bounds fit observe margin={3}>{childrenWithCallback}</Bounds>
-            </Suspense>
+            <Bounds fit observe margin={0.20}>
+  {/* Invisible bounding offset */}
+  <mesh position={[0, 45, 0]} visible={false}>
+    <boxGeometry args={[1,1,1]} />
+  </mesh>
+
+  {/* Your actual model (NOT moved) */}
+  {childrenWithCallback}
+</Bounds>
           </Canvas>
         </div>
       </div>
