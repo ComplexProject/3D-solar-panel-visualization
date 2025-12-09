@@ -54,7 +54,7 @@ function SideMenu({ nodeRef, onClick }: SideMenuProps) {
                         </IconoirProvider>
                     </button>
                 </div>
-                <div className="flex flex-col drop-shadow transition-all duration-[230ms] ease-in-out py-5 px-8 bg-white rounded-2xl">
+                <div className="flex flex-col drop-shadow transition-all duration-[230ms] ease-in-out py-5 px-8 bg-white rounded-2xl overflow-hidden" style={{ height: maxHeight}}>
                     {!isCalculationRunning ? 
                     <> {showAdvancedSettings ? <AdvancedSettings /> : <ParameterForm />} </>
                     :

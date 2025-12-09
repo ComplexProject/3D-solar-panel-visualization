@@ -49,6 +49,7 @@ function ParameterForm() {
                 })
                 localStorage.removeItem("latitude");
                 localStorage.removeItem("longitude");
+                localStorage.removeItem("city");
             }
         }
     }
@@ -68,7 +69,7 @@ function ParameterForm() {
                     <p className='text-red-500'>*</p>
                 </div>
                 <input className={`${errors.cityFetchFailed ? 'bg-[#FFDEDE]' : null} ${inputClass}`} type="text" placeholder='Middelburg' {...register("city", { onBlur: handleCityBlur })} id="city" />
-                {errors.cityFetchFailed ? <p className='text-[#FF0000] text-sm'>{errors.cityFetchFailed?.message}</p> : null}
+                {errors.cityFetchFailed ? <p className='text-[#FF0000] text-sm absolute z-50'>{errors.cityFetchFailed?.message}</p> : null}
             </div>
             <div>
                 <div className='flex flex-row gap-1'>
