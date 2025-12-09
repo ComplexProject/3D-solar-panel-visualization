@@ -34,20 +34,22 @@ function ParameterForm() {
     const handleCityBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
         const cityValue = e.target.value;
         localStorage.setItem("city", JSON.stringify(cityValue));
-        setFormData(prev => ({ ...prev, city: cityValue }));
-        const locationData = await GetGeocodingData(cityValue);
-        if (locationData) {
-            if (errors.cityFetchFailed) {
-                clearErrors('cityFetchFailed')
+        if (cityValue != "") {
+            setFormData(prev => ({ ...prev, city: cityValue }));
+            const locationData = await GetGeocodingData(cityValue);
+            if (locationData) {
+                if (errors.cityFetchFailed) {
+                    clearErrors('cityFetchFailed')
+                }
+                localStorage.setItem("latitude", JSON.stringify(locationData.latitude));
+                localStorage.setItem("longitude", JSON.stringify(locationData.longitude));
+            } else {
+                setError("cityFetchFailed", {
+                    message: 'City not found',
+                })
+                localStorage.removeItem("latitude");
+                localStorage.removeItem("longitude");
             }
-            localStorage.setItem("latitude", JSON.stringify(locationData.latitude));
-            localStorage.setItem("longitude", JSON.stringify(locationData.longitude));
-        } else {
-            setError("cityFetchFailed", {
-                message: 'City not found',
-            })
-            localStorage.removeItem("latitude");
-            localStorage.removeItem("longitude");
         }
     }
 
