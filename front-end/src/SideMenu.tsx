@@ -22,10 +22,11 @@ function SideMenu({ nodeRef, onClick }: SideMenuProps) {
     const calculate = async () => {
         try {
             setIsCalculationRunning(true)
+            setResultData(null)
             setIsResultAvailable(1)
             const res = await sendFormData();
-            console.log("send", res);
             setResultData(res);
+            localStorage.setItem('resultData', JSON.stringify(res));
             setIsCalculationRunning(false);
             setIsResultAvailable(2);
         } catch (err) {

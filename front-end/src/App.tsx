@@ -1,5 +1,5 @@
 import './App.css'
-import { useState, useRef, useEffect, useContext } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { CSSTransition } from 'react-transition-group'
 import SideMenu from './SideMenu'
 import TotalEnergy from './energyResultsComponents/TotalEnergy'
@@ -39,12 +39,21 @@ function App() {
   const nodeRef = useRef(null)
   const pullTabRef = useRef(null)
   const navRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const savedResult = localStorage.getItem('resultData');
+    if (savedResult) {
+      setResultData(JSON.parse(savedResult));
+      setIsResultAvailable(2);
+    }
+  }, [])
   
   const getSolarPanelResult = () => {
     if (!resultData?.output?.panels) return [];
     return Object.values(resultData.output.panels).map((panel: any) => ({
       azimuth: panel.azimuth,
-      slope: panel.slope
+      slope: panel.slope,
+      kwp: panel.kwp
     }));
   };
 
@@ -110,16 +119,16 @@ function App() {
       <div className='px-12 py-16 flex flex-col h-full w-full gap-11 bg-[#F8F8F8]'>
         <div className='flex justify-between items-center'>
           <h1 className='font-bold text-5xl'>Results</h1>
-          {resultData ? 
+          {resultData  && !isCalculationRunning ?
           <div className='flex'>
             <h2 className='text-3xl pr-2'>Year:</h2>
-            <h2 className='text-3xl font-bold'>{localStorage.getItem("year")}</h2>
+            <h2 className='text-3xl font-bold'>{`${JSON.parse(localStorage.getItem("year")!)}`}</h2>
           </div>
             :
           <></>
           }
         </div>
-        { resultData ? 
+        { resultData  && !isCalculationRunning ?
         <>
           <div className='w-full h-full flex flex-row gap-10'>
             <div className='relative bg-white p-10 gap-0 drop-shadow rounded-2xl w-2/3 flex flex-col min-w-0'>
@@ -166,13 +175,13 @@ function App() {
               <hr className='border-1'/>
               <div className='px-10 py-1 text-2xl divide-y divide-black max-h-[300px] overflow-auto'>
                 {getSolarPanelResult().map((panel, index) => (
-                  <ProducedSolarEnergy key={index} panelNumber={index + 1} producedEnergy={resultData.output.panels[`panel${index + 1}`]?.energy || 0} />
+                  <ProducedSolarEnergy key={index} panelNumber={index + 1} producedEnergy={panel.kwp} />
                 ))}
               </div>
             </div>
           </div>
           <div className='w-full h-full flex flex-row gap-10'>
-          {resultData ? (
+          {resultData  && !isCalculationRunning ? (
             <>
               <div className='flex w-2/3 gap-10'>
                 <TotalEnergy title='Total energy demand' results={(resultData.output?.ppv_usable || 0) + (resultData.output?.energy_from_grid || 0)}  />
