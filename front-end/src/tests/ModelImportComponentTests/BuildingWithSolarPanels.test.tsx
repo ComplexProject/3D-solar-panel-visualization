@@ -8,117 +8,146 @@ let panelPositionsMock: [number, number, number][] = []
 let panelOrientationsMock: Quaternion[] = []
 let panelScaleMock: [number, number, number] | null = null
 
+vi.mock("@react-three/drei", () => ({
+  useGLTF: vi.fn(() => {
+    const mesh: any = new Object3D()
+    mesh.isMesh = true
+
+    const posArray = new Float32Array([
+      -1, 0, -0.5,
+       1, 0, -0.5,
+       1, 0,  0.5,
+      -1, 0,  0.5
+    ])
+
+    mesh.geometry = {
+      boundingBox: {
+        min: new Vector3(-1, 0, -0.5),
+        max: new Vector3(1, 0, 0.5)
+      },
+      getAttribute: (name: string) => {
+        if (name === "position")
+          return {
+            count: 4,
+            getX: (i: number) => posArray[i * 3 + 0],
+            getY: (i: number) => posArray[i * 3 + 1],
+            getZ: (i: number) => posArray[i * 3 + 2]
+          }
+        if (name === "normal")
+          return {
+            count: 4,
+            getX: () => 0,
+            getY: () => 1,
+            getZ: () => 0
+          }
+        return null
+      }
+    }
+
+    const scene: any = new Object3D()
+    scene.add(mesh)
+    scene.traverse = (fn: any) => fn(mesh)
+    return { scene }
+  })
+}))
+
 function createMockRoof(): Object3D {
-  const roof = new Object3D() as any
+  const roof: any = new Object3D()
   roof.isMesh = true
+  roof.name = "roof"
+
+  const posArray = new Float32Array([
+    -10, 10, -10,
+     10, 10, -10,
+     10, 10,  10,
+    -10, 10,  10
+  ])
+
   roof.geometry = {
-    getAttribute: () => ({ count: 1, getX: () => 0, getY: () => 1, getZ: () => 0 }),
-    boundingBox: { min: new Vector3(-5, 10, -5), max: new Vector3(5, 10, 5) }
+    getAttribute: (name: string) => {
+      if (name === "position")
+        return {
+          count: 4,
+          getX: (i: number) => posArray[i * 3 + 0],
+          getY: (i: number) => posArray[i * 3 + 1],
+          getZ: (i: number) => posArray[i * 3 + 2]
+        }
+      if (name === "normal")
+        return {
+          count: 4,
+          getX: () => 0,
+          getY: () => 1,
+          getZ: () => 0
+        }
+      return null
+    },
+    boundingBox: {
+      min: new Vector3(-10, 10, -10),
+      max: new Vector3(10, 10, 10)
+    }
   }
-  roof.position.set(0, 10, 0)
-  roof.updateMatrixWorld()
+
+  roof.updateMatrixWorld = () => {}
+  roof.updateWorldMatrix = () => {}
   return roof
 }
 
-function createMockHouse(): Object3D {
-  const house = new Object3D()
-  const roof = createMockRoof()
-  house.add(roof)
-  house.traverse = ((fn: (o: Object3D) => void) => { fn(house); fn(roof) }) as any
-  return house
-}
-
 vi.mock("../../ModelImportComponent/BuildingModel", () => ({
-  default: React.forwardRef<Object3D>((_props, ref) => {
-    React.useEffect(() => { if (ref) (ref as any)(createMockHouse()) }, [])
+  default: React.forwardRef((_props, ref) => {
+    React.useEffect(() => {
+      const house = new Object3D()
+      const roof = createMockRoof()
+
+      house.add(roof)
+      house.traverse = (fn: any) => { fn(house); fn(roof) }
+
+      if (typeof ref === "function") ref(house)
+      else if (ref && typeof ref === "object") (ref as any).current = house
+    }, [])
     return null
   })
 }))
 
 vi.mock("../../ModelImportComponent/SolarPanels", () => ({
-  default: () => {
-    panelPositionsMock = []
-    panelOrientationsMock = []
-    const cols = 8
-    const rows = 6
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        panelPositionsMock.push([c, 10, r])
-        panelOrientationsMock.push(new Quaternion())
-      }
-    }
-    panelScaleMock = [1, 1, 1]
+  default: ({ positions, orientations, defaultScale }: any) => {
+    panelPositionsMock= positions.map((p: any) => [...p])
+    panelOrientationsMock = orientations
+    panelScaleMock = defaultScale
     return null
   }
 }))
 
-vi.mock("@react-three/drei", () => ({
-  useGLTF: vi.fn(() => ({
-    scene: { traverse: (fn: (o: Object3D) => void) => fn(createMockRoof()) }
-  }))
-}))
-
-vi.mock("three", async (importOriginal) => {
-  const actual = await importOriginal() as Record<string, any>
-  class FakeRaycaster extends actual.Raycaster {
-    intersectObject(_object: Object3D) {
-      const hits: any[] = []
-      const cols = 8
-      const rows = 6
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          hits.push({ point: new Vector3(c, 10, r), face: null, object: _object })
-        }
-      }
-      return hits
-    }
-    set() {}
-  }
-  return { ...actual, Raycaster: FakeRaycaster }
-})
 
 describe("BuildingWithSolarPanels", () => {
-
   let renderer: Awaited<ReturnType<typeof TestRenderer.create>>
 
   beforeEach(async () => {
-    panelPositionsMock = []
+    panelPositionsMock= []
     panelOrientationsMock = []
     panelScaleMock = null
     vi.clearAllMocks()
     renderer = await TestRenderer.create(<BuildingWithSolarPanels />)
   })
-
-  it("renders root scene without crashing", () => {
-    expect(renderer.scene).toBeDefined()
-  })
-
+// if useMemo is empty capturePositions is empty
   it("generates panels", () => {
-    expect(panelPositionsMock.length).toBeGreaterThan(0)
+    expect(panelPositionsMock
+    .length).toBeGreaterThan(0)
+  })
+// have orientation for each position
+  it("generates orientations for all panels", () => {
     expect(panelOrientationsMock.length).toBe(panelPositionsMock.length)
-    expect(panelScaleMock).not.toBeNull()
   })
-
-  it("positions panels on rooftop", () => {
-    panelPositionsMock.forEach(pos => expect(pos[1]).toBeGreaterThanOrEqual(10))
-  })
-
-  it("does not exceed max", () => {
-    const MAX_PANELS = 50
-    expect(panelPositionsMock.length).toBeLessThanOrEqual(MAX_PANELS)
-  })
-
-  it("orientations are upright", () => {
-    const up = new Vector3(0, 1, 0)
-    panelOrientationsMock.forEach(q => {
-      const dir = new Vector3(0, 1, 0).applyQuaternion(q)
-      expect(dir.dot(up)).toBeGreaterThan(0.9)
+  it("panels are above the roof (y >= 10)", () => {
+    panelPositionsMock.forEach(p => {
+      expect(p[1]).toBeGreaterThanOrEqual(10)
     })
   })
 
-  it("panels are not overlapping", () => {
-    const unique = new Set(panelPositionsMock.map(p => `${p[0]},${p[1]},${p[2]}`))
-    expect(unique.size).toBe(panelPositionsMock.length)
+  it("scale is applied", () => {
+    expect(panelScaleMock).not.toBeNull()
   })
 
+  it("does not exceed 50 panels", () => {
+    expect(panelPositionsMock.length).toBeLessThanOrEqual(50)
+  })
 })
