@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
-import { it, expect, describe, beforeEach } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/react';
+import { it, expect, describe, beforeEach } from 'vitest';
 import AdvancedSettings from '../../formComponents/AdvancedSettings';
 
 const localStorageMock = (() => {
@@ -20,55 +20,57 @@ const localStorageMock = (() => {
   };
 })();
 Object.defineProperty(window, 'localStorage', { value: localStorageMock, writable: true });
-
-
 describe('Advanced Settings', () => {
     beforeEach(() => {
   localStorage.clear();
 });
 
-    it('should render form with saved values from localStorage', () => {
-        localStorage.setItem("latitude", JSON.stringify(45.0));
-        localStorage.setItem("longitude", JSON.stringify(-93));
-        localStorage.setItem("year", JSON.stringify(2023));
+  it('renders form with saved values from localStorage', () => {
+    localStorage.setItem("latitude", "45");
+    localStorage.setItem("longitude", "-93");
+    localStorage.setItem("year", "2023");
 
-        render(<AdvancedSettings />);
+    render(<AdvancedSettings />);
 
-        expect(screen.getByDisplayValue('45')).toBeInTheDocument();
-        expect(screen.getByDisplayValue('-93')).toBeInTheDocument();
-        expect(screen.getByDisplayValue('2023')).toBeInTheDocument();
-    });
+    expect(screen.getByDisplayValue("45")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("-93")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("2023")).toBeInTheDocument();  
+  });
 
-    // it('Should save form values to localStorage on submit', () => {
-    //     render(<AdvancedSettings />);
+  it('renders default values when localStorage is empty', () => {
+    render(<AdvancedSettings />);
 
-    //     fireEvent.change(screen.getByLabelText(/latitude/i), { target: { value: "42" } });
-    //     fireEvent.change(screen.getByLabelText(/longitude/i), { target: { value: "4" } });
-    //     fireEvent.change(screen.getByLabelText(/year/i), { target: { value: "2024" } });
-    //     fireEvent.change(screen.getByLabelText(/azimuth increment/i), { target: { value: "2" } });
-    //     fireEvent.change(screen.getByLabelText(/slope increment/i), { target: { value: "1" } });
+    expect(screen.getByLabelText(/latitude/i)).toHaveValue("0");
+    expect(screen.getByLabelText(/longitude/i)).toHaveValue("0");
+    expect(screen.getByLabelText(/year/i)).toHaveValue(2024);
+  });
 
-    //     const form = screen.getByTestId('advanced-settings-form');
-    //     fireEvent.submit(form);
+  it('disables latitude & longitude when predefined city exists', () => {
+    localStorage.setItem("city", JSON.stringify("Nijmegen"));
 
-    //     to avoid JSON.parse repetition
-    //     const getLS = (key: string) => {
-    //     const item = localStorage.getItem(key);
-    //     return item !== null ? JSON.parse(item) : null;
-    // };
+    render(<AdvancedSettings />);
 
-    //     expect(JSON.parse(localStorage.getItem("latitude")!)).toBe(42);
-    //     expect(JSON.parse(localStorage.getItem("longitude")!)).toBe(4);
-    //     expect(JSON.parse(localStorage.getItem("year")!)).toBe(2024);
-    //     expect(JSON.parse(localStorage.getItem("azimuthIncrement")!)).toBe(2);
-    //     expect(JSON.parse(localStorage.getItem("slopeIncrement")!)).toBe(1);
-    // });
+    expect(screen.getByLabelText(/latitude/i)).toBeDisabled();
+    expect(screen.getByLabelText(/longitude/i)).toBeDisabled();
+  });
 
-    it("should render form with default values when localStorage is empty", () => {
-        render(<AdvancedSettings />);
-        expect(screen.getByLabelText(/latitude/i)).toHaveValue("0");
-        expect(screen.getByLabelText(/longitude/i)).toHaveValue("0");
-        expect(screen.getByLabelText(/year/i)).toHaveValue(2024);
-    });
+  it('renders tooltip when predefined city exists', () => {
+    localStorage.setItem("city", JSON.stringify("Nijmegen"));
+
+    render(<AdvancedSettings />);
+
+    expect(screen.getAllByText(/city is already predefined/i).length).toBe(2);
+  });
+
+  it('useEffect sets form values correctly based on state', () => {
+    localStorage.setItem("latitude", "11");
+    localStorage.setItem("longitude", "22");
+    localStorage.setItem("year", "2033");
+
+    render(<AdvancedSettings />);
+
+    expect(screen.getByDisplayValue("11")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("22")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("2033")).toBeInTheDocument();
+  });
 });
-

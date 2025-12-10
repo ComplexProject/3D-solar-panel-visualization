@@ -44,7 +44,7 @@ function AdvancedSettings() {
   }
 
   return (
-    <form id='advanced-settings-form' onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[0.965rem] w-full h-full">
+    <form id='advanced-settings-form' data-testid="advanced-settings-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[0.965rem] w-full h-full">
       <div className='group'>
         <label htmlFor="latitude">{predefinedCity() ? `Latitude for ${predefinedCity()}` : 'Latitude'}</label><br />
         <input className={inputClass} type="float" id="latitude" disabled={predefinedCity()} {...register("latitude")} /><br/>
