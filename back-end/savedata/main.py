@@ -40,9 +40,9 @@ async def list_saved_files():
 
 @app.get("/checkFile")
 def checkFile(filename: str):
-    path = os.path.join("/app/data", filename)
+    path = f"{filename}"
     print(os.path.exists(path))
-    return {"exists": os.path.isfile(path)}
+    return {"exists": os.path.exists(path)}
 
 
 if __name__ == "__main__":

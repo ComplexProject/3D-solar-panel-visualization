@@ -24,9 +24,9 @@ function AdvancedSettings() {
     const savedYear = localStorage.getItem("year");
 
     return {
-        latitude: savedLatitude ? JSON.parse(savedLatitude) : 0,
-        longitude: savedLongitude ? JSON.parse(savedLongitude) : 0,
-        year: savedYear ? JSON.parse(savedYear) : 2024,
+        latitude: savedLatitude ? Number(JSON.parse(savedLatitude)) || 0 : 0,
+        longitude: savedLongitude ? Number(JSON.parse(savedLongitude)) || 0 : 0,
+        year: savedYear ? Number(JSON.parse(savedYear)) || 2023 : 2023,
     };
   });
 
@@ -37,22 +37,25 @@ function AdvancedSettings() {
   }, [setValue, formData]);
 
   const onSubmit = (data: FormData) => {    
-    localStorage.setItem("latitude", JSON.stringify(data.latitude));
-    localStorage.setItem("longitude", JSON.stringify(data.longitude));
-    localStorage.setItem("year", JSON.stringify(data.year));    
-    setFormData(data);
+  const lat = Number(data.latitude) || 0;
+  const lon = Number(data.longitude) || 0;
+  const year = Number(data.year) || 2023;
+  localStorage.setItem("latitude", JSON.stringify(lat));
+  localStorage.setItem("longitude", JSON.stringify(lon));
+  localStorage.setItem("year", JSON.stringify(year));    
+  setFormData({ latitude: lat, longitude: lon, year });
   }
 
   return (
     <form id='advanced-settings-form' onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[0.965rem] w-full h-full">
       <div className='group'>
         <label htmlFor="latitude">{predefinedCity() ? `Latitude for ${predefinedCity()}` : 'Latitude'}</label><br />
-        <input className={inputClass} type="float" id="latitude" disabled={predefinedCity()} {...register("latitude")} /><br/>
+        <input className={inputClass} type="number" step="any" id="latitude" disabled={predefinedCity()} {...register("latitude")} /><br/>
         {predefinedCity() ? <ToolTip toolTipText='City is already predefined' toolTipPosition='bottom'/> : ''}
       </div>
       <div className='group'>
         <label htmlFor="longitude">{predefinedCity() ? `Longitude for ${predefinedCity()}` : 'Longitude'}</label><br />
-        <input className={inputClass} type="float" id="longitude" disabled={predefinedCity()} {...register("longitude")} /><br/>
+        <input className={inputClass} type="number" step="any" id="longitude" disabled={predefinedCity()} {...register("longitude")} /><br/>
         {predefinedCity() ? <ToolTip toolTipText='City is already predefined' toolTipPosition='bottom'/> : ''}
       </div>
       <div>
