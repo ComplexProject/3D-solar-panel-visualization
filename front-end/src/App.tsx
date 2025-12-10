@@ -16,25 +16,19 @@ import ErrorMessage from './statusMessageComponents/errorMessage'
 import Header from './Header'
 import React from 'react'
 import RunCalculation from './statusMessageComponents/runCalculation'
+import UnsavedChanges from './formComponents/UnsavedChanges'
 
 export const CalculationContext = React.createContext<{isCalculationRunning: boolean; setIsCalculationRunning: (value: boolean) => void}>({isCalculationRunning: false, setIsCalculationRunning: () => {}});
-export const ResultContext = React.createContext<{
-  isResultAvailabe: number;
-  setIsResultAvailable: (value: number) => void;
-  resultData: any | null;
-  setResultData: (value: any) => void;
-}>({
-  isResultAvailabe: 0,
-  setIsResultAvailable: () => {},
-  resultData: null,
-  setResultData: () => {}
-});
+export const ResultContext = React.createContext<{isResultAvailabe: number; setIsResultAvailable: (value: number) => void; resultData: any | null; setResultData: (value: any) => void;}>({ isResultAvailabe: 0, setIsResultAvailable: () => {}, resultData: null, setResultData: () => {}});
+export const HasUnsavedChanges = React.createContext<{showPopUp: (shouldClose: boolean, onConfirm?: () => void) => void;}>({showPopUp: () => {}});
 
 function App() {
   const [showSideMenu, setShowSideMenu] = useState(false)
   const [isCalculationRunning, setIsCalculationRunning] = useState(false)
   const [isResultAvailabe, setIsResultAvailable] = useState(0)
   const [resultData, setResultData] = useState<any | null>(null)
+  const [showPopUp, setPopUp] = useState(false);
+  const [pending, setPending] = useState<(() => void) | null>(null);
 
   const nodeRef = useRef(null)
   const pullTabRef = useRef(null)
@@ -66,18 +60,39 @@ function App() {
     }
   }
 
-  const closeSideMenu = () => {
-    setShowSideMenu(false)
-  }
+  const closeSideMenu = () => setShowSideMenu(false);
+  const showNavArrows = () => getSolarPanelResult().length > 4;
 
-  const showNavArrows = (): boolean => {
-    return getSolarPanelResult().length > 4;
-  }
+  const showPopUpHandler = (_shouldClose: boolean, onConfirm?: () => void) => {
+    if (onConfirm) {
+      setPending(() => onConfirm);
+    }
+    setPopUp(true);
+  };
+
+  const handleConfirm = () => {
+    setPopUp(false);
+    if (pending) {
+      pending();
+      setPending(null);
+    }
+  };
+
+  const handleCancel = () => {
+    setPopUp(false);
+    setPending(null);
+  };
 
   return (
     <>
-      <div className='h-screen w-full bg-red-50'>
+      <div className='h-screen w-full bg-red-50 flex justify-center items-center'>
         <Header/>
+        {showPopUp && (
+          <UnsavedChanges 
+            onConfirm={handleConfirm}
+            onCancel={handleCancel}
+          />
+        )} 
         <div className="relative h-full w-full">
           <ModelViewer>
             <BuildingWithSolarPanels />
@@ -109,9 +124,11 @@ function App() {
               nodeRef={nodeRef}
             >
               <ResultContext.Provider value={{ isResultAvailabe, setIsResultAvailable, resultData, setResultData }}>
-              <CalculationContext.Provider value={{ isCalculationRunning: isCalculationRunning, setIsCalculationRunning: setIsCalculationRunning}}>
-                <SideMenu nodeRef={nodeRef} onClick={closeSideMenu} />
-              </CalculationContext.Provider>
+                <CalculationContext.Provider value={{ isCalculationRunning: isCalculationRunning, setIsCalculationRunning: setIsCalculationRunning}}>
+                  <HasUnsavedChanges.Provider value={{ showPopUp: showPopUpHandler }}>
+                    <SideMenu nodeRef={nodeRef} onClick={closeSideMenu} />
+                  </HasUnsavedChanges.Provider>
+                </CalculationContext.Provider>
               </ResultContext.Provider>
             </CSSTransition>
           </div>
@@ -120,9 +137,12 @@ function App() {
         <div className='flex justify-between items-center'>
           <h1 className='font-bold text-5xl'>Results</h1>
           {resultData  && !isCalculationRunning ?
-          <div className='flex'>
-            <h2 className='text-3xl pr-2'>Year:</h2>
-            <h2 className='text-3xl font-bold'>{`${JSON.parse(localStorage.getItem("year")!)}`}</h2>
+          <div className='flex flex-row gap-5 justify-center items-center'>
+            <div className='flex'>
+              <h2 className='text-3xl pr-2'>Year:</h2>
+              <h2 className='text-3xl font-bold'>{`${JSON.parse(localStorage.getItem("year")!)}`}</h2>
+            </div>
+            <button className='drop-shadow-sm cursor-pointer rounded-xl p-2 bg-[#006FAA] text-white hover:scale-105'>Export results</button>
           </div>
             :
           <></>
