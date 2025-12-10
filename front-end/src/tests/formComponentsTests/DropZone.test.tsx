@@ -78,9 +78,10 @@ describe("StyledDropzone", () => {
     await fireEvent.change(input, {
       target: { files: [mockFile] },
     });
-
+    
     await waitFor(() => {
     expect(localStorage.setItem).toHaveBeenCalled();
+
     });
     expect(localStorage.setItem).toHaveBeenCalledWith("demandProfile", 
       expect.stringContaining('"name":"data.csv"')

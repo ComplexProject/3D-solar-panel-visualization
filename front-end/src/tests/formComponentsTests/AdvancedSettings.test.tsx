@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { it, expect, describe, beforeEach } from 'vitest';
 import AdvancedSettings from '../../formComponents/AdvancedSettings';
 
