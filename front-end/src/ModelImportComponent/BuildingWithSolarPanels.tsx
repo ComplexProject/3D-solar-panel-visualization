@@ -22,25 +22,57 @@ const PANEL_GAP_X = 1.7
 const PANEL_GAP_Z = 1.9
 const TARGET_ACROSS = 8
 const UPSCALE_PANELS = false
-const MAX_PANELS = 50
+const MAX_PANELS = 4
 const USE_FIXED_GRID = false
 const FIXED_COLS = 8
 const FIXED_ROWS = 3
 
-// Fetches panel orientation overrides (azimuth/slope) from API
+// Fetches panel orientation overrides (azimuth/slope) from localStorage
 function usePanelOverrides() {
   const [overrides, setOverrides] = useState<PanelOverride[]>([])
   useEffect(() => {
-    let alive = true
-    const load = async () => {
+    const load = () => {
       try {
-        const r = await fetch("http://127.0.0.1:8510/getDummy")
-        const json = await r.json()
-        if (alive && Array.isArray(json?.solarPanels)) setOverrides(json.solarPanels as PanelOverride[])
-      } catch {}
+        const savedResult = localStorage.getItem('resultData')
+        if (!savedResult) {
+          setOverrides([])
+          return
+        }
+        
+        const resultData = JSON.parse(savedResult)
+        if (!resultData?.output?.panels) {
+          setOverrides([])
+          return
+        }
+        
+        // Convert panels object to array format
+        // Panels are stored as { panel1: {azimuth, slope, kwp}, panel2: {...}, ... }
+        const panelsArray: PanelOverride[] = Object.values(resultData.output.panels).map((panel: any) => ({
+          azimuth: panel.azimuth,
+          slope: panel.slope
+        }))
+        
+        setOverrides(panelsArray)
+      } catch (error) {
+        console.error('Error loading panel overrides from localStorage:', error)
+        setOverrides([])
+      }
     }
+    
+    // Load immediately on mount
     load()
-    return () => { alive = false }
+    
+    // Listen for storage changes (works across tabs/windows)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'resultData') {
+        load()
+      }
+    }
+    window.addEventListener('storage', handleStorageChange)
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+    }
   }, [])
   return overrides
 }
@@ -279,9 +311,9 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
     const positions: [number, number, number][] = []
     const orientations: Quaternion[] = []
 
-    // Place panels on invisible plane
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
+    // Place panels on invisible plane (row by row, left to right)
+    for (let c = 0; c < cols; c++) {
+      for (let r = 0; r < rows; r++) {
         if (positions.length >= total) break
 
         const x = gridStartX + effX / 2 + (cols === 1 ? 0 : c * stepX)
@@ -363,9 +395,11 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
   }, [house, panel, overrides])
 
   useEffect(() => {
-    const isLoading = !house || !panel || data.positions.length === 0
+    // Only wait for building and panel model to load. Don't wait for panel positions
+    // (panels may not exist, and that's fine - just show the building)
+    const isLoading = !house || !panel
     onLoadingChange?.(isLoading)
-  }, [house, panel, data.positions.length, onLoadingChange])
+  }, [house, panel, onLoadingChange])
 
   return (
     <group>
