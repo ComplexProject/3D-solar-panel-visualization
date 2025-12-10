@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { it, expect, describe, beforeEach } from 'vitest';
 import AdvancedSettings from '../../formComponents/AdvancedSettings';
 
@@ -60,10 +60,6 @@ describe('Advanced Settings', () => {
         expect(screen.getByLabelText(/longitude/i)).toHaveValue("0");
         expect(screen.getByLabelText(/year/i)).toHaveValue(2023);
     });
-});
-
-    expect(screen.getAllByText(/city is already predefined/i).length).toBe(2);
-  });
 
   it('useEffect sets form values correctly based on state', () => {
     localStorage.setItem("latitude", "11");
