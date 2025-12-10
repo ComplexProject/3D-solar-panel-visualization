@@ -119,8 +119,7 @@ export default function ModelViewer({ children }: { children: React.ReactNode })
           </Canvas>
         </div>
       </div>
-      <LoadingMessageModelViewer />
-      
+      { !isLoading && (<LoadingMessageModelViewer />) }
       {isLoading && (
         <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
           <div className="flex flex-col items-center gap-4 bg-white bg-opacity-80 rounded-lg p-8 shadow-lg">
