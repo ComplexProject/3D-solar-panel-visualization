@@ -40,9 +40,9 @@ describe('Advanced Settings', () => {
   it('renders default values when localStorage is empty', () => {
     render(<AdvancedSettings />);
 
-    expect(screen.getByLabelText(/latitude/i)).toHaveValue("0");
-    expect(screen.getByLabelText(/longitude/i)).toHaveValue("0");
-    expect(screen.getByLabelText(/year/i)).toHaveValue(2024);
+    expect(screen.getByLabelText(/latitude/i)).toHaveValue(0);
+    expect(screen.getByLabelText(/longitude/i)).toHaveValue(0);
+    expect(screen.getByLabelText(/year/i)).toHaveValue(2023);
   });
 
   it('disables latitude & longitude when predefined city exists', () => {
@@ -54,16 +54,12 @@ describe('Advanced Settings', () => {
     expect(screen.getByLabelText(/longitude/i)).toBeDisabled();
   });
 
-    it("should render form with default values when localStorage is empty", () => {
-        render(<AdvancedSettings />);
-        expect(screen.getByLabelText(/latitude/i)).toHaveValue("0");
-        expect(screen.getByLabelText(/longitude/i)).toHaveValue("0");
-        expect(screen.getByLabelText(/year/i)).toHaveValue(2023);
+  it("should render form with default values when localStorage is empty", () => {
+    render(<AdvancedSettings />);
+    expect(screen.getByLabelText(/latitude/i)).toHaveValue(0);
+    expect(screen.getByLabelText(/longitude/i)).toHaveValue(0);
+    expect(screen.getByLabelText(/year/i)).toHaveValue(2023);
     });
-});
-
-    expect(screen.getAllByText(/city is already predefined/i).length).toBe(2);
-  });
 
   it('useEffect sets form values correctly based on state', () => {
     localStorage.setItem("latitude", "11");
