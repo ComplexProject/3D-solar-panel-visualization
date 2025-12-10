@@ -68,7 +68,7 @@ describe('Advanced Settings', () => {
         render(<AdvancedSettings />);
         expect(screen.getByLabelText(/latitude/i)).toHaveValue("0");
         expect(screen.getByLabelText(/longitude/i)).toHaveValue("0");
-        expect(screen.getByLabelText(/year/i)).toHaveValue(2024);
+        expect(screen.getByLabelText(/year/i)).toHaveValue(2023);
     });
 });
 

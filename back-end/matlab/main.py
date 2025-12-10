@@ -21,6 +21,7 @@ async def runMatlab(
     tmp_dir = "tmp"
     os.makedirs(tmp_dir, exist_ok=True)
     demand_path = os.path.join(tmp_dir, demandProfile.filename)
+    print(demand_path)
     with open(demand_path, "wb") as f:
         f.write(await demandProfile.read())
 
@@ -34,9 +35,10 @@ async def runMatlab(
         return {"error": f"Failed to download file: {response.status_code}"}
 
     result = subprocess.run(
-        ["octave", "--no-gui", "calculation.m", demand_path, weather_path, str(azimuth), str(slope)],
+        ["octave", "--no-gui", "--no-window-system", "calculation.m", demand_path, weather_path, str(azimuth), str(slope)],
         capture_output=True,
-        text=True
+        text=True,
+        env={**os.environ, "DISPLAY": ""}
     )
 
 

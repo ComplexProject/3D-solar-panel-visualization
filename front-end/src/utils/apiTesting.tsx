@@ -77,7 +77,7 @@ if (!response.ok) {
 
     const data: GeocodingResult[] = await response.json();
     try {
-    } catch {
+    } catch{
       throw new Error("Failed to parse JSON response.");
     }
 
@@ -85,7 +85,7 @@ if (!response.ok) {
       throw new Error("No results for this city.");
     }
 
-    return data;
+    return data[0];
 
     // if (data && data.length > 0) {
     //   const newCoords: Coordinate = {
@@ -94,7 +94,7 @@ if (!response.ok) {
     //   };
 
     //   const distance = calculateDistance(referenceCoords, newCoords);
-    return data[0];
+
   } catch (error) {
     console.error('Error:', error instanceof Error ? error.message : 'Unknown error');
   }
