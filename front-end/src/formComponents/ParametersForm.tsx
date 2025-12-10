@@ -34,20 +34,23 @@ function ParameterForm() {
     const handleCityBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
         const cityValue = e.target.value;
         localStorage.setItem("city", JSON.stringify(cityValue));
-        setFormData(prev => ({ ...prev, city: cityValue }));
-        const locationData = await GetGeocodingData(cityValue);
-        if (locationData) {
-            if (errors.cityFetchFailed) {
-                clearErrors('cityFetchFailed')
+        if (cityValue != "") {
+            setFormData(prev => ({ ...prev, city: cityValue }));
+            const locationData = await GetGeocodingData(cityValue);
+            if (locationData) {
+                if (errors.cityFetchFailed) {
+                    clearErrors('cityFetchFailed')
+                }
+                localStorage.setItem("latitude", JSON.stringify(locationData.latitude));
+                localStorage.setItem("longitude", JSON.stringify(locationData.longitude));
+            } else {
+                setError("cityFetchFailed", {
+                    message: 'City not found',
+                })
+                localStorage.removeItem("latitude");
+                localStorage.removeItem("longitude");
+                localStorage.removeItem("city");
             }
-            localStorage.setItem("latitude", JSON.stringify(locationData.latitude));
-            localStorage.setItem("longitude", JSON.stringify(locationData.longitude));
-        } else {
-            setError("cityFetchFailed", {
-                message: 'City not found',
-            })
-            localStorage.removeItem("latitude");
-            localStorage.removeItem("longitude");
         }
     }
 
@@ -66,7 +69,7 @@ function ParameterForm() {
                     <p className='text-red-500'>*</p>
                 </div>
                 <input className={`${errors.cityFetchFailed ? 'bg-[#FFDEDE]' : null} ${inputClass}`} type="text" placeholder='Middelburg' {...register("city", { onBlur: handleCityBlur })} id="city" />
-                {errors.cityFetchFailed ? <p className='text-[#FF0000] text-sm'>{errors.cityFetchFailed?.message}</p> : null}
+                {errors.cityFetchFailed ? <p className='text-[#FF0000] text-sm absolute z-50'>{errors.cityFetchFailed?.message}</p> : null}
             </div>
             <div>
                 <div className='flex flex-row gap-1'>
