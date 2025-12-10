@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import StyledDropzone from "../../formComponents/DropZone";
 
 const localStorageMock = (() => {
@@ -54,9 +54,11 @@ describe("StyledDropzone", () => {
     await fireEvent.change(input, {
       target: { files: [mockFile] },
     });
-
-    expect(localStorage.setItem).toHaveBeenCalled();
-    expect(localStorage.setItem).toHaveBeenCalledWith("demandProfile",expect.stringContaining('"name":"data.json"')
+    await waitFor(() => {
+      expect(localStorage.setItem).toHaveBeenCalled();
+    });
+    expect(localStorage.setItem).toHaveBeenCalledWith("demandProfile",
+      expect.stringContaining('"name":"data.json"')
     );
 
     const fileNameElement = await screen.findByText("data.json");
@@ -77,7 +79,9 @@ describe("StyledDropzone", () => {
     await fireEvent.change(input, {
       target: { files: [mockFile] },
     });
-
+     await waitFor(() => {
+      expect(localStorage.setItem).toHaveBeenCalled();
+    });
     expect(localStorage.setItem).toHaveBeenCalledWith("demandProfile", 
       expect.stringContaining('"name":"data.csv"')
     );

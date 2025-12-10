@@ -40,9 +40,9 @@ describe('Advanced Settings', () => {
   it('renders default values when localStorage is empty', () => {
     render(<AdvancedSettings />);
 
-    expect(screen.getByLabelText(/latitude/i)).toHaveValue("0");
-    expect(screen.getByLabelText(/longitude/i)).toHaveValue("0");
-    expect(screen.getByLabelText(/year/i)).toHaveValue(2024);
+    expect(screen.getByLabelText(/latitude/i)).toHaveValue(0);
+    expect(screen.getByLabelText(/longitude/i)).toHaveValue(0);
+    expect(screen.getByLabelText(/year/i)).toHaveValue(2023);
   });
 
   it('disables latitude & longitude when predefined city exists', () => {
@@ -56,8 +56,8 @@ describe('Advanced Settings', () => {
 
     it("should render form with default values when localStorage is empty", () => {
         render(<AdvancedSettings />);
-        expect(screen.getByLabelText(/latitude/i)).toHaveValue("0");
-        expect(screen.getByLabelText(/longitude/i)).toHaveValue("0");
+        expect(screen.getByLabelText(/latitude/i)).toHaveValue(0);
+        expect(screen.getByLabelText(/longitude/i)).toHaveValue(0);
         expect(screen.getByLabelText(/year/i)).toHaveValue(2023);
     });
 
