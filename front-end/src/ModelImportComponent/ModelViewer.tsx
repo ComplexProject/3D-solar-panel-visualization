@@ -1,7 +1,6 @@
 import { Canvas, useThree } from "@react-three/fiber"
 import { Environment, OrbitControls, PerspectiveCamera, Bounds } from "@react-three/drei"
 import { Suspense, useState, useRef, useEffect, cloneElement, isValidElement } from "react"
-import { useThree } from "@react-three/fiber"
 import LoadingMessageModelViewer from "../statusMessageComponents/loadingMessage3DViewer"
 
 // Custom OrbitControls component that enables zoom only when Shift is held
