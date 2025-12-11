@@ -1,8 +1,9 @@
 export async function sendFormData() {
+    const apiPort = import.meta.env.VITE_API_PORT;
     const savedPower = JSON.parse(localStorage.getItem("power") || "0");
     const savedLatitude = JSON.parse(localStorage.getItem("latitude") || "0");
     const savedLongitude = JSON.parse(localStorage.getItem("longitude") || "0");
-    const savedYear = JSON.parse(localStorage.getItem("year") || "2024");
+    const savedYear = JSON.parse(localStorage.getItem("year") || "2023");
 
     const storedFileData = localStorage.getItem("demandProfile");
     if (!storedFileData) {
@@ -10,18 +11,23 @@ export async function sendFormData() {
     }
 
     const fileData = JSON.parse(storedFileData);
-    const response = await fetch(fileData.data);
+    const response = await fetch(fileData.dataUrl);
     const blob = await response.blob();
-    const file = new File([blob], fileData.name, { type: fileData.type });
+    
+    const fileName = fileData.name.endsWith('.mat') 
+        ? fileData.name 
+        : `${fileData.name}.mat`;
+    
+    const file = new File([blob], fileName, { type: fileData.type });
 
     const formData = new FormData();
-    formData.append('latitude', savedLatitude.toString());
-    formData.append('longitude', savedLongitude.toString());
-    formData.append('year', savedYear.toString());
-    formData.append('maxPower', savedPower.toString());
-    formData.append('demandProfile', file);
+    formData.append('latitude', String(savedLatitude));
+    formData.append('longitude', String(savedLongitude));
+    formData.append('year', String(savedYear));
+    formData.append('maxPower', String(savedPower));
+    formData.append('profileDemand', file, fileName);
 
-    const url = `http://localhost:8515/sendForm`;
+    const url = `http://localhost:${apiPort}/getData`;
     
     const resp = await fetch(url, {
         method: "POST",
