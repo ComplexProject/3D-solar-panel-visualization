@@ -263,7 +263,6 @@ export const exportToPDF = (data: ExportData) => {
     </html>
   `;
 
-  // Create a hidden iframe
   const iframe = document.createElement('iframe');
   iframe.style.position = 'fixed';
   iframe.style.right = '0';
@@ -281,18 +280,15 @@ export const exportToPDF = (data: ExportData) => {
     iframeDoc.write(htmlContent);
     iframeDoc.close();
 
-    // Auto-print and auto-close after print
     setTimeout(() => {
       iframe.contentWindow?.focus();
       iframe.contentWindow?.print();
       
-      // Remove iframe after print dialog appears
       setTimeout(() => {
         document.body.removeChild(iframe);
-      }, 1000);
+        }, 1000);
     }, 250);
   } else {
-    // Fallback to original method if iframe fails
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
       alert('Please allow popups to export the report');
