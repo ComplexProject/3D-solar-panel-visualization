@@ -17,6 +17,8 @@ import Header from './Header'
 import React from 'react'
 import RunCalculation from './statusMessageComponents/runCalculation'
 import UnsavedChanges from './formComponents/UnsavedChanges'
+import { exportToPDF, prepareExportData } from './utils/exportResult'
+
 
 export const CalculationContext = React.createContext<{isCalculationRunning: boolean; setIsCalculationRunning: (value: boolean) => void}>({isCalculationRunning: false, setIsCalculationRunning: () => {}});
 export const ResultContext = React.createContext<{isResultAvailabe: number; setIsResultAvailable: (value: number) => void; resultData: any | null; setResultData: (value: any) => void;}>({ isResultAvailabe: 0, setIsResultAvailable: () => {}, resultData: null, setResultData: () => {}});
@@ -78,6 +80,21 @@ function App() {
     setUnsavedCallback(null);
   };
 
+  const handleExport = () => {
+  if (!resultData) {
+    alert('No calculation results available to export');
+    return;
+  }
+  
+  try {
+    const exportData = prepareExportData(getSolarPanelResult, resultData);
+    exportToPDF(exportData);
+  } catch (error) {
+      console.error('Error exporting PDF:', error);
+      alert('Error generating report. Please try again.');
+  }
+  };
+
   return (
     <>
       <div className='h-screen w-full bg-red-50 flex justify-center items-center'>
@@ -122,7 +139,7 @@ function App() {
               <h2 className='text-3xl pr-2'>Year:</h2>
               <h2 className='text-3xl font-bold'>{`${JSON.parse(localStorage.getItem("year")!)}`}</h2>
             </div>
-            <button className='drop-shadow-sm cursor-pointer rounded-xl p-2 bg-[#006FAA] text-white hover:scale-105'>Export results</button>
+            <button className='drop-shadow-sm cursor-pointer rounded-xl p-2 bg-[#006FAA] text-white hover:scale-105' onClick={handleExport}>Export results</button>
           </div>
             :
           <></>
