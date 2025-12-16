@@ -54,11 +54,11 @@ describe('Advanced Settings', () => {
     expect(screen.getByLabelText(/longitude/i)).toBeDisabled();
   });
 
-    it("should render form with default values when localStorage is empty", () => {
-        render(<AdvancedSettings />);
-        expect(screen.getByLabelText(/latitude/i)).toHaveValue(0);
-        expect(screen.getByLabelText(/longitude/i)).toHaveValue(0);
-        expect(screen.getByLabelText(/year/i)).toHaveValue(2023);
+  it("should render form with default values when localStorage is empty", () => {
+    render(<AdvancedSettings />);
+    expect(screen.getByLabelText(/latitude/i)).toHaveValue(0);
+    expect(screen.getByLabelText(/longitude/i)).toHaveValue(0);
+    expect(screen.getByLabelText(/year/i)).toHaveValue(2023);
     });
 
   it('useEffect sets form values correctly based on state', () => {

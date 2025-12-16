@@ -55,10 +55,9 @@ describe("StyledDropzone", () => {
       target: { files: [mockFile] },
     });
     await waitFor(() => {
-      expect(localStorage.setItem).toHaveBeenCalled();
+    expect(localStorage.setItem).toHaveBeenCalled();
     });
-    expect(localStorage.setItem).toHaveBeenCalledWith("demandProfile",
-      expect.stringContaining('"name":"data.json"')
+    expect(localStorage.setItem).toHaveBeenCalledWith("demandProfile",expect.stringContaining('"name":"data.json"')
     );
 
     const fileNameElement = await screen.findByText("data.json");
@@ -79,8 +78,10 @@ describe("StyledDropzone", () => {
     await fireEvent.change(input, {
       target: { files: [mockFile] },
     });
-     await waitFor(() => {
-      expect(localStorage.setItem).toHaveBeenCalled();
+    
+    await waitFor(() => {
+    expect(localStorage.setItem).toHaveBeenCalled();
+
     });
     expect(localStorage.setItem).toHaveBeenCalledWith("demandProfile", 
       expect.stringContaining('"name":"data.csv"')
