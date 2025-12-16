@@ -10,7 +10,7 @@ const PANEL_URL = "/models/SolarPanel/scene.gltf"
 type PanelOverride = { azimuth?: number; slope?: number }
 const DEG = Math.PI / 180
 
-// Configuration constants
+// Panel layout configuration
 const BASE_PANEL_SCALE: [number, number, number] = [8, 8, 8]
 const ROOF_MARGIN_X = 0
 const ROOF_MARGIN_Z = 0.5
@@ -27,7 +27,7 @@ const USE_FIXED_GRID = false
 const FIXED_COLS = 8
 const FIXED_ROWS = 3
 
-// Fetches panel orientation overrides (azimuth/slope) from localStorage
+// Get panel azimuth/slope overrides from localStorage
 function usePanelOverrides() {
   const [overrides, setOverrides] = useState<PanelOverride[]>([])
   useEffect(() => {
@@ -45,8 +45,7 @@ function usePanelOverrides() {
           return
         }
         
-        // Convert panels object to array format
-        // Panels are stored as { panel1: {azimuth, slope, kwp}, panel2: {...}, ... }
+        // API format: { panel1: {azimuth, slope, kwp}, ... }
         const panelsArray: PanelOverride[] = Object.values(resultData.output.panels).map((panel: any) => ({
           azimuth: panel.azimuth,
           slope: panel.slope
@@ -54,15 +53,14 @@ function usePanelOverrides() {
         
         setOverrides(panelsArray)
       } catch (error) {
-        console.error('Error loading panel overrides from localStorage:', error)
         setOverrides([])
       }
     }
     
-    // Load immediately on mount
+    // Load on mount
     load()
     
-    // Listen for storage changes (works across tabs/windows)
+    // Reload on storage changes
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'resultData') {
         load()
@@ -77,7 +75,7 @@ function usePanelOverrides() {
   return overrides
 }
 
-// Finds roof meshes by name or heuristics (largest upward-facing surface near top)
+// Find roof meshes by name or geometry (top-facing, largest area)
 function pickRoofTop(root: Object3D | null): Object3D[] {
   if (!root) return []
   
@@ -92,7 +90,7 @@ function pickRoofTop(root: Object3D | null): Object3D[] {
   
   if (roofMeshes.length > 0) return roofMeshes
   
-  // Heuristic: find meshes near top with upward-facing normals
+  // Fallback: find large, upward-facing meshes near the top of the model
   const modelBox = new Box3().setFromObject(root)
   const topY = modelBox.max.y
   const up = new Vector3(0, 1, 0)
@@ -128,7 +126,7 @@ function pickRoofTop(root: Object3D | null): Object3D[] {
   return candidates.filter(c => c.score >= threshold).map(c => c.mesh)
 }
 
-// Extracts panel footprint dimensions and orientation axes
+// Get panel model's footprint and orientation axes
 function usePanelFootprint(url: string) {
   const gltf = useGLTF(url) as any
   return useMemo(() => {
@@ -138,7 +136,7 @@ function usePanelFootprint(url: string) {
     let meshCount = 0
     gltf.scene.traverse((o: any) => { if (o.isMesh) meshCount++ })
     
-    // For multi-mesh models, use only XZ footprint (ignore pole height)
+    // For multi-mesh panels, use XZ footprint (ignore height)
     const box = meshCount > 1
       ? new Box3(new Vector3(sceneBox.min.x, 0, sceneBox.min.z), new Vector3(sceneBox.max.x, 0.1, sceneBox.max.z))
       : sceneBox
@@ -147,7 +145,7 @@ function usePanelFootprint(url: string) {
     let normalizedSize = size.clone()
     let normalizationFactor = 1
     
-    // Normalize if dimensions seem wrong (likely unit conversion issue)
+    // Normalize panel size if it seems incorrect (e.g., >100 units)
     if (size.x > 100 || size.z > 100) {
       const maxDimension = Math.max(size.x, size.z)
       normalizationFactor = 4.0 / maxDimension
@@ -191,7 +189,7 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
     
     roofMeshes.forEach(roof => roof.updateMatrixWorld(true))
     
-    // Extract vertices from roof geometry to find top surface
+    // Get all roof vertices to identify the highest point
     const roofVertices: Vector3[] = []
     let maxY = -Infinity
     
@@ -214,7 +212,7 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
       return { positions: [], orientations: [], scale: BASE_PANEL_SCALE }
     }
     
-    // Filter vertices near top surface (excludes edges/gables)
+    // Isolate top-surface vertices (ignore gables)
     let topThreshold = 0.1
     let topVertices = roofVertices.filter(v => Math.abs(v.y - maxY) <= topThreshold)
     
@@ -225,7 +223,7 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
       topVertices = roofVertices.filter(v => Math.abs(v.y - maxY) <= topThreshold)
     }
     
-    // Calculate invisible plane boundaries from top surface vertices
+    // Define a 2D plane based on the top vertices
     const topX = topVertices.map(v => v.x)
     const topZ = topVertices.map(v => v.z)
     const planeTopY = maxY + PLANE_OFFSET_Y
@@ -234,7 +232,7 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
     const planeZMin = Math.min(...topZ) + PLANE_OFFSET_Z
     const planeZMax = Math.max(...topZ) + PLANE_OFFSET_Z
     
-    // Apply margins and calculate available space
+    // Calculate usable roof area with margins
     const clampedXMin = Math.max(planeXMin, planeXMin + ROOF_MARGIN_X)
     const clampedXMax = Math.min(planeXMax, planeXMax - ROOF_MARGIN_X)
     const clampedZMin = Math.max(planeZMin, planeZMin + ROOF_MARGIN_Z)
@@ -246,7 +244,7 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
       return { positions: [], orientations: [], scale: BASE_PANEL_SCALE }
     }
 
-    // Calculate panel grid dimensions
+    // Determine panel grid size based on available space
     const baseX = panel.widthX * Math.abs(BASE_PANEL_SCALE[0])
     const baseZ = panel.depthZ * Math.abs(BASE_PANEL_SCALE[2])
     const longIsX = widthAvailable >= depthAvailable
@@ -270,7 +268,7 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
       stepX = effX + PANEL_GAP_X
       stepZ = effZ + PANEL_GAP_Z
     } else {
-      // Auto-fit: scale panels to fit TARGET_ACROSS along longer side
+      // Auto-fit: scale panels to fit a target count along the longest roof edge
       const T = Math.max(1, Math.floor(TARGET_ACROSS))
       let s = acrossSpan / (T * baseAcross)
       if (!UPSCALE_PANELS) s = Math.min(1, s)
@@ -295,13 +293,13 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
       }
     }
 
-    // Position grid centered within roof bounds
+    // Center the panel grid on the roof
     const totalWidth = cols * effX + (cols - 1) * PANEL_GAP_X
     const totalDepth = rows * effZ + (rows - 1) * PANEL_GAP_Z
     gridStartX = Math.max(planeXMin, Math.min(clampedXMin + (widthAvailable - totalWidth) / 2, planeXMax - totalWidth))
     gridStartZ = Math.max(planeZMin, Math.min(clampedZMin + (depthAvailable - totalDepth) / 2, planeZMax - totalDepth))
 
-    // Limit total panels to the number of overrides from API, or use calculated grid size
+    // Cap panel count at MAX_PANELS or API override count
     const maxFromGrid = Math.min(MAX_PANELS, rows * cols)
     const maxFromAPI = overrides.length > 0 ? overrides.length : maxFromGrid
     const total = Math.min(maxFromGrid, maxFromAPI)
@@ -311,7 +309,7 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
     const positions: [number, number, number][] = []
     const orientations: Quaternion[] = []
 
-    // Place panels on invisible plane (row by row, left to right)
+    // Position panels on the virtual roof plane
     for (let c = 0; c < cols; c++) {
       for (let r = 0; r < rows; r++) {
         if (positions.length >= total) break
@@ -321,7 +319,7 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
         const panelHalfX = effX / 2
         const panelHalfZ = effZ / 2
         
-        // Boundary check: ensure panel stays within roof
+        // Check if panel is within roof boundaries
         const safetyMargin = 0.4
         if (x - panelHalfX < planeXMin + safetyMargin || x + panelHalfX > planeXMax - safetyMargin ||
             z - panelHalfZ < planeZMin + safetyMargin || z + panelHalfZ > planeZMax - safetyMargin) {
@@ -333,58 +331,52 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
         const panelIndex = positions.length
         const ov = overrides.length ? overrides[panelIndex % overrides.length] : undefined
 
-        // Calculate panel orientation from azimuth/slope overrides
-        // Azimuth: 0°=North, 90°=East, 180°=South, 270°=West
-        // Slope: 0°=horizontal, 90°=vertical
+        // Set panel orientation from API overrides.
+        // Convert PVGIS orientation (South=0°, horizontal=0°) to Three.js coordinates.
         let desiredNormal = normal.clone()
         let desiredHeading = new Vector3()
         
         if (ov) {
-          const az = (ov.azimuth ?? 0) * DEG
+          // Convert PVGIS azimuth (0°=S, 90°=W, -90°=E) to standard compass (0°=N, 90°=E)
+          const pvgisAzimuth = ov.azimuth ?? 0
+          // Normalize to 0-360 range (handles negative values)
+          const normalizedPvgis = ((pvgisAzimuth % 360) + 360) % 360
+          const standardAzimuth = (normalizedPvgis + 180) % 360
+
+          // The panel group is rotated +90° on Y-axis. Pre-compensate azimuth by -90°.
+          const compensatedAzimuth = (standardAzimuth - 90 + 360) % 360
+          const az = compensatedAzimuth * DEG
           const sl = (ov.slope ?? 0) * DEG
           
-          // For flat roof, use standard compass directions directly
-          // North = -Z, East = +X in Three.js coordinate system
-          const north = new Vector3(0, 0, -1)
-          const east = new Vector3(1, 0, 0)
-          
-          // Calculate heading direction in horizontal plane (XZ)
-          // heading = north * cos(azimuth) + east * sin(azimuth)
+          // Calculate heading vector in XZ plane from compensated azimuth.
           const heading2D = new Vector3(
-            Math.sin(az),  // East component
+            Math.sin(az),  // East component (positive X)
             0,
             -Math.cos(az)  // North component (negative Z = North)
           ).normalize()
           
-          // Calculate panel normal: tilt from vertical (up) toward heading by slope angle
-          // This creates the correct panel orientation
+          // Calculate panel's normal vector from slope and heading.
           desiredNormal = new Vector3(
             heading2D.x * Math.sin(sl),
-            Math.cos(sl),  // Vertical component
+            Math.cos(sl),  // Vertical component (positive = up toward sky)
             heading2D.z * Math.sin(sl)
           ).normalize()
           
+          // Ensure panel normal points up (Y>0).
+          if (desiredNormal.y <= 0) {
+            desiredNormal.multiplyScalar(-1)
+          }
+          
           desiredHeading.copy(heading2D)
         } else {
-          // Default: face North, no tilt
+          // Default orientation: North, no tilt.
           desiredHeading.set(0, 0, -1)
         }
 
-        // Build rotation quaternion from panel local axes to desired orientation
-        const localNormal = panel.tAxis.clone().normalize()
-        const localRight = panel.uAxis.clone().normalize()
-        const localForward = new Vector3().crossVectors(localNormal, localRight).normalize()
-        const forward = desiredHeading.clone().projectOnPlane(desiredNormal).normalize()
+        // Align panel's default "up" vector with the calculated normal.
+        const defaultPanelUp = panel.tAxis.clone().normalize();
         
-        if (forward.lengthSq() < 1e-12) {
-          const fallback = Math.abs(desiredNormal.y) > 0.99 ? new Vector3(0, 0, 1) : new Vector3(0, 1, 0)
-          forward.copy(new Vector3().crossVectors(desiredNormal, fallback).normalize())
-        }
-        
-        const right = new Vector3().crossVectors(forward, desiredNormal).normalize()
-        const targetMatrix = new Matrix4().makeBasis(right, forward, desiredNormal)
-        const localMatrix = new Matrix4().makeBasis(localRight, localForward, localNormal)
-        const q = new Quaternion().setFromRotationMatrix(targetMatrix.clone().multiply(localMatrix.clone().invert()))
+        const q = new Quaternion().setFromUnitVectors(defaultPanelUp, desiredNormal);
 
         positions.push([p.x, p.y, p.z])
         orientations.push(q)
@@ -395,8 +387,7 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
   }, [house, panel, overrides])
 
   useEffect(() => {
-    // Only wait for building and panel model to load. Don't wait for panel positions
-    // (panels may not exist, and that's fine - just show the building)
+    // Update loading state based on building/panel models only. Panels are optional.
     const isLoading = !house || !panel
     onLoadingChange?.(isLoading)
   }, [house, panel, onLoadingChange])
