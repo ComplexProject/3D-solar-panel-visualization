@@ -1,7 +1,7 @@
 import StyledDropzone from './DropZone'
 import { useForm } from 'react-hook-form'
 import { useState, useEffect } from 'react';
-import { GetGeocodingData } from '../utils/apiTesting';
+import { GetCoordinates } from '../utils/GeocodingAPI';
 import { IconoirProvider, InfoCircle } from 'iconoir-react';
 import ToolTip from './ToolTip';
 
@@ -36,7 +36,7 @@ function ParameterForm() {
         localStorage.setItem("city", JSON.stringify(cityValue));
         if (cityValue != "") {
             setFormData(prev => ({ ...prev, city: cityValue }));
-            const locationData = await GetGeocodingData(cityValue);
+            const locationData = await GetCoordinates(cityValue);
             if (locationData) {
                 if (errors.cityFetchFailed) {
                     clearErrors('cityFetchFailed')

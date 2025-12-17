@@ -13,6 +13,7 @@ export interface ExportData {
   totalEnergyDemand: number;
   energyFromGrid: number;
   pvEnergyProduction: number;
+  city: string; 
 }
 
 export const formatNumber = (num: number): string => {
@@ -330,6 +331,7 @@ export const prepareExportData = (
     power,
     totalEnergyDemand,
     energyFromGrid,
-    pvEnergyProduction
+    pvEnergyProduction,
+    city,
   };
 };

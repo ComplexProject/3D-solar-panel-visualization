@@ -6,7 +6,7 @@ import FormButton from './formComponents/FormButton';
 import { Settings, Xmark, IconoirProvider } from 'iconoir-react';
 import { sendFormData } from './utils/sendFormData';
 import { CalculationContext, ResultContext } from './App';
-import { useUnsavedChanges } from './hooks/useUnsavedChanges'; // Import the hook
+import { useUnsavedChanges } from './hooks/useUnsavedChanges';
 
 type SideMenuProps = {
     nodeRef: RefObject<HTMLDivElement | null>;
@@ -18,9 +18,14 @@ function SideMenu({ nodeRef, onClick, onShowUnsavedChanges }: SideMenuProps) {
     const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
     const { isCalculationRunning, setIsCalculationRunning } = useContext(CalculationContext);
     const { setIsResultAvailable, setResultData } = useContext(ResultContext);
-    const { checkUnsavedChanges } = useUnsavedChanges(); // Use the hook
+    const { checkUnsavedChanges } = useUnsavedChanges();
 
+    const [formRefresh, setFormRefresh] = useState(0);
     const maxHeight = isCalculationRunning ? '12.394rem' : (!showAdvancedSettings ? '22.968rem' : '14.394rem');
+
+    const refreshForms = () => {
+        setFormRefresh(prev => prev + 1);
+    };
 
     const calculate = async () => {
         try {
@@ -42,16 +47,20 @@ function SideMenu({ nodeRef, onClick, onShowUnsavedChanges }: SideMenuProps) {
     const handleToggleSettings = () => {
         if (showAdvancedSettings && checkUnsavedChanges()) {
             onShowUnsavedChanges?.(() => setShowAdvancedSettings(false));
+            refreshForms();
         } else {
             setShowAdvancedSettings(!showAdvancedSettings);
+            refreshForms();
         }
     };
 
     const handleGoBack = () => {
         if (checkUnsavedChanges()) {
             onShowUnsavedChanges?.(() => setShowAdvancedSettings(false));
+            refreshForms();
         } else {
             setShowAdvancedSettings(false);
+            refreshForms();
         }
     };
     
@@ -68,7 +77,7 @@ function SideMenu({ nodeRef, onClick, onShowUnsavedChanges }: SideMenuProps) {
             </div>
             <div className="flex flex-col drop-shadow transition-all duration-[230ms] ease-in-out py-5 px-8 bg-white rounded-2xl overflow-hidden" style={{ height: maxHeight}}>
                 {!isCalculationRunning ? 
-                <> {showAdvancedSettings ? <AdvancedSettings /> : <ParameterForm />} </>
+                <> {showAdvancedSettings ? <AdvancedSettings key={`advanced-${formRefresh}`} /> : <ParameterForm key={`advanced-${formRefresh}`}/>} </>
                 :
                 <div className='flex flex-col gap-10 p-5 justify-center items-center'>
                     <div className="relative w-12 h-12">
