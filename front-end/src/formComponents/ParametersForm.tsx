@@ -68,7 +68,7 @@ function ParameterForm() {
                     <label htmlFor="city">City</label>
                     <p className='text-red-500'>*</p>
                 </div>
-                <input className={`${errors.cityFetchFailed ? 'bg-[#FFDEDE]' : null} ${inputClass}`} type="text" placeholder='Middelburg' {...register("city", { onBlur: handleCityBlur })} id="city" />
+                <input className={`${errors.cityFetchFailed ? 'bg-[#FFDEDE]' : null} ${inputClass}`} type="text" placeholder='Middelburg' {...register("city", { onBlur: handleCityBlur, onChange: () => {clearErrors('cityFetchFailed')} })} id="city" />
                 {errors.cityFetchFailed ? <p className='text-[#FF0000] text-sm absolute z-50'>{errors.cityFetchFailed?.message}</p> : null}
             </div>
             <div>

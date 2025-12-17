@@ -18,7 +18,7 @@ function predefinedCity() {
 }
 
 function AdvancedSettings() {
-  const { register, handleSubmit, setValue, setError, clearErrors } = useForm<FormData>();
+  const { register, handleSubmit, setValue, setError, formState: {errors}, clearErrors } = useForm<FormData>();
   
   const [formData, setFormData] = useState<FormData>(() => {
     const savedLatitude = localStorage.getItem("latitude");
@@ -38,50 +38,51 @@ function AdvancedSettings() {
       setValue("year", formData.year);
   }, [setValue, formData]);
 
-  const onSubmit = async (data: FormData) => {    
+  const onSubmit = async (data: FormData) => { 
+    console.log("pressed")   
     const lat = Number(data.latitude) || 0;
     const lon = Number(data.longitude) || 0;
     const year = Number(data.year) || 2023;
 
-    if (!predefinedCity() && lat !== 0 && lon !== 0) {
-      try {
-        const cityData = await GetCityName(lat, lon);
-        if (cityData) {
-          clearErrors('coordinateFecthFailed');
-          localStorage.setItem("city", JSON.stringify(cityData.name));
-          console.log(`City automatically set to: ${cityData.name}`);
-        } else {
-          setError('coordinateFecthFailed', {
-            message: 'No city for these cooridnates',
-          });
-          localStorage.removeItem("city");
-        }
-      } catch (error) {
-          setError('coordinateFecthFailed', {
-          type: "manual",
-          message: 'Failed to fetch city for coordinates',
-        });
-        localStorage.removeItem("city");
-      }
-    }
+    clearErrors('coordinateFecthFailed');
 
     localStorage.setItem("latitude", JSON.stringify(lat));
     localStorage.setItem("longitude", JSON.stringify(lon));
     localStorage.setItem("year", JSON.stringify(year));    
     setFormData({ latitude: lat, longitude: lon, year });
+
+    if (!predefinedCity() && lat !== 0 && lon !== 0) {
+      console.log("im here")
+        const cityData = await GetCityName(lat, lon);
+        if (cityData) {
+          if (errors.coordinateFecthFailed) {
+            clearErrors('coordinateFecthFailed');
+          }
+          localStorage.setItem("city", JSON.stringify(cityData.name));
+        } else {
+          setError('coordinateFecthFailed', {
+            message: 'No city exists for these coordinates',
+          });
+          localStorage.removeItem("latitude");
+          localStorage.removeItem("longitude");
+          localStorage.removeItem("city");
+        }
+    }
   }
 
   return (
     <form id='advanced-settings-form' data-testid="advanced-settings-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[0.965rem] w-full h-full">
       <div className='group'>
         <label htmlFor="latitude">{predefinedCity() ? `Latitude for ${predefinedCity()}` : 'Latitude'}</label><br />
-        <input className={inputClass} type="number" step="any" id="latitude" disabled={predefinedCity()} {...register("latitude")} /><br/>
+        <input className={`${errors.coordinateFecthFailed ? 'bg-[#FFDEDE]' : null} ${inputClass}`} type="number" step="any" id="latitude" disabled={predefinedCity()} {...register("latitude", { onChange: () => { clearErrors('coordinateFecthFailed');}})}  /><br/>
         {predefinedCity() ? <ToolTip toolTipText='City is already predefined' toolTipPosition='bottom'/> : ''}
+        {errors.coordinateFecthFailed ? <p className='text-[#FF0000] text-sm absolute z-50'>{errors.coordinateFecthFailed?.message}</p> : null}
       </div>
       <div className='group'>
         <label htmlFor="longitude">{predefinedCity() ? `Longitude for ${predefinedCity()}` : 'Longitude'}</label><br />
-        <input className={inputClass} type="number" step="any" id="longitude" disabled={predefinedCity()} {...register("longitude")} /><br/>
+        <input className={`${errors.coordinateFecthFailed ? 'bg-[#FFDEDE]' : null} ${inputClass}`} type="number" step="any" id="longitude" disabled={predefinedCity()} {...register("longitude", { onChange: () => { clearErrors('coordinateFecthFailed');}})}  /><br/>
         {predefinedCity() ? <ToolTip toolTipText='City is already predefined' toolTipPosition='bottom'/> : ''}
+      {errors.coordinateFecthFailed ? <p className='text-[#FF0000] text-sm absolute z-50'>{errors.coordinateFecthFailed?.message}</p> : null}
       </div>
       <div>
         <label htmlFor="year">Year</label><br />
