@@ -14,6 +14,10 @@ const rejectStyle: React.CSSProperties = {
   borderColor: '#ff1744'
 };
 
+/**
+ * React component that has the styling and logic of the Drop zone
+ * @returns Dropzone component
+ */
 function StyledDropzone() {
 const [file, setFile] = useState<File | undefined>(undefined);
 const [fileName, setFileName] = useState<string>('');

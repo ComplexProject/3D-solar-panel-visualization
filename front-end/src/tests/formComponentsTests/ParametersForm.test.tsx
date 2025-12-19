@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ParameterForm from '../../formComponents/ParametersForm';
 import userEvent from '@testing-library/user-event';
-import * as api from '../../utils/apiTesting';
+import * as api from '../../utils/geocodingAPI';
 
 describe('ParameterForm Component', () => {
 
@@ -42,8 +42,8 @@ it('updates localStorage when power is changed', async () => {
   });
 });
 
-it('calls GetGeocodingData on city blur and updates latitude/longitude in localStorage', async () => {
-  const mockGetGeocodingData = vi.spyOn(api, 'GetGeocodingData').mockResolvedValue({name: 'Middelburg', country: 'NL',latitude: 10, longitude: 20 });
+it('calls GetCoordinates on city blur and updates latitude/longitude in localStorage', async () => {
+  const mockGetCoordinates = vi.spyOn(api, 'GetCoordinates').mockResolvedValue({name: 'Middelburg', country: 'NL',latitude: 10, longitude: 20 });
     render(<ParameterForm />);
 
     const cityInput = screen.getByLabelText(/City/i) as HTMLInputElement;
@@ -51,7 +51,7 @@ it('calls GetGeocodingData on city blur and updates latitude/longitude in localS
     await userEvent.tab();
 
     await waitFor(() => {
-      expect(mockGetGeocodingData).toHaveBeenCalledWith('Middelburg');
+      expect(mockGetCoordinates).toHaveBeenCalledWith('Middelburg');
       const storedLatitude = localStorage.getItem('latitude');
       const storedLongitude = localStorage.getItem('longitude');
       expect(storedLatitude).toBe(JSON.stringify(10));

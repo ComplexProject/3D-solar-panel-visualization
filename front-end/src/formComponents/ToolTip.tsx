@@ -3,6 +3,12 @@ type Props= {
     toolTipPosition?: string
 }
 
+/**
+ * React component that has the styling of the tooltip
+ * @param toolTipPosition - decided where the tooltip should be positioned
+ * @param toolTipText - text of the tooltip
+ * @returns Tooltip component
+ */
 function ToolTip({ toolTipPosition='left', toolTipText}:Props){
     return (
         <div className={`absolute z-50 pl-8 pt-1 pr-4 hidden group-hover:flex ${toolTipPosition === 'left' ? 'right-10' : 'left-0'} justify-center items-center drop-shadow-xl`}>

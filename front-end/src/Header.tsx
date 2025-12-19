@@ -1,3 +1,7 @@
+/**
+ * React component that has the styling of the Header
+ * @returns Header component
+ */
 function Header() {
     return (
         <div className="w-full absolute p-2 select-none items-center top-0 z-[100] flex flex-row gap-3">

@@ -6,6 +6,12 @@ type FormButtonProps = {
     form?: string; 
 };
 
+/**
+ * React component that has the styling of the buttons
+ * @param buttonText - text of the button
+ * @param isClosing - wheather the button is used to close the form
+ * @returns Styled button
+ */
 function FormButton({ buttonText, isClosingButton = false, onClick, type = "button", form }: FormButtonProps) {
     return (
         <button
