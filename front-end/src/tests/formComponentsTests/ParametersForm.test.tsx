@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ParameterForm from '../../formComponents/ParametersForm';
 import userEvent from '@testing-library/user-event';
-import * as api from '../../utils/GeocodingAPI';
+import * as api from '../../utils/geocodingAPI';
 
 describe('ParameterForm Component', () => {
 

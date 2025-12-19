@@ -16,6 +16,11 @@ export interface ExportData {
   city: string; 
 }
 
+/**
+ * Function to format the number with , instead of .
+ * @param num to be formated
+ * @returns formated number
+ */
 export const formatNumber = (num: number): string => {
   return num.toLocaleString('en-US', {
     minimumFractionDigits: 2,
@@ -23,6 +28,42 @@ export const formatNumber = (num: number): string => {
   });
 };
 
+/**
+ * Function to change scale the number as much as it can from kWp to either MWp or GWp
+ * @param value number to be scaled
+ * @returns scaled number with the proper unit
+ */
+export const formatEnergyValue = (value: number): string => {
+  if (value === 0) return "0 kWp";
+  
+  const absValue = Math.abs(value);
+  
+  if (absValue >= 1000000) {
+    const gwValue = value / 1000000;
+    return `${cleanFormat(gwValue)} GWp`;
+  } else if (absValue >= 1000) {
+    const mwValue = value / 1000;
+    return `${cleanFormat(mwValue)} MWp`;
+  } else {
+    return `${cleanFormat(value)} kWp`;
+  }
+};
+
+const cleanFormat = (num: number): string => {
+  if (num % 1 === 0) {
+    return num.toFixed(0);
+  } else if (num * 10 % 1 === 0) {
+    return num.toFixed(1);
+  } else {
+    return num.toFixed(3);
+  }
+};
+
+/**
+ * Function that creates the exported PDF with custom css and the data from results
+ * @param data whole result data with predifined parameters
+ * @returns Styled PDF
+ */
 export const exportToPDF = (data: ExportData) => {
   if (!data.panels?.length) {
     alert('No data available to export');
@@ -30,7 +71,7 @@ export const exportToPDF = (data: ExportData) => {
   }
 
   const htmlContent = `
-    <!DOCTYPE html>
+  <!DOCTYPE html>
     <html>
       <head>
         <title>Solar Panel Analysis Report</title>
@@ -49,7 +90,7 @@ export const exportToPDF = (data: ExportData) => {
           }
           
           .report-container {
-            padding: 10mm 10mm 10mm 10mm;
+            padding: 5mm 10mm 10mm 10mm;
             box-sizing: border-box;
           }
           
@@ -115,11 +156,13 @@ export const exportToPDF = (data: ExportData) => {
             gap: 10px;
           }
           
-          .energy-card, .parameter-item {
+          .energy-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             background: #f8f9fa;
             padding: 10px;
             border-radius: 6px;
-            border-left: 3px solid #006FAA;
           }
           
           .energy-card .label, .parameter-label {
@@ -137,15 +180,17 @@ export const exportToPDF = (data: ExportData) => {
           
           .parameters-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
           }
           
           .parameter-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 15px;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
           }
           
           .parameter-value {
@@ -170,8 +215,12 @@ export const exportToPDF = (data: ExportData) => {
               margin-bottom: 15px !important;
             }
             
-            .energy-grid, .parameters-grid {
+            .energy-grid {
               grid-template-columns: repeat(2, 1fr) !important;
+            }
+
+            .parameters-grid {
+              grid-template-columns: repeat(3, 1fr) !important;
             }
             
             table th {
@@ -186,12 +235,48 @@ export const exportToPDF = (data: ExportData) => {
           <div class="header">
             <h1>Solar Panel Analysis Report</h1>
             <div class="subtitle">
-              Year: ${data.year} | Generated on: ${new Date().toLocaleDateString()}
+              Generated on: ${new Date().toLocaleDateString()}
             </div>
           </div>
-          
           <div class="section">
-            <h2 class="section-title">1. Optimal Solar Placement</h2>
+            <h2 class="section-title">1. Used Parameters</h2>
+            <div class="parameters-grid">
+              <div class="parameter-item">
+                <span class="parameter-label">Latitude</span>
+                <span class="parameter-value">${data.latitude}°</span>
+              </div>
+              <div class="parameter-item">
+                <span class="parameter-label">Longitude</span>
+                <span class="parameter-value">${data.longitude}°</span>
+              </div>
+              <div class="parameter-item">
+                <span class="parameter-label">City</span>
+                <span class="parameter-value">${data.city}</span>
+              </div>
+              <div class="parameter-item">
+                <span class="parameter-label">Year</span>
+                <span class="parameter-value">${data.year}</span>
+              </div>
+              <div class="parameter-item">
+                <span class="parameter-label">Slope Increment</span>
+                <span class="parameter-value">1°</span>
+              </div>
+              <div class="parameter-item">
+                <span class="parameter-label">Azimuth Increment</span>
+                <span class="parameter-value">1°</span>
+              </div>
+              <div class="parameter-item">
+                <span class="parameter-label">PV Max Power</span>
+                <span class="parameter-value">${data.power} kWp</span>
+              </div>
+              <div class="parameter-item">
+                <span class="parameter-label">PV Longevity</span>
+                <span class="parameter-value">15 years</span>
+              </div>
+            </div>
+          </div>
+          <div class="section">
+            <h2 class="section-title">2. Optimal Solar Placement</h2>
             <div>
               <table>
                 <thead>
@@ -217,45 +302,15 @@ export const exportToPDF = (data: ExportData) => {
           </div>
           
           <div class="section">
-            <h2 class="section-title">2. Energy Summary</h2>
+            <h2 class="section-title">3. Energy Summary</h2>
             <div class="energy-grid">
               <div class="energy-card">
                 <div class="label">Energy from the Grid</div>
-                <div class="value">${formatNumber(data.energyFromGrid)} kWp</div>
+                <div class="value">${formatEnergyValue(data.energyFromGrid)}</div>
               </div>
               <div class="energy-card">
                 <div class="label">PV Energy Production</div>
-                <div class="value">${formatNumber(data.pvEnergyProduction)} kWp</div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="section">
-            <h2 class="section-title">3. Used Parameters</h2>
-            <div class="parameters-grid">
-              <div class="parameter-item">
-                <span class="parameter-label">Latitude</span>
-                <span class="parameter-value">${data.latitude}°</span>
-              </div>
-              <div class="parameter-item">
-                <span class="parameter-label">Longitude</span>
-                <span class="parameter-value">${data.longitude}°</span>
-              </div>
-              <div class="parameter-item">
-                <span class="parameter-label">Slope Increment</span>
-                <span class="parameter-value">1° increment</span>
-              </div>
-              <div class="parameter-item">
-                <span class="parameter-label">Azimuth Increment</span>
-                <span class="parameter-value">1° increment</span>
-              </div>
-              <div class="parameter-item">
-                <span class="parameter-label">PV Max Power</span>
-                <span class="parameter-value">${data.power} kWp</span>
-              </div>
-              <div class="parameter-item">
-                <span class="parameter-label">PV Longevity</span>
-                <span class="parameter-value">15 years</span>
+                <div class="value">${formatEnergyValue(data.pvEnergyProduction)}</div>
               </div>
             </div>
           </div>
@@ -318,9 +373,9 @@ export const prepareExportData = (
   const latitude = localStorage.getItem("latitude") ? JSON.parse(localStorage.getItem("latitude")!) : "N/A";
   const longitude = localStorage.getItem("longitude") ? JSON.parse(localStorage.getItem("longitude")!) : "N/A";
   const power = localStorage.getItem("power") || "N/A";
-
   const pvEnergyProduction = resultData?.output?.ppv_usable || 0;
   const energyFromGrid = resultData?.output?.energy_from_grid || 0;
+  const city = JSON.parse(localStorage.getItem("city") || "");
   const totalEnergyDemand = pvEnergyProduction + energyFromGrid;
 
   return {

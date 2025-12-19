@@ -136,8 +136,12 @@ function App() {
           {resultData  && !isCalculationRunning ?
           <div className='flex flex-row gap-5 justify-center items-center'>
             <div className='flex'>
-              <h2 className='text-3xl pr-2'>Year:</h2>
-              <h2 className='text-3xl font-bold'>{`${JSON.parse(localStorage.getItem("year")!)}`}</h2>
+              <h2 className='text-2xl pr-2'>City:</h2>
+              <h2 className='text-2xl font-bold'>{`${JSON.parse(localStorage.getItem("city")!)}`}</h2>
+            </div>
+            <div className='flex'>
+              <h2 className='text-2xl pr-2'>Year:</h2>
+              <h2 className='text-2xl font-bold'>{`${JSON.parse(localStorage.getItem("year")!)}`}</h2>
             </div>
             <button className='drop-shadow-sm cursor-pointer rounded-xl p-2 bg-[#006FAA] text-white hover:scale-105' onClick={handleExport}>Export results</button>
           </div>

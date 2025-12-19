@@ -49,10 +49,15 @@ function toRadians(degrees: number): number {
   return degrees * (Math.PI / 180);
 }
 
+/**
+ * API call that get the latitude and longitude of a user defined city
+ * @param city - user defined city
+ * @returns latitude and longitude
+ */
 export async function GetCoordinates(city:string) {
   const apiKey = import.meta.env.VITE_API_KEY;
   try {
-    const response = await fetch(
+    const response = await fetch (
       `https://api.api-ninjas.com/v1/geocoding?city=${city}&country=NL`,
       {
         method: 'GET',
@@ -106,6 +111,12 @@ if (!response.ok) {
   }
 }
 
+/**
+ * Api call to get the City form user defined latitude and longitude
+ * @param latitude - user defined latitude
+ * @param longitude - user defined longitude
+ * @returns City name
+ */
 export async function GetCityName(latitude:number, longitude:number) {
   const apiKey = import.meta.env.VITE_API_KEY;
   try {

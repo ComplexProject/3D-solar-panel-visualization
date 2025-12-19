@@ -6,6 +6,10 @@ type UnsavedChangesProps = {
   onCancel: () => void;
 }
 
+/**
+ * React component that has the styling of the UnsavedChanges component
+ * @returns Unsaved changes component
+ */
 function UnsavedChanges({ onConfirm, onCancel }: UnsavedChangesProps) {
   useEffect(() => {
     document.body.style.overflow = "hidden";

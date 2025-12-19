@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { useState, useEffect } from 'react';
-import { GetCityName } from '../utils/GeocodingAPI';
+import { GetCityName } from '../utils/geocodingAPI';
 import ToolTip from './ToolTip';
 
 const inputClass = 'px-2 py-0.5 hover:border-[#006FAA] focus:ring-1 focus:outline-none focus:ring-[#006FAA] border shadow-md border-[#808080] w-full rounded-[7px] disabled:bg-gray-200 disabled:text-gray-700 disabled:cursor-not-allowed'
@@ -17,6 +17,10 @@ function predefinedCity() {
   return savedCity && savedCity !== "" ? JSON.parse(savedCity) : false;
 }
 
+/**
+ * React component that has the Advanced settings styling and logic
+ * @returns The final component
+ */
 function AdvancedSettings() {
   const { register, handleSubmit, setValue, setError, formState: {errors}, clearErrors } = useForm<FormData>();
   
@@ -38,8 +42,12 @@ function AdvancedSettings() {
       setValue("year", formData.year);
   }, [setValue, formData]);
 
+  /**
+   * On submit the data in the form are saved in the local storage
+   * If there is a predifined city the lat and lon input fields are disabled to prevent errors
+   * @param data - data from the input field
+   */
   const onSubmit = async (data: FormData) => { 
-    console.log("pressed")   
     const lat = Number(data.latitude) || 0;
     const lon = Number(data.longitude) || 0;
     const year = Number(data.year) || 2023;
@@ -52,7 +60,6 @@ function AdvancedSettings() {
     setFormData({ latitude: lat, longitude: lon, year });
 
     if (!predefinedCity() && lat !== 0 && lon !== 0) {
-      console.log("im here")
         const cityData = await GetCityName(lat, lon);
         if (cityData) {
           if (errors.coordinateFecthFailed) {

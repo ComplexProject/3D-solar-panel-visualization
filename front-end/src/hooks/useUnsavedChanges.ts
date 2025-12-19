@@ -1,3 +1,7 @@
+/**
+ * React hook that checks if the user saved their advanced setting before exiting
+ * @returns True if the changes were saved, False if the changes were not saved
+ */
 export const useUnsavedChanges = () => {
   const checkUnsavedChanges = () => {
     try {

@@ -1,3 +1,8 @@
+/**
+ * Function that sends form data to the backend for further processinig
+ * When the user clicks calculate on the form this is automatically sent to the backend
+ * @returns JSON repsonse of the data in the form
+ */
 export async function sendFormData() {
     const apiPort = import.meta.env.VITE_API_PORT;
     const savedPower = JSON.parse(localStorage.getItem("power") || "0");
