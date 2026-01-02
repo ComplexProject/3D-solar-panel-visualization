@@ -1,7 +1,9 @@
 import { Canvas, useThree } from "@react-three/fiber"
 import { Environment, OrbitControls, PerspectiveCamera, Bounds } from "@react-three/drei"
 import { Suspense, useState, useRef, useEffect, cloneElement, isValidElement } from "react"
-import LoadingMessageModelViewer from "../statusMessageComponents/loadingMessage3DViewer"
+import LoadingMessage3DViewer from "../statusMessageComponents/modelViewer/loading3DViewer"
+import RunCalc3Dviewer from "../statusMessageComponents/modelViewer/runCalc3DViewer"
+import Error3DViewer from "../statusMessageComponents/modelViewer/error3DViewer"
 
 // Custom OrbitControls component that enables zoom only when Shift is held
 function OrbitControlsWithShiftZoom(props: any) {
@@ -42,10 +44,28 @@ function OrbitControlsWithShiftZoom(props: any) {
   return <OrbitControls ref={controlsRef} {...props} />
 }
 
-export default function ModelViewer({ children }: { children: React.ReactNode }) {
+function ShowStatusMessage(isResultAvailable: number) {
+  switch(isResultAvailable) {
+    case 0:
+      return <RunCalc3Dviewer /> 
+    case 1:
+      return <LoadingMessage3DViewer />
+    case 3:
+      return <Error3DViewer />
+    default:
+      return null
+  }
+}
+
+type Props = {
+  isResultAvailabe: any
+}
+
+export default function ModelViewer({ children, props }: { children: React.ReactNode, props : Props }) {
   const [isLoading, setIsLoading] = useState(true)
   const [isReady, setIsReady] = useState(false)
   const timeoutRef = useRef<number | null>(null)
+  let isResultAvailable = props.isResultAvailabe
 
   // Handle loading state changes with a small delay to ensure everything is rendered
   const handleLoadingChange = (loading: boolean) => {
@@ -154,7 +174,9 @@ export default function ModelViewer({ children }: { children: React.ReactNode })
           </div>
         </div>
       )}
-      { !isLoading && (<LoadingMessageModelViewer />) }
+
+      { !isLoading && ShowStatusMessage(isResultAvailable) }
+    
       {isLoading && (
         <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
           <div className="flex flex-col items-center gap-4 bg-white bg-opacity-80 rounded-lg p-8 shadow-lg">
