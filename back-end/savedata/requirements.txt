@@ -3,3 +3,5 @@ fastapi[standard]
 uvicorn
 numpy
 scipy
+httpx
+pytest
