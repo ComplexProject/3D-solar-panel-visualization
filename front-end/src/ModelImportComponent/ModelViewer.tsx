@@ -1,6 +1,9 @@
 import { Canvas, useThree } from "@react-three/fiber"
 import { Environment, OrbitControls, PerspectiveCamera, Bounds } from "@react-three/drei"
 import { Suspense, useState, useRef, useEffect, cloneElement, isValidElement } from "react"
+import LoadingMessage3DViewer from "../statusMessageComponents/modelViewer/loading3DViewer"
+import RunCalc3Dviewer from "../statusMessageComponents/modelViewer/runCalc3DViewer"
+import Error3DViewer from "../statusMessageComponents/modelViewer/error3DViewer"
 
 // Custom OrbitControls component that enables zoom only when Shift is held
 function OrbitControlsWithShiftZoom(props: any) {
@@ -41,10 +44,28 @@ function OrbitControlsWithShiftZoom(props: any) {
   return <OrbitControls ref={controlsRef} {...props} />
 }
 
-export default function ModelViewer({ children }: { children: React.ReactNode }) {
+function StatusMessage(isResultAvailable: number) {
+  switch(isResultAvailable) {
+    case 0:
+      return <RunCalc3Dviewer /> 
+    case 1:
+      return <LoadingMessage3DViewer message="Please wait..." />
+    case 3:
+      return <Error3DViewer />
+    default:
+      return null
+  }
+}
+
+type Props = {
+  isResultAvailabe: any
+}
+
+export default function ModelViewer({ children, props }: { children: React.ReactNode, props : Props }) {
   const [isLoading, setIsLoading] = useState(true)
   const [isReady, setIsReady] = useState(false)
   const timeoutRef = useRef<number | null>(null)
+  let isResultAvailable = props.isResultAvailabe
 
   // Handle loading state changes with a small delay to ensure everything is rendered
   const handleLoadingChange = (loading: boolean) => {
@@ -154,17 +175,9 @@ export default function ModelViewer({ children }: { children: React.ReactNode })
         </div>
       )}
 
-      {isLoading && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
-          <div className="flex flex-col items-center gap-4 bg-white bg-opacity-80 rounded-lg p-8 shadow-lg">
-            <div className="relative w-16 h-16">
-              <div className="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
-              <div className="absolute inset-0 border-4 border-[#006FAA] rounded-full border-t-transparent animate-spin"></div>
-            </div>
-            <p className="text-gray-600 text-lg font-medium">Loading 3D Model...</p>
-          </div>
-        </div>
-      )}
+      { !isLoading && StatusMessage(isResultAvailable) }
+    
+      {isLoading && ( <LoadingMessage3DViewer message="Loading 3D Model..." /> )}
     </div>
   )
 }
