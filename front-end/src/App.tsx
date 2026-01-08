@@ -11,11 +11,11 @@ import { ArrowLeft } from 'iconoir-react';
 import { ArrowRight } from 'iconoir-react';
 import ModelViewer from './ModelImportComponent/ModelViewer'
 import BuildingWithSolarPanels from './ModelImportComponent/BuildingWithSolarPanels'
-import LoadingMessage from './statusMessageComponents/loadingMessage'
-import ErrorMessage from './statusMessageComponents/errorMessage'
+import LoadingMessage from './statusMessageComponents/results/loadingMessage'
+import ErrorMessage from './statusMessageComponents/results/errorMessage'
 import Header from './Header'
 import React from 'react'
-import RunCalculation from './statusMessageComponents/runCalculation'
+import RunCalculation from './statusMessageComponents/results/runCalculation'
 
 export const CalculationContext = React.createContext<{isCalculationRunning: boolean; setIsCalculationRunning: (value: boolean) => void}>({isCalculationRunning: false, setIsCalculationRunning: () => {}});
 export const ResultContext = React.createContext<{
@@ -79,7 +79,11 @@ function App() {
       <div className='h-screen w-full bg-red-50'>
         <Header/>
         <div className="relative h-full w-full">
-          <ModelViewer>
+          <ModelViewer
+          props={{
+            isResultAvailabe: isResultAvailabe,
+          }}
+          >
             <BuildingWithSolarPanels />
           </ModelViewer>
         </div>
