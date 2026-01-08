@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { useState, useEffect } from 'react';
-import { GetCityName } from '../utils/GeocodingAPI';
+import { GetCityName, findClosestSavedCoordinate } from '../utils/GeocodingAPI';
 import ToolTip from './ToolTip';
 
 const inputClass = 'px-2 py-0.5 hover:border-[#006FAA] focus:ring-1 focus:outline-none focus:ring-[#006FAA] border shadow-md border-[#808080] w-full rounded-[7px] disabled:bg-gray-200 disabled:text-gray-700 disabled:cursor-not-allowed'
@@ -91,6 +91,8 @@ function AdvancedSettings() {
           localStorage.removeItem("city");
         }
     }
+
+    await findClosestSavedCoordinate(lat, lon, year);
   }
 
   return (

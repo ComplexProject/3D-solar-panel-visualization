@@ -26,7 +26,7 @@ function ClosestCityFound({ onConfirm, onCancel, distance }: Props) {
       <p>We found an alternative city within ~{distance} km. You can use this to get your results much faster. Do you wish to use this new city?</p>
       <div className="flex flex-row gap-5">
         <FormButton buttonText="Yes" onClick={onConfirm}/>
-        <FormButton buttonText="Cancel" isClosingButton={true} onClick={onCancel}/>
+        <FormButton buttonText="No" isClosingButton={true} onClick={onCancel}/>
       </div>
     </div>
     </div>

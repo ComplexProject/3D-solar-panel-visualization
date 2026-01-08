@@ -133,7 +133,6 @@ function App() {
                 localStorage.setItem('latitude', JSON.stringify(closestCoords.lat));
                 localStorage.setItem('longitude', JSON.stringify(closestCoords.lon));
                 
-                // Get city name for the coordinates
                 const cityData = await GetCityName(closestCoords.lat, closestCoords.lon);
                 if (cityData) {
                   localStorage.setItem('city', JSON.stringify(cityData.name));
