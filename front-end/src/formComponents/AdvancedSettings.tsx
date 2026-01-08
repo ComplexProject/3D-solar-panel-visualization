@@ -42,6 +42,22 @@ function AdvancedSettings() {
       setValue("year", formData.year);
   }, [setValue, formData]);
 
+  useEffect(() => {
+    function handler(e: Event) {
+      const ev = e as CustomEvent;
+      const lat = ev?.detail?.lat;
+      const lon = ev?.detail?.lon;
+      if (typeof lat === 'number' && typeof lon === 'number') {
+        setValue("latitude", lat);
+        setValue("longitude", lon);
+        setFormData(prev => ({...prev, latitude: lat, longitude: lon}));
+      }
+    }
+
+    window.addEventListener('coordinatesUpdated', handler as EventListener);
+    return () => window.removeEventListener('coordinatesUpdated', handler as EventListener);
+  }, [setValue]);
+
   /**
    * On submit the data in the form are saved in the local storage
    * If there is a predifined city the lat and lon input fields are disabled to prevent errors

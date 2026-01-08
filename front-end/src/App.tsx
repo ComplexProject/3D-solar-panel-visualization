@@ -32,6 +32,7 @@ function App() {
   const [unsavedCallback, setUnsavedCallback] = useState<(() => void) | null>(null);
   const [showClosestPopup, setShowClosestPopup] = useState(false);
   const [closestDistance, setClosestDistance] = useState<number | null>(null);
+  const [closestCoords, setClosestCoords] = useState<{lat: number, lon: number} | null>(null);
 
   const nodeRef = useRef(null)
   const pullTabRef = useRef(null)
@@ -49,8 +50,11 @@ function App() {
     function handler(e: Event) {
       const ev = e as CustomEvent;
       const distance = ev?.detail?.distance;
-      if (typeof distance === 'number') {
+      const lat = ev?.detail?.lat;
+      const lon = ev?.detail?.lon;
+      if (typeof distance === 'number' && typeof lat === 'number' && typeof lon === 'number') {
         setClosestDistance(Math.round(distance));
+        setClosestCoords({lat, lon});
         setShowClosestPopup(true);
       }
     }
@@ -123,7 +127,16 @@ function App() {
         )}
         {showClosestPopup && (
           <ClosestCityFound
-            onConfirm={() => setShowClosestPopup(false)}
+            onConfirm={() => {
+              if (closestCoords) {
+                localStorage.setItem('latitude', JSON.stringify(closestCoords.lat));
+                localStorage.setItem('longitude', JSON.stringify(closestCoords.lon));
+                window.dispatchEvent(new CustomEvent('coordinatesUpdated', {
+                  detail: {lat: closestCoords.lat, lon: closestCoords.lon}
+                }));
+              }
+              setShowClosestPopup(false);
+            }}
             onCancel={() => setShowClosestPopup(false)}
             distance={closestDistance ?? 0}
           />
