@@ -369,7 +369,7 @@ export const prepareExportData = (
   resultData: any
 ): ExportData => {
   const panels = getSolarPanelResult();
-  const year = JSON.parse(localStorage.getItem("year") || "2023");
+  const year = JSON.parse(localStorage.getItem("year") || "2019");
   const latitude = localStorage.getItem("latitude") ? JSON.parse(localStorage.getItem("latitude")!) : "N/A";
   const longitude = localStorage.getItem("longitude") ? JSON.parse(localStorage.getItem("longitude")!) : "N/A";
   const power = localStorage.getItem("power") || "N/A";

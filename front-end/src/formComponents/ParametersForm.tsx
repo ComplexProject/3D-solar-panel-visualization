@@ -19,7 +19,6 @@ interface FormData {
  */
 function ParameterForm() {
     const { register, setValue, setError, formState: {errors}, clearErrors } = useForm<FormData>();
-
     const [formData, setFormData] = useState<FormData>(() => {
         const savedCity = localStorage.getItem("city");
         const savedPower = localStorage.getItem("power");
@@ -44,7 +43,9 @@ function ParameterForm() {
         localStorage.setItem("city", JSON.stringify(cityValue));
         if (cityValue != "") {
             setFormData(prev => ({ ...prev, city: cityValue }));
-            const locationData = await GetCoordinates(cityValue);
+            const savedYear = localStorage.getItem("year");
+            const yearNumber = savedYear ? parseInt(savedYear) : 2019;
+            const locationData = await GetCoordinates(cityValue, yearNumber);
             if (locationData) {
                 if (errors.cityFetchFailed) {
                     clearErrors('cityFetchFailed')

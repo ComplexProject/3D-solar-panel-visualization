@@ -67,9 +67,10 @@ function extractCoordinates(filenames: string[]): Array<{lat: number, lon: numbe
 /**
  * API call that get the latitude and longitude of a user defined city
  * @param city - user defined city
+ * @param year - user defined year
  * @returns latitude and longitude
  */
-export async function GetCoordinates(city:string) {
+export async function GetCoordinates(city:string, year:number) {
   const apiKey = import.meta.env.VITE_API_KEY;
   try {
     const response = await fetch (
@@ -111,24 +112,66 @@ if (!response.ok) {
       throw new Error("No results for this city.");
     }
 
+    const cityCoords: Coordinate = {
+      latitude: data[0].latitude,
+      longitude: data[0].longitude
+    };
+
     try {
-      const filesResponse = await fetch(`http://localhost:8505/listSavedFilesForFrontEnd?year=2019`);
+      const filesResponse = await fetch(`http://localhost:8505/listSavedFilesForFrontEnd?year=${year}`);
       const filesData = await filesResponse.json();
       const extractedCoordinates = extractCoordinates(filesData.saved_files);
-      console.log("Extracted coordinates from filenames:", extractedCoordinates);
+      
+      // Find the closest coordinate
+      let closestCoord: {lat: number, lon: number} | null = null;
+      let minDistance = Infinity;
+      
+      for (const coord of extractedCoordinates) {
+        const extractedCoord: Coordinate = {
+          latitude: coord.lat,
+          longitude: coord.lon
+        };
+        
+        const distance = calculateDistance(cityCoords, extractedCoord);
+        
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestCoord = coord;
+        }
+      }
+      
+      if (closestCoord && minDistance < 50) {
+        
+        console.log(`Closest coordinate to ${city}:`);
+        console.log(`Latitude: ${closestCoord.lat}, Longitude: ${closestCoord.lon}`);
+        console.log(`Distance: ${minDistance.toFixed(2)} km`);
+
+        console.log({
+          cityCoordinates: cityCoords,
+          closestExtractedCoordinate: closestCoord,
+          distanceKm: minDistance
+        });
+
+        try {
+          window.dispatchEvent(new CustomEvent('closestCityFound', {
+            detail: {
+              lat: closestCoord.lat,
+              lon: closestCoord.lon,
+              distance: minDistance
+            }
+          }));
+        } catch (e) {
+          console.warn('Could not dispatch closestCityFound event', e);
+        }
+      } else {
+        console.log("No coordinates found in filenames to compare with.");
+      }
+      
     } catch (err) {
       console.warn("Could not fetch file list:", err);
     }
 
     return data[0];
-
-    // if (data && data.length > 0) {
-    //   const newCoords: Coordinate = {
-    //     latitude: data[0].latitude,
-    //     longitude: data[0].longitude
-    //   };
-
-    //   const distance = calculateDistance(referenceCoords, newCoords);
 
   } catch (error) {
     console.error('Error:', error instanceof Error ? error.message : 'Unknown error');

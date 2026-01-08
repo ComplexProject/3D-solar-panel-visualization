@@ -17,6 +17,7 @@ import Header from './Header'
 import React from 'react'
 import RunCalculation from './statusMessageComponents/results/runCalculation'
 import UnsavedChanges from './formComponents/UnsavedChanges'
+import ClosestCityFound from './formComponents/ClosestCityFound'
 import { exportToPDF, prepareExportData } from './utils/exportResult'
 
 export const CalculationContext = React.createContext<{isCalculationRunning: boolean; setIsCalculationRunning: (value: boolean) => void}>({isCalculationRunning: false, setIsCalculationRunning: () => {}});
@@ -29,6 +30,8 @@ function App() {
   const [resultData, setResultData] = useState<any | null>(null)
   const [showUnsavedPopup, setShowUnsavedPopup] = useState(false);
   const [unsavedCallback, setUnsavedCallback] = useState<(() => void) | null>(null);
+  const [showClosestPopup, setShowClosestPopup] = useState(false);
+  const [closestDistance, setClosestDistance] = useState<number | null>(null);
 
   const nodeRef = useRef(null)
   const pullTabRef = useRef(null)
@@ -41,6 +44,20 @@ function App() {
       setIsResultAvailable(2);
     }
   }, [])
+
+  useEffect(() => {
+    function handler(e: Event) {
+      const ev = e as CustomEvent;
+      const distance = ev?.detail?.distance;
+      if (typeof distance === 'number') {
+        setClosestDistance(Math.round(distance));
+        setShowClosestPopup(true);
+      }
+    }
+
+    window.addEventListener('closestCityFound', handler as EventListener);
+    return () => window.removeEventListener('closestCityFound', handler as EventListener);
+  }, []);
   
   const getSolarPanelResult = () => {
     if (!resultData?.output?.panels) return [];
@@ -103,7 +120,15 @@ function App() {
             onConfirm={handleUnsavedConfirm}
             onCancel={handleUnsavedCancel}
           />
-        )}      
+        )}
+        {showClosestPopup && (
+          <ClosestCityFound
+            onConfirm={() => setShowClosestPopup(false)}
+            onCancel={() => setShowClosestPopup(false)}
+            distance={closestDistance ?? 0}
+          />
+        )}
+              
         <div className="relative h-full w-full">
           <ModelViewer
           props={{

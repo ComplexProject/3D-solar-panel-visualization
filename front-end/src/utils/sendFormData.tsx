@@ -8,7 +8,7 @@ export async function sendFormData() {
     const savedPower = JSON.parse(localStorage.getItem("power") || "0");
     const savedLatitude = JSON.parse(localStorage.getItem("latitude") || "0");
     const savedLongitude = JSON.parse(localStorage.getItem("longitude") || "0");
-    const savedYear = JSON.parse(localStorage.getItem("year") || "2023");
+    const savedYear = JSON.parse(localStorage.getItem("year") || "2019");
 
     const storedFileData = localStorage.getItem("demandProfile");
     if (!storedFileData) {

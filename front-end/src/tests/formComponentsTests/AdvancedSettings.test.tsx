@@ -28,13 +28,13 @@ describe('Advanced Settings', () => {
   it('renders form with saved values from localStorage', () => {
     localStorage.setItem("latitude", "45");
     localStorage.setItem("longitude", "-93");
-    localStorage.setItem("year", "2023");
+    localStorage.setItem("year", "2019");
 
     render(<AdvancedSettings />);
 
     expect(screen.getByDisplayValue("45")).toBeInTheDocument();
     expect(screen.getByDisplayValue("-93")).toBeInTheDocument();
-    expect(screen.getByDisplayValue("2023")).toBeInTheDocument();  
+    expect(screen.getByDisplayValue("2019")).toBeInTheDocument();  
   });
 
   it('renders default values when localStorage is empty', () => {
@@ -42,7 +42,7 @@ describe('Advanced Settings', () => {
 
     expect(screen.getByLabelText(/latitude/i)).toHaveValue(0);
     expect(screen.getByLabelText(/longitude/i)).toHaveValue(0);
-    expect(screen.getByLabelText(/year/i)).toHaveValue(2023);
+    expect(screen.getByLabelText(/year/i)).toHaveValue(2019);
   });
 
   it('disables latitude & longitude when predefined city exists', () => {
@@ -58,7 +58,7 @@ describe('Advanced Settings', () => {
     render(<AdvancedSettings />);
     expect(screen.getByLabelText(/latitude/i)).toHaveValue(0);
     expect(screen.getByLabelText(/longitude/i)).toHaveValue(0);
-    expect(screen.getByLabelText(/year/i)).toHaveValue(2023);
+    expect(screen.getByLabelText(/year/i)).toHaveValue(2019);
     });
 
   it('useEffect sets form values correctly based on state', () => {
