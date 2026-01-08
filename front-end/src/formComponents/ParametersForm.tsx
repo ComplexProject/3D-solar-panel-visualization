@@ -2,7 +2,7 @@ import StyledDropzone from './DropZone'
 import { useForm } from 'react-hook-form'
 import { useState, useEffect } from 'react';
 import { IconoirProvider, InfoCircle } from 'iconoir-react';
-import { GetCoordinates } from '../utils/geocodingAPI';
+import { GetCoordinates } from '../utils/GeocodingAPI';
 import ToolTip from './ToolTip';
 
 const inputClass = 'px-2 py-0.5 hover:border-[#006FAA] focus:ring-1 focus:outline-none focus:ring-[#006FAA] border shadow-md border-[#808080] w-full rounded-[7px]'

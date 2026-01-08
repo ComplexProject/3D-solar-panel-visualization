@@ -49,6 +49,21 @@ function toRadians(degrees: number): number {
   return degrees * (Math.PI / 180);
 }
 
+function extractCoordinates(filenames: string[]): Array<{lat: number, lon: number}> {
+  return filenames
+    .map(filename => {
+      const match = filename.match(/_(\d+\.\d+)_(\d+\.\d+)\.mat$/);
+      if (match) {
+        return {
+          lat: parseFloat(match[1]),
+          lon: parseFloat(match[2])
+        };
+      }
+      return null;
+    })
+    .filter((coord): coord is {lat: number, lon: number} => coord !== null);
+}
+
 /**
  * API call that get the latitude and longitude of a user defined city
  * @param city - user defined city
@@ -94,6 +109,15 @@ if (!response.ok) {
 
     if (!data || (Array.isArray(data) && data.length === 0)) {
       throw new Error("No results for this city.");
+    }
+
+    try {
+      const filesResponse = await fetch(`http://localhost:8505/listSavedFilesForFrontEnd?year=2019`);
+      const filesData = await filesResponse.json();
+      const extractedCoordinates = extractCoordinates(filesData.saved_files);
+      console.log("Extracted coordinates from filenames:", extractedCoordinates);
+    } catch (err) {
+      console.warn("Could not fetch file list:", err);
     }
 
     return data[0];
