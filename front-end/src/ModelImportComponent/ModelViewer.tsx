@@ -44,12 +44,12 @@ function OrbitControlsWithShiftZoom(props: any) {
   return <OrbitControls ref={controlsRef} {...props} />
 }
 
-function ShowStatusMessage(isResultAvailable: number) {
+function StatusMessage(isResultAvailable: number) {
   switch(isResultAvailable) {
     case 0:
       return <RunCalc3Dviewer /> 
     case 1:
-      return <LoadingMessage3DViewer />
+      return <LoadingMessage3DViewer message="Please wait..." />
     case 3:
       return <Error3DViewer />
     default:
@@ -175,19 +175,9 @@ export default function ModelViewer({ children, props }: { children: React.React
         </div>
       )}
 
-      { !isLoading && ShowStatusMessage(isResultAvailable) }
+      { !isLoading && StatusMessage(isResultAvailable) }
     
-      {isLoading && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
-          <div className="flex flex-col items-center gap-4 bg-white bg-opacity-80 rounded-lg p-8 shadow-lg">
-            <div className="relative w-16 h-16">
-              <div className="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
-              <div className="absolute inset-0 border-4 border-[#006FAA] rounded-full border-t-transparent animate-spin"></div>
-            </div>
-            <p className="text-gray-600 text-lg font-medium">Loading 3D Model...</p>
-          </div>
-        </div>
-      )}
+      {isLoading && ( <LoadingMessage3DViewer message="Loading 3D Model..." /> )}
     </div>
   )
 }

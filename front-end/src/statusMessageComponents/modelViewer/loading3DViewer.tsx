@@ -1,18 +1,21 @@
+type Props = {
+    message: string;
+}
 
-function loadingMessage3DViewer() {
+function loading3DViewer({message}: Props) {
     return (
         <>
-            <div className="m-20 absolute z-50 bg-[#FDFFDA] border border-[#FFE3AE] rounded-2xl p-3 w-xs pointer-events-none">
-                <div className='flex items-center gap-2'>
-                    <div className="relative">
-                        <div className="absolute w-6 h-6 border-2 border-gray-100 rounded-full"></div>
-                        <div className="w-6 h-6 border-2 border-[#000000] rounded-full border-t-transparent animate-spin"></div>
-                    </div>
-                    <p className="text-xl font-semibold">Please wait until the calculation has finished</p> 
-                </div>                
+            <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
+                <div className="flex flex-col items-center gap-4 bg-white bg-opacity-80 rounded-lg p-8 shadow-lg">
+                    <div className="relative w-16 h-16">
+                    <div className="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
+                    <div className="absolute inset-0 border-4 border-[#006FAA] rounded-full border-t-transparent animate-spin"></div>
+                </div>
+                <p className="text-gray-600 text-lg font-medium">{message}</p>
+                </div>
             </div>
         </>
     )
 }
 
-export default loadingMessage3DViewer
+export default loading3DViewer
