@@ -34,6 +34,20 @@ function ParameterForm() {
         setValue("power", formData.power);
     }, [setValue, formData]);
 
+    useEffect(() => {
+      function handler(e: Event) {
+        const ev = e as CustomEvent;
+        const city = ev?.detail?.city;
+        if (typeof city === 'string') {
+          setFormData(prev => ({...prev, city}));
+          setValue("city", city);
+        }
+      }
+
+      window.addEventListener('coordinatesUpdated', handler as EventListener);
+      return () => window.removeEventListener('coordinatesUpdated', handler as EventListener);
+    }, [setValue]);
+
     /**
      * When a user exits the City input field API is called to get the lat and lon of the City
      * @param e input field of the City

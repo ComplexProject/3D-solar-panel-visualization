@@ -19,6 +19,7 @@ import RunCalculation from './statusMessageComponents/results/runCalculation'
 import UnsavedChanges from './formComponents/UnsavedChanges'
 import ClosestCityFound from './formComponents/ClosestCityFound'
 import { exportToPDF, prepareExportData } from './utils/exportResult'
+import { GetCityName } from './utils/GeocodingAPI'
 
 export const CalculationContext = React.createContext<{isCalculationRunning: boolean; setIsCalculationRunning: (value: boolean) => void}>({isCalculationRunning: false, setIsCalculationRunning: () => {}});
 export const ResultContext = React.createContext<{isResultAvailabe: number; setIsResultAvailable: (value: number) => void; resultData: any | null; setResultData: (value: any) => void;}>({ isResultAvailabe: 0, setIsResultAvailable: () => {}, resultData: null, setResultData: () => {}});
@@ -127,13 +128,23 @@ function App() {
         )}
         {showClosestPopup && (
           <ClosestCityFound
-            onConfirm={() => {
+            onConfirm={async () => {
               if (closestCoords) {
                 localStorage.setItem('latitude', JSON.stringify(closestCoords.lat));
                 localStorage.setItem('longitude', JSON.stringify(closestCoords.lon));
-                window.dispatchEvent(new CustomEvent('coordinatesUpdated', {
-                  detail: {lat: closestCoords.lat, lon: closestCoords.lon}
-                }));
+                
+                // Get city name for the coordinates
+                const cityData = await GetCityName(closestCoords.lat, closestCoords.lon);
+                if (cityData) {
+                  localStorage.setItem('city', JSON.stringify(cityData.name));
+                  window.dispatchEvent(new CustomEvent('coordinatesUpdated', {
+                    detail: {lat: closestCoords.lat, lon: closestCoords.lon, city: cityData.name}
+                  }));
+                } else {
+                  window.dispatchEvent(new CustomEvent('coordinatesUpdated', {
+                    detail: {lat: closestCoords.lat, lon: closestCoords.lon}
+                  }));
+                }
               }
               setShowClosestPopup(false);
             }}
