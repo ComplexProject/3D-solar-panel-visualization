@@ -1,3 +1,5 @@
 requests
 fastapi[standard]
 uvicorn
+pytest
+httpx
