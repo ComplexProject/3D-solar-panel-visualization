@@ -1,8 +1,8 @@
 import StyledDropzone from './DropZone'
 import { useForm } from 'react-hook-form'
 import { useState, useEffect } from 'react';
-import { GetGeocodingData } from '../utils/apiTesting';
 import { IconoirProvider, InfoCircle } from 'iconoir-react';
+import { GetCoordinates } from '../utils/geocodingAPI';
 import ToolTip from './ToolTip';
 
 const inputClass = 'px-2 py-0.5 hover:border-[#006FAA] focus:ring-1 focus:outline-none focus:ring-[#006FAA] border shadow-md border-[#808080] w-full rounded-[7px]'
@@ -13,6 +13,10 @@ interface FormData {
     cityFetchFailed?: boolean;
 }
 
+/**
+ * React component that has the styling and the logic of the Parameter form
+ * @returns Parameter form component
+ */
 function ParameterForm() {
     const { register, setValue, setError, formState: {errors}, clearErrors } = useForm<FormData>();
 
@@ -31,12 +35,16 @@ function ParameterForm() {
         setValue("power", formData.power);
     }, [setValue, formData]);
 
+    /**
+     * When a user exits the City input field API is called to get the lat and lon of the City
+     * @param e input field of the City
+     */
     const handleCityBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
         const cityValue = e.target.value;
         localStorage.setItem("city", JSON.stringify(cityValue));
         if (cityValue != "") {
             setFormData(prev => ({ ...prev, city: cityValue }));
-            const locationData = await GetGeocodingData(cityValue);
+            const locationData = await GetCoordinates(cityValue);
             if (locationData) {
                 if (errors.cityFetchFailed) {
                     clearErrors('cityFetchFailed')
@@ -54,6 +62,10 @@ function ParameterForm() {
         }
     }
 
+    /**
+     * After user changes the power it is automatically saved in local storage
+     * @param e power input field
+     */
     const handlePowerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         const powerNumber = value === "" ? 0 : parseFloat(value);
@@ -68,7 +80,7 @@ function ParameterForm() {
                     <label htmlFor="city">City</label>
                     <p className='text-red-500'>*</p>
                 </div>
-                <input className={`${errors.cityFetchFailed ? 'bg-[#FFDEDE]' : null} ${inputClass}`} type="text" placeholder='Middelburg' {...register("city", { onBlur: handleCityBlur })} id="city" />
+                <input className={`${errors.cityFetchFailed ? 'bg-[#FFDEDE]' : null} ${inputClass}`} type="text" placeholder='Middelburg' {...register("city", { onBlur: handleCityBlur, onChange: () => {clearErrors('cityFetchFailed')} })} id="city" />
                 {errors.cityFetchFailed ? <p className='text-[#FF0000] text-sm absolute z-50'>{errors.cityFetchFailed?.message}</p> : null}
             </div>
             <div>

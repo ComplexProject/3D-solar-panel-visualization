@@ -16,25 +16,19 @@ import ErrorMessage from './statusMessageComponents/results/errorMessage'
 import Header from './Header'
 import React from 'react'
 import RunCalculation from './statusMessageComponents/results/runCalculation'
+import UnsavedChanges from './formComponents/UnsavedChanges'
+import { exportToPDF, prepareExportData } from './utils/exportResult'
 
 export const CalculationContext = React.createContext<{isCalculationRunning: boolean; setIsCalculationRunning: (value: boolean) => void}>({isCalculationRunning: false, setIsCalculationRunning: () => {}});
-export const ResultContext = React.createContext<{
-  isResultAvailabe: number;
-  setIsResultAvailable: (value: number) => void;
-  resultData: any | null;
-  setResultData: (value: any) => void;
-}>({
-  isResultAvailabe: 0,
-  setIsResultAvailable: () => {},
-  resultData: null,
-  setResultData: () => {}
-});
+export const ResultContext = React.createContext<{isResultAvailabe: number; setIsResultAvailable: (value: number) => void; resultData: any | null; setResultData: (value: any) => void;}>({ isResultAvailabe: 0, setIsResultAvailable: () => {}, resultData: null, setResultData: () => {}});
 
 function App() {
   const [showSideMenu, setShowSideMenu] = useState(false)
   const [isCalculationRunning, setIsCalculationRunning] = useState(false)
   const [isResultAvailabe, setIsResultAvailable] = useState(0)
   const [resultData, setResultData] = useState<any | null>(null)
+  const [showUnsavedPopup, setShowUnsavedPopup] = useState(false);
+  const [unsavedCallback, setUnsavedCallback] = useState<(() => void) | null>(null);
 
   const nodeRef = useRef(null)
   const pullTabRef = useRef(null)
@@ -66,18 +60,50 @@ function App() {
     }
   }
 
-  const closeSideMenu = () => {
-    setShowSideMenu(false)
-  }
+  const closeSideMenu = () => setShowSideMenu(false);
+  const showNavArrows = () => getSolarPanelResult().length > 4;
 
-  const showNavArrows = (): boolean => {
-    return getSolarPanelResult().length > 4;
+  const showUnsavedChangesPopup = (callback: () => void) => {
+    setUnsavedCallback(() => callback);
+    setShowUnsavedPopup(true);
+  };
+
+  const handleUnsavedConfirm = () => {
+    setShowUnsavedPopup(false);
+    unsavedCallback?.();
+    setUnsavedCallback(null);
+  };
+
+  const handleUnsavedCancel = () => {
+    setShowUnsavedPopup(false);
+    setUnsavedCallback(null);
+  };
+
+  const handleExport = () => {
+  if (!resultData) {
+    alert('No calculation results available to export');
+    return;
   }
+  
+  try {
+    const exportData = prepareExportData(getSolarPanelResult, resultData);
+    exportToPDF(exportData);
+  } catch (error) {
+      console.error('Error exporting PDF:', error);
+      alert('Error generating report. Please try again.');
+  }
+  };
 
   return (
     <>
-      <div className='h-screen w-full bg-red-50'>
-        <Header/>
+      <div className='h-screen w-full bg-red-50 flex justify-center items-center'>
+        <Header/>        
+        {showUnsavedPopup && (
+          <UnsavedChanges 
+            onConfirm={handleUnsavedConfirm}
+            onCancel={handleUnsavedCancel}
+          />
+        )}      
         <div className="relative h-full w-full">
           <ModelViewer
           props={{
@@ -90,43 +116,37 @@ function App() {
         <div
           ref={pullTabRef}
           className={`absolute right-0 top-1/4 h-24 flex items-center px-5 bg-[#F8F8F8] z-20 rounded-l-4xl drop-shadow cursor-pointer transition-all duration-150
-            ${showSideMenu ? 'lg:w-[30%] md:w-[58%] sm:w-[60%]' : 'w-[5.5rem]'}`}
+          ${showSideMenu ? 'lg:w-[30%] md:w-[58%] sm:w-[60%]' : 'w-[5.5rem]'}`}
           onClick={() => setShowSideMenu(!showSideMenu)}
         >
-          <IconoirProvider
-            iconProps={{
-              color: '#000000',
-              strokeWidth: 1.5,
-              width: '2.6rem',
-              height: '2.6rem',
-            }}
-          >
+          <IconoirProvider iconProps={{ color: '#000000', strokeWidth: 1.5, width: '2.6rem', height: '2.6rem' }}>
             <FastArrowLeft />
           </IconoirProvider>
-          </div>
-          <div className='absolute right-0 top-1/6 lg:w-1/4 md:w-1/2 sm:w-1/2 z-30 overflow-x-hidden py-1 pl-1'>
-            <CSSTransition
-              in={showSideMenu}
-              timeout={150}
-              classNames="sideMenuSlide"
-              unmountOnExit
-              nodeRef={nodeRef}
-            >
-              <ResultContext.Provider value={{ isResultAvailabe, setIsResultAvailable, resultData, setResultData }}>
+        </div>
+        <div className='absolute right-0 top-1/6 lg:w-1/4 md:w-1/2 sm:w-1/2 z-30 overflow-x-hidden py-1 pl-1'>
+          <CSSTransition in={showSideMenu} timeout={150} classNames="sideMenuSlide" unmountOnExit nodeRef={nodeRef}>
+            <ResultContext.Provider value={{ isResultAvailabe, setIsResultAvailable, resultData, setResultData }}>
               <CalculationContext.Provider value={{ isCalculationRunning: isCalculationRunning, setIsCalculationRunning: setIsCalculationRunning}}>
-                <SideMenu nodeRef={nodeRef} onClick={closeSideMenu} />
+                <SideMenu nodeRef={nodeRef} onClick={closeSideMenu} onShowUnsavedChanges={showUnsavedChangesPopup}/>
               </CalculationContext.Provider>
-              </ResultContext.Provider>
-            </CSSTransition>
-          </div>
+            </ResultContext.Provider>
+          </CSSTransition>
+        </div>
       </div>
       <div className='px-12 py-16 flex flex-col h-full w-full gap-11 bg-[#F8F8F8]'>
         <div className='flex justify-between items-center'>
           <h1 className='font-bold text-5xl'>Results</h1>
           {resultData  && !isCalculationRunning ?
-          <div className='flex'>
-            <h2 className='text-3xl pr-2'>Year:</h2>
-            <h2 className='text-3xl font-bold'>{`${JSON.parse(localStorage.getItem("year")!)}`}</h2>
+          <div className='flex flex-row gap-5 justify-center items-center'>
+            <div className='flex'>
+              <h2 className='text-2xl pr-2'>City:</h2>
+              <h2 className='text-2xl font-bold'>{`${JSON.parse(localStorage.getItem("city")!)}`}</h2>
+            </div>
+            <div className='flex'>
+              <h2 className='text-2xl pr-2'>Year:</h2>
+              <h2 className='text-2xl font-bold'>{`${JSON.parse(localStorage.getItem("year")!)}`}</h2>
+            </div>
+            <button className='drop-shadow-sm cursor-pointer rounded-xl p-2 bg-[#006FAA] text-white hover:scale-105' onClick={handleExport}>Export results</button>
           </div>
             :
           <></>
@@ -154,7 +174,7 @@ function App() {
                   height: '1.5rem',
                   }}
                   >
-                    <ArrowLeft />
+                  <ArrowLeft />
                   </IconoirProvider>
                 </button>
                 <button onClick={() => handleNav('right')}>

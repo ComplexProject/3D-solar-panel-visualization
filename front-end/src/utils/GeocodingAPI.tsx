@@ -1,4 +1,4 @@
-interface GeocodingResult {
+interface GeocodingCoordinateResult {
   latitude: number;
   longitude: number;
   name: string;
@@ -8,6 +8,12 @@ interface GeocodingResult {
 interface Coordinate {
   latitude: number;
   longitude: number;
+}
+
+interface GeocodingCityResult {
+  name: string;
+  country: string;
+  state: string;
 }
 
 /**
@@ -43,10 +49,15 @@ function toRadians(degrees: number): number {
   return degrees * (Math.PI / 180);
 }
 
-export async function GetGeocodingData(city:string) {
+/**
+ * API call that get the latitude and longitude of a user defined city
+ * @param city - user defined city
+ * @returns latitude and longitude
+ */
+export async function GetCoordinates(city:string) {
   const apiKey = import.meta.env.VITE_API_KEY;
   try {
-    const response = await fetch(
+    const response = await fetch (
       `https://api.api-ninjas.com/v1/geocoding?city=${city}&country=NL`,
       {
         method: 'GET',
@@ -75,7 +86,7 @@ if (!response.ok) {
       throw new Error(message);
     }
 
-    const data: GeocodingResult[] = await response.json();
+    const data: GeocodingCoordinateResult[] = await response.json();
     try {
     } catch{
       throw new Error("Failed to parse JSON response.");
@@ -98,4 +109,59 @@ if (!response.ok) {
   } catch (error) {
     console.error('Error:', error instanceof Error ? error.message : 'Unknown error');
   }
+}
+
+/**
+ * Api call to get the City form user defined latitude and longitude
+ * @param latitude - user defined latitude
+ * @param longitude - user defined longitude
+ * @returns City name
+ */
+export async function GetCityName(latitude:number, longitude:number) {
+  const apiKey = import.meta.env.VITE_API_KEY;
+  try {
+    const response = await fetch(
+      `https://api.api-ninjas.com/v1/reversegeocoding?lat=${latitude}&lon=${longitude}`,
+      {
+        method: 'GET',
+        headers: {
+          'X-Api-Key': apiKey,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+  if (!response.ok) {
+      let message = `Request failed with status ${response.status}`;
+
+      switch (response.status) {
+        case 400:
+          message = "Bad request (400). Check your parameters.";
+          break;
+        case 404:
+          message = "Not found (404). City not found.";
+          break;
+        case 500:
+          message = "Server error (500). Try again later.";
+          break;
+      }
+
+      throw new Error(message);
+    }
+
+    const data: GeocodingCityResult[] = await response.json();
+    try {
+    } catch {
+      throw new Error ("Failed to parse JSON response.");
+    }
+
+    if (!data || (Array.isArray(data) && data.length === 0)) {
+      throw new Error("No result for these coordinates");
+    }
+
+    return data[0];
+
+    } catch (error) {
+      console.error("Error:", error instanceof Error ? error.message : 'Unknown error occured');
+    }
 }
