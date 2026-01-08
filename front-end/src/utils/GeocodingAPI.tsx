@@ -141,17 +141,6 @@ if (!response.ok) {
       }
       
       if (closestCoord && minDistance < 50) {
-        
-        console.log(`Closest coordinate to ${city}:`);
-        console.log(`Latitude: ${closestCoord.lat}, Longitude: ${closestCoord.lon}`);
-        console.log(`Distance: ${minDistance.toFixed(2)} km`);
-
-        console.log({
-          cityCoordinates: cityCoords,
-          closestExtractedCoordinate: closestCoord,
-          distanceKm: minDistance
-        });
-
         try {
           window.dispatchEvent(new CustomEvent('closestCityFound', {
             detail: {
