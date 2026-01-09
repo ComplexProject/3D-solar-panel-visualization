@@ -9,6 +9,7 @@
     "@types/react-dom": "^19.2.1",
     "@types/react-transition-group": "^4.4.12",
     "@vitejs/plugin-react": "^5.0.4",
+    "@vitest/coverage-v8": "^4.0.8",
     "@vitest/ui": "^4.0.8",
     "babel-plugin-react-compiler": "^19.1.0-rc.3",
     "dotenv": "^17.2.3",
@@ -19,7 +20,8 @@
   "scripts": {
     "dev": "vite",
     "test": "vitest",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.6",
