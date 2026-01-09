@@ -126,7 +126,7 @@ function App() {
 
   return (
     <>
-      <div className='h-screen w-full bg-red-50 flex justify-center items-center'>
+      <div className='h-screen w-full bg-white flex justify-center items-center'>
         <Header/>        
         {showUnsavedPopup && (
           <UnsavedChanges 
