@@ -183,7 +183,6 @@ export async function GetCoordinates(city: string, year: number) {
       longitude: data[0].longitude
     };
 
-    // Find closest saved coordinate
     const extractedCoordinates = await fetchAndExtractCoordinates(year);
     
     if (extractedCoordinates.length > 0) {

@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useRef } from 'react';
 import type { RefObject } from 'react';
 import ParameterForm from './formComponents/ParametersForm';
 import AdvancedSettings from './formComponents/AdvancedSettings';
@@ -24,6 +24,7 @@ function SideMenu({ nodeRef, onClick, onShowUnsavedChanges }: SideMenuProps) {
     const { isCalculationRunning, setIsCalculationRunning } = useContext(CalculationContext);
     const { setIsResultAvailable, setResultData } = useContext(ResultContext);
     const { checkUnsavedChanges } = useUnsavedChanges();
+    const parameterFormRef = useRef<{ validateBeforeCalculate: () => boolean }>(null);
 
     const [formRefresh, setFormRefresh] = useState(0);
     const maxHeight = isCalculationRunning ? '12.394rem' : (!showAdvancedSettings ? '22.968rem' : '14.394rem');
@@ -48,6 +49,10 @@ function SideMenu({ nodeRef, onClick, onShowUnsavedChanges }: SideMenuProps) {
      */
     const calculate = async () => {
         try {
+            if (!parameterFormRef.current?.validateBeforeCalculate()) {
+                return;
+            }
+
             setIsCalculationRunning(true)
             setResultData(null)
             setIsResultAvailable(1)
@@ -104,7 +109,7 @@ function SideMenu({ nodeRef, onClick, onShowUnsavedChanges }: SideMenuProps) {
             </div>
             <div className="flex flex-col drop-shadow transition-all duration-[230ms] ease-in-out py-5 px-8 bg-white rounded-2xl overflow-hidden" style={{ height: maxHeight}}>
                 {!isCalculationRunning ? 
-                <> {showAdvancedSettings ? <AdvancedSettings key={`advanced-${formRefresh}`} /> : <ParameterForm key={`advanced-${formRefresh}`}/>} </>
+                <> {showAdvancedSettings ? <AdvancedSettings key={`advanced-${formRefresh}`} /> : <ParameterForm ref={parameterFormRef} key={`advanced-${formRefresh}`}/>} </>
                 :
                 <div className='flex flex-col gap-10 p-5 justify-center items-center'>
                     <div className="relative w-12 h-12">
