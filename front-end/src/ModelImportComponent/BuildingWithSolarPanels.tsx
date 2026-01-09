@@ -30,50 +30,62 @@ const FIXED_ROWS = 3
 // Get panel azimuth/slope overrides from localStorage
 function usePanelOverrides() {
   const [overrides, setOverrides] = useState<PanelOverride[]>([])
-  useEffect(() => {
-    const load = () => {
-      try {
-        const savedResult = localStorage.getItem('resultData')
-        if (!savedResult) {
-          setOverrides([])
-          return
-        }
-        
-        const resultData = JSON.parse(savedResult)
-        if (!resultData?.output?.panels) {
-          setOverrides([])
-          return
-        }
-        
-        // API format: { panel1: {azimuth, slope, kwp}, ... }
-        const panelsArray: PanelOverride[] = Object.values(resultData.output.panels).map((panel: any) => ({
-          azimuth: panel.azimuth,
-          slope: panel.slope
-        }))
-        
-        setOverrides(panelsArray)
-      } catch (error) {
-        setOverrides([])
+
+  const load = useCallback(() => {
+    try {
+      const savedResult = localStorage.getItem('resultData')
+      if (!savedResult) {
+        setOverrides(prev => prev.length === 0 ? prev : [])
+        return
       }
+      
+      const resultData = JSON.parse(savedResult)
+      if (!resultData?.output?.panels) {
+        setOverrides(prev => prev.length === 0 ? prev : [])
+        return
+      }
+      
+      // API format: { panel1: {azimuth, slope, kwp}, ... }
+      const panelsArray: PanelOverride[] = Object.values(resultData.output.panels).map((panel: any) => ({
+        azimuth: panel.azimuth,
+        slope: panel.slope
+      }))
+      
+      setOverrides(prev => {
+        if (JSON.stringify(prev) === JSON.stringify(panelsArray)) return prev
+        return panelsArray
+      })
+
+    } catch (error) {
+      console.error("Failed to load panel overrides:", error)
+      setOverrides([])
     }
+  }, [])
+
+  useEffect(() => {
     
-    // Load on mount
     load()
     
-    // Reload on storage changes
+    // Handle cross-tab changes (standard storage event)
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'resultData') {
-        load()
-      }
+      if (e.key === 'resultData') load()
     }
+    
+    // Handle same-tab changes (our new custom event)
+    const handleCustomUpdate = () => load()
+    
     window.addEventListener('storage', handleStorageChange)
+    window.addEventListener('resultDataUpdated', handleCustomUpdate)
     
     return () => {
       window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('resultDataUpdated', handleCustomUpdate)
     }
-  }, [])
+  }, [load])
+
   return overrides
 }
+
 
 // Find roof meshes by name or geometry (top-facing, largest area)
 function pickRoofTop(root: Object3D | null): Object3D[] {
@@ -332,7 +344,6 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
         const ov = overrides.length ? overrides[panelIndex % overrides.length] : undefined
 
         // Set panel orientation from API overrides.
-        // Convert PVGIS orientation (South=0°, horizontal=0°) to Three.js coordinates.
         let desiredNormal = normal.clone()
         let desiredHeading = new Vector3()
         

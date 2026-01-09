@@ -64,6 +64,14 @@ function App() {
     return () => window.removeEventListener('closestCityFound', handler as EventListener);
   }, []);
   
+
+  useEffect(() => {
+    if (resultData) {
+      localStorage.setItem('resultData', JSON.stringify(resultData));
+      window.dispatchEvent(new Event('resultDataUpdated'));
+    }
+  }, [resultData])
+  
   const getSolarPanelResult = () => {
     if (!resultData?.output?.panels) return [];
     return Object.values(resultData.output.panels).map((panel: any) => ({
@@ -118,7 +126,7 @@ function App() {
 
   return (
     <>
-      <div className='h-screen w-full bg-red-50 flex justify-center items-center'>
+      <div className='h-screen w-full bg-white flex justify-center items-center'>
         <Header/>        
         {showUnsavedPopup && (
           <UnsavedChanges 
