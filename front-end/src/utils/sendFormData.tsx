@@ -1,9 +1,14 @@
+/**
+ * Function that sends form data to the backend for further processinig
+ * When the user clicks calculate on the form this is automatically sent to the backend
+ * @returns JSON repsonse of the data in the form
+ */
 export async function sendFormData() {
     const apiPort = import.meta.env.VITE_API_PORT;
     const savedPower = JSON.parse(localStorage.getItem("power") || "0");
     const savedLatitude = JSON.parse(localStorage.getItem("latitude") || "0");
     const savedLongitude = JSON.parse(localStorage.getItem("longitude") || "0");
-    const savedYear = JSON.parse(localStorage.getItem("year") || "2023");
+    const savedYear = JSON.parse(localStorage.getItem("year") || "2019");
 
     const storedFileData = localStorage.getItem("demandProfile");
     if (!storedFileData) {
