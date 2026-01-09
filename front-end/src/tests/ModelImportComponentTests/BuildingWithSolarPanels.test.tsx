@@ -128,12 +128,10 @@ describe("BuildingWithSolarPanels", () => {
     vi.clearAllMocks()
     renderer = await TestRenderer.create(<BuildingWithSolarPanels />)
   })
-// if useMemo is empty capturePositions is empty
   it("generates panels", () => {
     expect(panelPositionsMock
     .length).toBeGreaterThan(0)
   })
-// have orientation for each position
   it("generates orientations for all panels", () => {
     expect(panelOrientationsMock.length).toBe(panelPositionsMock.length)
   })
@@ -149,5 +147,105 @@ describe("BuildingWithSolarPanels", () => {
 
   it("does not exceed 50 panels", () => {
     expect(panelPositionsMock.length).toBeLessThanOrEqual(50)
+  })
+})
+
+describe("BuildingWithSolarPanels - integration tests", () => {
+  let renderer: Awaited<ReturnType<typeof TestRenderer.create>>
+
+  beforeEach(async () => {
+    panelPositionsMock = []
+    panelOrientationsMock = []
+    panelScaleMock = null
+    localStorage.clear()
+    vi.clearAllMocks()
+  })
+
+  it("calls onLoadingChange(true → false)", async () => {
+    const onLoadingChange = vi.fn()
+
+    renderer = await TestRenderer.create(
+      <BuildingWithSolarPanels onLoadingChange={onLoadingChange} />
+    )
+
+    expect(onLoadingChange).toHaveBeenCalledWith(true)
+    expect(onLoadingChange).toHaveBeenLastCalledWith(false)
+  })
+
+  it("uses panel overrides from localStorage", async () => {
+    localStorage.setItem(
+      "resultData",
+      JSON.stringify({
+        output: {
+          panels: {
+            panel1: { azimuth: 0, slope: 30 },
+            panel2: { azimuth: 90, slope: 20 }
+          }
+        }
+      })
+    )
+
+    renderer = await TestRenderer.create(<BuildingWithSolarPanels />)
+
+    expect(panelOrientationsMock.length).toBeGreaterThanOrEqual(2)
+
+    panelOrientationsMock.forEach(q => {
+      expect(
+        Math.abs(q.x) + Math.abs(q.y) + Math.abs(q.z)
+      ).toBeGreaterThan(0)
+    })
+  })
+
+  it("limits number of panels to API override count", async () => {
+    localStorage.setItem(
+      "resultData",
+      JSON.stringify({
+        output: {
+          panels: {
+            p1: { azimuth: 0, slope: 10 },
+            p2: { azimuth: 0, slope: 10 }
+          }
+        }
+      })
+    )
+
+    renderer = await TestRenderer.create(<BuildingWithSolarPanels />)
+
+    expect(panelPositionsMock.length).toBe(2)
+  })
+
+  it("recomputes panels when storage event is fired", async () => {
+    renderer = await TestRenderer.create(<BuildingWithSolarPanels />)
+
+    const initialCount = panelPositionsMock.length
+
+    localStorage.setItem(
+      "resultData",
+      JSON.stringify({
+        output: {
+          panels: {
+            p1: { azimuth: 45, slope: 15 }
+          }
+        }
+      })
+    )
+
+    window.dispatchEvent(
+      new StorageEvent("storage", { key: "resultData" })
+    )
+
+    await TestRenderer.act(async () => {})
+
+    expect(panelPositionsMock.length).toBe(1)
+    expect(panelPositionsMock.length).not.toBe(initialCount)
+  })
+
+  it("default orientation is north-facing when no overrides exist", async () => {
+    renderer = await TestRenderer.create(<BuildingWithSolarPanels />)
+
+    const q = panelOrientationsMock[0]
+    const v = new Vector3(0, 1, 0).applyQuaternion(q)
+
+    expect(v.y).toBeGreaterThan(0.5)
   })
 })
