@@ -14,7 +14,7 @@ export const useUnsavedChanges = () => {
       
       const savedLat = localStorage.getItem("latitude") ? JSON.parse(localStorage.getItem("latitude")!).toString() : '0';
       const savedLon = localStorage.getItem("longitude") ? JSON.parse(localStorage.getItem("longitude")!).toString() : '0';
-      const savedYear = localStorage.getItem("year") ? JSON.parse(localStorage.getItem("year")!).toString() : '2023';
+      const savedYear = localStorage.getItem("year") ? JSON.parse(localStorage.getItem("year")!).toString() : '2019';
       
       return lat !== savedLat || lon !== savedLon || year !== savedYear;
     } catch(e) {

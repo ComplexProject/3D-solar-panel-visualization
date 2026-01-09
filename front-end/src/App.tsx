@@ -17,7 +17,9 @@ import Header from './Header'
 import React from 'react'
 import RunCalculation from './statusMessageComponents/results/runCalculation'
 import UnsavedChanges from './formComponents/UnsavedChanges'
+import ClosestCityFound from './formComponents/ClosestCityFound'
 import { exportToPDF, prepareExportData } from './utils/exportResult'
+import { GetCityName } from './utils/GeocodingAPI'
 
 export const CalculationContext = React.createContext<{isCalculationRunning: boolean; setIsCalculationRunning: (value: boolean) => void}>({isCalculationRunning: false, setIsCalculationRunning: () => {}});
 export const ResultContext = React.createContext<{isResultAvailabe: number; setIsResultAvailable: (value: number) => void; resultData: any | null; setResultData: (value: any) => void;}>({ isResultAvailabe: 0, setIsResultAvailable: () => {}, resultData: null, setResultData: () => {}});
@@ -29,6 +31,9 @@ function App() {
   const [resultData, setResultData] = useState<any | null>(null)
   const [showUnsavedPopup, setShowUnsavedPopup] = useState(false);
   const [unsavedCallback, setUnsavedCallback] = useState<(() => void) | null>(null);
+  const [showClosestPopup, setShowClosestPopup] = useState(false);
+  const [closestDistance, setClosestDistance] = useState<number | null>(null);
+  const [closestCoords, setClosestCoords] = useState<{lat: number, lon: number} | null>(null);
 
   const nodeRef = useRef(null)
   const pullTabRef = useRef(null)
@@ -41,6 +46,23 @@ function App() {
       setIsResultAvailable(2);
     }
   }, [])
+
+  useEffect(() => {
+    function handler(e: Event) {
+      const ev = e as CustomEvent;
+      const distance = ev?.detail?.distance;
+      const lat = ev?.detail?.lat;
+      const lon = ev?.detail?.lon;
+      if (typeof distance === 'number' && typeof lat === 'number' && typeof lon === 'number') {
+        setClosestDistance(Math.round(distance));
+        setClosestCoords({lat, lon});
+        setShowClosestPopup(true);
+      }
+    }
+
+    window.addEventListener('closestCityFound', handler as EventListener);
+    return () => window.removeEventListener('closestCityFound', handler as EventListener);
+  }, []);
   
   const getSolarPanelResult = () => {
     if (!resultData?.output?.panels) return [];
@@ -103,7 +125,33 @@ function App() {
             onConfirm={handleUnsavedConfirm}
             onCancel={handleUnsavedCancel}
           />
-        )}      
+        )}
+        {showClosestPopup && (
+          <ClosestCityFound
+            onConfirm={async () => {
+              if (closestCoords) {
+                localStorage.setItem('latitude', JSON.stringify(closestCoords.lat));
+                localStorage.setItem('longitude', JSON.stringify(closestCoords.lon));
+                
+                const cityData = await GetCityName(closestCoords.lat, closestCoords.lon);
+                if (cityData) {
+                  localStorage.setItem('city', JSON.stringify(cityData.name));
+                  window.dispatchEvent(new CustomEvent('coordinatesUpdated', {
+                    detail: {lat: closestCoords.lat, lon: closestCoords.lon, city: cityData.name}
+                  }));
+                } else {
+                  window.dispatchEvent(new CustomEvent('coordinatesUpdated', {
+                    detail: {lat: closestCoords.lat, lon: closestCoords.lon}
+                  }));
+                }
+              }
+              setShowClosestPopup(false);
+            }}
+            onCancel={() => setShowClosestPopup(false)}
+            distance={closestDistance ?? 0}
+          />
+        )}
+              
         <div className="relative h-full w-full">
           <ModelViewer
           props={{

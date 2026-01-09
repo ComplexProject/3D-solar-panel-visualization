@@ -2,14 +2,14 @@ import StyledDropzone from './DropZone'
 import { useForm } from 'react-hook-form'
 import { useState, useEffect } from 'react';
 import { IconoirProvider, InfoCircle } from 'iconoir-react';
-import { GetCoordinates } from '../utils/geocodingAPI';
+import { GetCoordinates } from '../utils/GeocodingAPI';
 import ToolTip from './ToolTip';
 
 const inputClass = 'px-2 py-0.5 hover:border-[#006FAA] focus:ring-1 focus:outline-none focus:ring-[#006FAA] border shadow-md border-[#808080] w-full rounded-[7px]'
 
 interface FormData {
-    city: string;
-    power: number;
+    city?: string;
+    power?: number;
     cityFetchFailed?: boolean;
 }
 
@@ -19,7 +19,6 @@ interface FormData {
  */
 function ParameterForm() {
     const { register, setValue, setError, formState: {errors}, clearErrors } = useForm<FormData>();
-
     const [formData, setFormData] = useState<FormData>(() => {
         const savedCity = localStorage.getItem("city");
         const savedPower = localStorage.getItem("power");
@@ -35,30 +34,60 @@ function ParameterForm() {
         setValue("power", formData.power);
     }, [setValue, formData]);
 
+    useEffect(() => {
+    function handler(e: Event) {
+        const ev = e as CustomEvent;
+        const city = ev?.detail?.city;
+        if (typeof city === 'string') {
+          setFormData(prev => ({...prev, city}));
+          setValue("city", city);
+        }
+      }
+
+      window.addEventListener('coordinatesUpdated', handler as EventListener);
+      return () => window.removeEventListener('coordinatesUpdated', handler as EventListener);
+    }, [setValue]);
+
     /**
      * When a user exits the City input field API is called to get the lat and lon of the City
      * @param e input field of the City
      */
     const handleCityBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
-        const cityValue = e.target.value;
+        const cityValue = e.target.value;        
+        
+        if (cityValue === "") {
+            localStorage.removeItem("city");
+            setFormData(prev => ({ ...prev, city: undefined }));
+            return;
+        } 
+        
+        const savedCity = localStorage.getItem("city");
+        const parsedSavedCity = savedCity ? JSON.parse(savedCity) : null;
+        if (cityValue === parsedSavedCity) {
+            return;
+        }
+        
         localStorage.setItem("city", JSON.stringify(cityValue));
-        if (cityValue != "") {
-            setFormData(prev => ({ ...prev, city: cityValue }));
-            const locationData = await GetCoordinates(cityValue);
+        setFormData(prev => ({ ...prev, city: cityValue }));
+        const savedYear = localStorage.getItem("year");
+        const yearNumber = savedYear ? parseInt(savedYear) : 2019;
+        
+        try {
+            const locationData = await GetCoordinates(cityValue, yearNumber);
             if (locationData) {
                 if (errors.cityFetchFailed) {
                     clearErrors('cityFetchFailed')
                 }
                 localStorage.setItem("latitude", JSON.stringify(locationData.latitude));
                 localStorage.setItem("longitude", JSON.stringify(locationData.longitude));
-            } else {
-                setError("cityFetchFailed", {
-                    message: 'City not found',
-                })
-                localStorage.removeItem("latitude");
-                localStorage.removeItem("longitude");
-                localStorage.removeItem("city");
             }
+        } catch (error) {
+            setError("cityFetchFailed", {
+                message: 'City not found',
+            })
+            localStorage.removeItem("latitude");
+            localStorage.removeItem("longitude");
+            localStorage.removeItem("city");
         }
     }
 

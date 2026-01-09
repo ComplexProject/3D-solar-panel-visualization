@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { useState, useEffect } from 'react';
-import { GetCityName } from '../utils/geocodingAPI';
+import { GetCityName, findClosestSavedCoordinate } from '../utils/GeocodingAPI';
 import ToolTip from './ToolTip';
 
 const inputClass = 'px-2 py-0.5 hover:border-[#006FAA] focus:ring-1 focus:outline-none focus:ring-[#006FAA] border shadow-md border-[#808080] w-full rounded-[7px] disabled:bg-gray-200 disabled:text-gray-700 disabled:cursor-not-allowed'
@@ -32,7 +32,7 @@ function AdvancedSettings() {
     return {
         latitude: savedLatitude ? Number(JSON.parse(savedLatitude)) || 0 : 0,
         longitude: savedLongitude ? Number(JSON.parse(savedLongitude)) || 0 : 0,
-        year: savedYear ? Number(JSON.parse(savedYear)) || 2023 : 2023,
+        year: savedYear ? Number(JSON.parse(savedYear)) || 2019 : 2019,
     };
   });
 
@@ -42,6 +42,22 @@ function AdvancedSettings() {
       setValue("year", formData.year);
   }, [setValue, formData]);
 
+  useEffect(() => {
+    function handler(e: Event) {
+      const ev = e as CustomEvent;
+      const lat = ev?.detail?.lat;
+      const lon = ev?.detail?.lon;
+      if (typeof lat === 'number' && typeof lon === 'number') {
+        setValue("latitude", lat);
+        setValue("longitude", lon);
+        setFormData(prev => ({...prev, latitude: lat, longitude: lon}));
+      }
+    }
+
+    window.addEventListener('coordinatesUpdated', handler as EventListener);
+    return () => window.removeEventListener('coordinatesUpdated', handler as EventListener);
+  }, [setValue]);
+
   /**
    * On submit the data in the form are saved in the local storage
    * If there is a predifined city the lat and lon input fields are disabled to prevent errors
@@ -50,7 +66,7 @@ function AdvancedSettings() {
   const onSubmit = async (data: FormData) => { 
     const lat = Number(data.latitude) || 0;
     const lon = Number(data.longitude) || 0;
-    const year = Number(data.year) || 2023;
+    const year = Number(data.year) || 2019;
 
     clearErrors('coordinateFecthFailed');
 
@@ -75,6 +91,8 @@ function AdvancedSettings() {
           localStorage.removeItem("city");
         }
     }
+
+    await findClosestSavedCoordinate(lat, lon, year);
   }
 
   return (
