@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import TestRenderer from "@react-three/test-renderer"
-import { Object3D } from "three"
+import { Object3D, Quaternion } from "three"
 import { Mesh, BufferGeometry, Material } from "three"
 import SolarPanels from "../../ModelImportComponent/SolarPanels"
 
@@ -102,4 +102,45 @@ describe("SolarPanels", () => {
     expect(meshInstance.material).toBe(mesh.material)
   })
 })
+})
+
+describe("SolarPanels – integration tests", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it("applies defaultScale correctly to all panels", async () => {
+    const { scene, mesh } = createMockSceneWithMesh("panelMesh")
+    mockUseGLTF.mockReturnValue({ scene })
+
+    const positions: [number, number, number][] = [
+      [0, 0, 0],
+      [1, 1, 1]
+    ]
+
+    const defaultScale: [number, number, number] = [2, 2, 2]
+
+    const renderer = await TestRenderer.create(
+      <SolarPanels url="/panel.glb" positions={positions} defaultScale={defaultScale} />
+    )
+
+    const meshes = collectMeshesFromWrapper(renderer.scene)
+    meshes.forEach(m => {
+      expect(m.scale.x).toBe(defaultScale[0])
+      expect(m.scale.y).toBe(defaultScale[1])
+      expect(m.scale.z).toBe(defaultScale[2])
+    })
+  })
+
+  it("renders nothing when positions array is empty", async () => {
+    const { scene } = createMockSceneWithMesh("panelMesh")
+    mockUseGLTF.mockReturnValue({ scene })
+
+    const renderer = await TestRenderer.create(
+      <SolarPanels url="/panel.glb" positions={[]} />
+    )
+
+    const meshes = collectMeshesFromWrapper(renderer.scene)
+    expect(meshes.length).toBe(0)
+  })
 })
