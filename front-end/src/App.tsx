@@ -47,6 +47,13 @@ function App() {
       setIsResultAvailable(2);
     }
   }, [])
+
+  useEffect(() => {
+    if (resultData) {
+      localStorage.setItem('resultData', JSON.stringify(resultData));
+      window.dispatchEvent(new Event('resultDataUpdated'));
+    }
+  }, [resultData])
   
   const getSolarPanelResult = () => {
     if (!resultData?.output?.panels) return [];
