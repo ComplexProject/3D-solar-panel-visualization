@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ParameterForm from '../../formComponents/ParametersForm';
 import userEvent from '@testing-library/user-event';
-import * as api from '../../utils/geocodingAPI';
+import * as api from '../../utils/GeocodingAPI';
 
 describe('ParameterForm Component', () => {
 
@@ -51,7 +51,7 @@ it('calls GetCoordinates on city blur and updates latitude/longitude in localSto
     await userEvent.tab();
 
     await waitFor(() => {
-      expect(mockGetCoordinates).toHaveBeenCalledWith('Middelburg');
+      expect(mockGetCoordinates).toHaveBeenCalledWith('Middelburg', 2019);
       const storedLatitude = localStorage.getItem('latitude');
       const storedLongitude = localStorage.getItem('longitude');
       expect(storedLatitude).toBe(JSON.stringify(10));
