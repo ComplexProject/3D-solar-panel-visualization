@@ -4,46 +4,28 @@
     Starts Docker containers, waits for healthchecks, runs tests, and attaches to logs.
 #>
 
-# Ensure errors stop the script
-$ErrorActionPreference = "Stop"
-
-# List of services to test
-$containers = @("back-end-api-gateway-1", "matlab", "python", "routerstrategy", "savedata")
-
-Write-Host "=== Starting all containers in detached mode ==="
+Write-Host "=== Starting Docker ==="
 docker compose up -d
 
-# Optional: wait for containers to be healthy
-Write-Host "=== Waiting for containers to become healthy (up to 30s) ==="
-foreach ($c in $containers) {
-    $maxWait = 30
-    $waited = 0
-    while ($waited -lt $maxWait) {
-        $status = docker inspect --format='{{.State.Health.Status}}' $c 2>$null
-        if ($status -eq "healthy" -or $status -eq "") { break }
-        Start-Sleep -Seconds 1
-        $waited++
-    }
-    if ($status -ne "healthy" -and $status -ne "") {
-        Write-Warning "$c did not report healthy status after $maxWait seconds"
-    } else {
-        Write-Host "$c is healthy or no healthcheck defined"
-    }
-}
+Write-Host "`n=== Running tests ==="
 
-# Run tests in each container
-Write-Host "=== Running tests in all containers ==="
-foreach ($c in $containers) {
-    Write-Host "`n===== Running tests in $c ====="
-    docker exec -it $c pytest -v
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error "Tests failed in $c. Exiting script."
-        exit 1
-    }
-}
+# Run tests in each container (same as your Linux script)
+docker exec -it back-end-apigateway-1 pytest -v
+if ($LASTEXITCODE -ne 0) { exit 1 }
+
+docker exec -it matlab pytest -v
+if ($LASTEXITCODE -ne 0) { exit 1 }
+
+docker exec -it python pytest -v
+if ($LASTEXITCODE -ne 0) { exit 1 }
+
+docker exec -it routerstrategy pytest -v
+if ($LASTEXITCODE -ne 0) { exit 1 }
+
+docker exec -it savedata pytest -v
+if ($LASTEXITCODE -ne 0) { exit 1 }
 
 Write-Host "`n=== All tests completed successfully! ==="
 
-# Attach to live logs
-Write-Host "`n=== Attaching to container logs (Ctrl+C to stop) ==="
+Write-Host "`n=== Attaching to Docker logs ==="
 docker compose logs -f
