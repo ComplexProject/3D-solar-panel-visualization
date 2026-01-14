@@ -194,6 +194,11 @@ export default function BuildingWithSolarPanels({ onLoadingChange }: BuildingWit
       return { positions: [] as [number, number, number][], orientations: [] as Quaternion[], scale: BASE_PANEL_SCALE }
     }
 
+    // Only render panels if we have API results with panel overrides
+    if (overrides.length === 0) {
+      return { positions: [] as [number, number, number][], orientations: [] as Quaternion[], scale: BASE_PANEL_SCALE }
+    }
+
     const roofMeshes = pickRoofTop(house)
     if (roofMeshes.length === 0) {
       return { positions: [], orientations: [], scale: BASE_PANEL_SCALE }
