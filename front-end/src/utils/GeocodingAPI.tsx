@@ -236,16 +236,22 @@ export async function findClosestSavedCoordinate(latitude: number, longitude: nu
   const { coord: closestCoord, distance } = findClosestCoordinate(userCoords, extractedCoordinates);
   
   if (closestCoord) {
-    try {
-      window.dispatchEvent(new CustomEvent('closestCityFound', {
-        detail: {
-          lat: closestCoord.lat,
-          lon: closestCoord.lon,
-          distance: distance
-        }
-      }));
-    } catch (e) {
-      console.warn('Could not dispatch closestCityFound event', e);
+    // Only trigger the event if the user's coordinates are significantly different from the closest saved coordinate
+    // Use a small threshold (0.01 km ≈ 10 meters) to avoid triggering when they're already using the saved coordinate
+    const SAME_LOCATION_THRESHOLD = 0.01;
+    
+    if (distance > SAME_LOCATION_THRESHOLD) {
+      try {
+        window.dispatchEvent(new CustomEvent('closestCityFound', {
+          detail: {
+            lat: closestCoord.lat,
+            lon: closestCoord.lon,
+            distance: distance
+          }
+        }));
+      } catch (e) {
+        console.warn('Could not dispatch closestCityFound event', e);
+      }
     }
     
     return closestCoord;
